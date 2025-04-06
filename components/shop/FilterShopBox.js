@@ -1,5 +1,5 @@
 "use client";
-import "@/public/assets/css/tailwind-cdn.css"
+import "@/public/assets/css/tailwind-cdn.css";
 import { addCart } from "@/features/shopSlice";
 import { addWishlist } from "@/features/wishlistSlice";
 import { Fragment, useEffect, useRef, useState } from "react";
@@ -12,7 +12,7 @@ import { supabase } from "@/lib/supabase";
 import PaginationComponent from "@/app/components/pagination";
 import { useSearchParams } from "next/navigation";
 import ProductSkeleton from "../skeleton/ShopSkeleton";
-
+import ProductSkeleton2 from "../skeleton/ShopSkeleton2";
 const FilterShopBox = () => {
   const searchParams = useSearchParams();
   const pageParms = searchParams.get("page") || "1";
@@ -21,7 +21,7 @@ const FilterShopBox = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [totalPages, setTotalPages] = useState(1);
-  const limit = 5;
+  const [limit, setLimit] = useState(5);
   const page = useRef(pageParms);
 
   const handlePageChange = (newPage) => {
@@ -113,11 +113,14 @@ const FilterShopBox = () => {
   };
   // sort handler
   const sortHandler = (e) => {
+    console.log(e.target.value)
     toast("sortHandle");
   };
 
   // per page handler
   const perPageHandler = (e) => {
+    console.log(e.target.value)
+    setLimit(e.target.value)
     toast("pagehandle");
   };
 
@@ -128,7 +131,6 @@ const FilterShopBox = () => {
 
   return (
     <>
-   
       <div className="product-filter-content mb-20">
         <div className="row align-items-center">
           <div className="col-sm-6">
@@ -242,8 +244,12 @@ const FilterShopBox = () => {
                 activeIndex == 1 ? "tab-pane fade show active" : "tab-pane fade"
               }
             >
-              {!loading
-                ? "okc"
+              {loading
+                ? <div className="flex gap-14 flex-col">
+                  <ProductSkeleton2/>
+                  <ProductSkeleton2/>
+                  <ProductSkeleton2/>
+                  </div>
                 : products.map((item, i) => (
                     <Fragment key={i}>
                       <ShopCardList
@@ -261,32 +267,34 @@ const FilterShopBox = () => {
               }
             >
               <div className="row row-cols-xxl-4 row-cols-xl-4 row-cols-lg-3 row-cols-md-3 row-cols-sm-2 row-cols-1 tpproduct">
-                {
-                   loading?
-                   products.length === 0
-                   ? Array.from({ length: 10 }).map((_, i) => <ProductSkeleton key={i} />)
-                   : products.map((item, i) => <ProductCard key={i} product={item} />)
-                    :
-                    products.map((item, i) => (
-                        <Fragment key={i}>
-                          <ShopCard
-                            item={item}
-                            addToCart={addToCart}
-                            addToWishlist={addToWishlist}
-                          />
-                        </Fragment>
-      
+                {loading
+                  ? products.length === 0
+                    ? Array.from({ length: 10 }).map((_, i) => (
+                        <ProductSkeleton key={i} />
                       ))
-                }
+                    : products.map((item, i) => (
+                        <ShopCard
+                          item={item}
+                          addToCart={addToCart}
+                          addToWishlist={addToWishlist}
+                        />
+                      ))
+                  : products.map((item, i) => (
+                      <Fragment key={i}>
+                        <ShopCard
+                          item={item}
+                          addToCart={addToCart}
+                          addToWishlist={addToWishlist}
+                        />
+                      </Fragment>
+                    ))}
               </div>
             </div>
           </div>
         </div>
       </div>
 
-    
-     
-     <PaginationComponent
+      <PaginationComponent
         currentPage={page}
         totalPages={totalPages}
         onPageChange={handlePageChange}

@@ -38,7 +38,6 @@ const FilterShopBox2 = ({ tab }) => {
       dataFetchedRef.current = true;
       loadProducts();
     }
-    console.log('rerender');
   }, []);
 
   // Filter products whenever the tab or products change
