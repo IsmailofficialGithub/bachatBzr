@@ -1,0 +1,82 @@
+import Image from "next/image";
+import Link from "next/link";
+
+export default function Category() {
+  const categories = [
+    {
+      title: "Shoes",
+      subTitle: "Men Sport",
+      link: "/shop",
+      imgSrc: "/assets/img/svg/shoes.svg",
+      count: 2,
+    },
+    {
+      title: "T-Shirts",
+      subTitle: "Casual Wear",
+      link: "/shop",
+      imgSrc: "/assets/img/svg/tshirt.svg",
+      count: 5,
+    },
+    {
+      title: "Hoodies",
+      subTitle: "Winter Collection",
+      link: "/shop",
+      imgSrc: "/assets/img/svg/hoodie.svg",
+      count: 3,
+    },
+    {
+      title: "Tracksuits",
+      subTitle: "Athletic Fit",
+      link: "/shop",
+      imgSrc: "/assets/img/svg/tracksuit.svg",
+      count: 10,
+    },
+    {
+      title: "Sneakers",
+      subTitle: "Trendy & Comfortable",
+      link: "/shop",
+      imgSrc: "/assets/img/svg/sneakers.svg",
+      count: 1,
+    },
+  ];
+
+  return (
+    <>
+      <section className="category-area pt-70 bg-green-500" style={{ backgroundColor: "green" }}>
+        <div className="container">
+          <div className="row">
+            <div className="col-md-12">
+              <div className="tpsection mb-40">
+                <h4 className="tpsection__title">
+                  Top{" "}
+                  <span className="text-green-600" style={{ color: "orange" }}>
+                    {" "}
+                    Categories{" "}
+                    <img src="/assets/img/icon/title-shape-01.jpg" alt="" />
+                  </span>
+                </h4>
+              </div>
+            </div>
+          </div>
+          <div className="custom-row category-border pb-45 justify-content-xl-between">
+            {categories.map((category, index) => (
+              <div key={index} className="tpcategory mb-40">
+                <div className="tpcategory__icon p-relative">
+                  <Image src={category.imgSrc} alt="" className="fn__svg" width={60} height={60}/>
+                  <span>{category.count}</span>
+                </div>
+                <div className="tpcategory__content">
+                  <h5 className="tpcategory__title">
+                    <Link href={category.link}>
+                      {category.title} <br /> {category.subTitle}
+                    </Link>
+                  </h5>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
