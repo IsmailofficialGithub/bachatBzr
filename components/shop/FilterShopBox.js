@@ -11,8 +11,7 @@ import { toast } from "react-toastify";
 import { supabase } from "@/lib/supabase";
 import PaginationComponent from "@/app/components/pagination";
 import { useSearchParams } from "next/navigation";
-import { Loader } from "lucide-react";
-import { Skeleton } from "../ui/skeleton";
+import ProductSkeleton from "../skeleton/ShopSkeleton";
 
 const FilterShopBox = () => {
   const searchParams = useSearchParams();
@@ -130,7 +129,7 @@ const FilterShopBox = () => {
   return (
     <>
    
-      <div className="product-filter-content mb-40">
+      <div className="product-filter-content mb-20">
         <div className="row align-items-center">
           <div className="col-sm-6">
             <div className="product-item-count">
@@ -244,7 +243,7 @@ const FilterShopBox = () => {
               }
             >
               {!loading
-                ? "loading"
+                ? "okc"
                 : products.map((item, i) => (
                     <Fragment key={i}>
                       <ShopCardList
@@ -263,10 +262,10 @@ const FilterShopBox = () => {
             >
               <div className="row row-cols-xxl-4 row-cols-xl-4 row-cols-lg-3 row-cols-md-3 row-cols-sm-2 row-cols-1 tpproduct">
                 {
-                   !loading?
-                    <div>wellcome</div>
-                   // <Skeleton/>
-                   // <Loader className="animate-spin w-1/5 flex items-center justify-center" />
+                   loading?
+                   products.length === 0
+                   ? Array.from({ length: 10 }).map((_, i) => <ProductSkeleton key={i} />)
+                   : products.map((item, i) => <ProductCard key={i} product={item} />)
                     :
                     products.map((item, i) => (
                         <Fragment key={i}>
