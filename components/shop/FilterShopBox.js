@@ -12,6 +12,7 @@ import { supabase } from "@/lib/supabase";
 import PaginationComponent from "@/app/components/pagination";
 import { useSearchParams } from "next/navigation";
 import { Loader } from "lucide-react";
+import { Skeleton } from "../ui/skeleton";
 
 const FilterShopBox = () => {
   const searchParams = useSearchParams();
@@ -262,8 +263,10 @@ const FilterShopBox = () => {
             >
               <div className="row row-cols-xxl-4 row-cols-xl-4 row-cols-lg-3 row-cols-md-3 row-cols-sm-2 row-cols-1 tpproduct">
                 {
-                   loading?
-                    <Loader className="animate-spin w-1/5 flex items-center justify-center" />
+                   !loading?
+                    <div>wellcome</div>
+                   // <Skeleton/>
+                   // <Loader className="animate-spin w-1/5 flex items-center justify-center" />
                     :
                     products.map((item, i) => (
                         <Fragment key={i}>
@@ -288,9 +291,8 @@ const FilterShopBox = () => {
         currentPage={page}
         totalPages={totalPages}
         onPageChange={handlePageChange}
-        className="mt-8"
+        className="mt-8 "
       />
-   
     </>
   );
 };
