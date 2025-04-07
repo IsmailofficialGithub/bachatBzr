@@ -112,14 +112,14 @@ const ShopSingleDynamicV1 = () => {
     if (product && !product.sold) {
       dispatch(addCart({ product }));
     } else {
-      toast.error("failed to add item in cart");
+      toast.error("Just missed it! This item is no longer available.");
     }
   };
   const addToWishlist = () => {
     if (product && !product.sold) {
       dispatch(addWishlist({ product }));
     } else {
-      toast.error("failed to add item in cart");
+      toast.error("Just missed it! This item is no longer available.");
     }
   };
   const RelatedaddToCart = (item) => {

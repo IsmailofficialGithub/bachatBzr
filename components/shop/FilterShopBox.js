@@ -3,7 +3,7 @@ import "@/public/assets/css/tailwind-cdn.css";
 import { addCart } from "@/features/shopSlice";
 import { addWishlist } from "@/features/wishlistSlice";
 import { Fragment, useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import ShopCard from "./ShopCard";
 import ShopCardList from "./ShopCardList";
 import axios from "axios";
@@ -22,7 +22,8 @@ const FilterShopBox = () => {
   const [error, setError] = useState(null);
   const [totalPages, setTotalPages] = useState(1);
   const [limit, setLimit] = useState(10);
-  const [sort,setSort]=useState('');
+  const [sort, setSort] = useState("");
+  const [soldProducts, setSoldProducts] = useState([]);
   const page = useRef(pageParms);
 
   const handlePageChange = (newPage) => {
@@ -50,65 +51,77 @@ const FilterShopBox = () => {
       setLoading(false);
     }
   };
-  const handlesort=async()=>{
+  const handlesort = async () => {
     try {
       setLoading(true);
-      const response=await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/product/sort?page=${page.current}&limit=${limit}&sort=${sort}`);
-      if(response.data.success){
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/product/sort?page=${page.current}&limit=${limit}&sort=${sort}`,
+      );
+      if (response.data.success) {
         setProducts(response.data.products);
-        setTotalPages(response.data.pagination.totalPages)
-      }else{
-        toast.error("Failed to sort product")
+        setTotalPages(response.data.pagination.totalPages);
+      } else {
+        toast.error("Failed to sort product");
       }
-      
     } catch (error) {
-      console.log(error);
-      toast.error("SomeThing wents wrong")
-    }finally{
-      setLoading(false)
+      toast.error("SomeThing wents wrong");
+    } finally {
+      setLoading(false);
     }
-  }
+  };
 
+ 
   useEffect(() => {
-    fetchProducts(pageParms);
-
+    fetchProducts(pageParms)
     const productSubscription = supabase
       .channel("realtime:products")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "products" },
         (payload) => {
-          console.log("Change detected:", payload);
-
+          const newProduct = payload.new;
+          const oldProduct = payload.old;
+  
           setProducts((prevProducts) => {
             let updatedProducts = [...prevProducts];
-
+  
             if (payload.eventType === "INSERT") {
-              // Add new product to the list
-              updatedProducts = [payload.new, ...prevProducts];
+              updatedProducts = [newProduct, ...prevProducts];
             } else if (payload.eventType === "UPDATE") {
-              // Update existing product
-              updatedProducts = prevProducts.map((product) =>
-                product._id === payload.new._id ? payload.new : product,
+              // If product is marked as sold now
+              if (newProduct.sold && !oldProduct.sold) {
+                // Trigger sold animation
+                setSoldProducts((prev) => [...prev, newProduct._id]);
+  
+                // Remove after 30 seconds
+                setTimeout(() => {
+                  setProducts((prev) =>
+                    prev.filter((p) => p._id !== newProduct._id)
+                  );
+                }, 30000);
+              }
+  
+              // Always update product in list
+              updatedProducts = prevProducts.map((p) =>
+                p._id === newProduct._id ? newProduct : p
               );
             } else if (payload.eventType === "DELETE") {
-              // Remove deleted product
               updatedProducts = prevProducts.filter(
-                (product) => product._id !== payload.old._id,
+                (p) => p._id !== oldProduct._id
               );
             }
-
+  
             return updatedProducts;
           });
-        },
+        }
       )
       .subscribe();
-
-    // Cleanup subscription on component unmount
+  
     return () => {
       supabase.removeChannel(productSubscription);
     };
   }, []);
+  
 
   const dispatch = useDispatch();
 
@@ -127,7 +140,7 @@ const FilterShopBox = () => {
   };
   // sort handler
   const sortHandler = (e) => {
-    setSort(e.target.value)
+    setSort(e.target.value);
     handlesort();
   };
 
@@ -137,12 +150,12 @@ const FilterShopBox = () => {
   };
 
   useEffect(() => {
-    fetchProducts()
+    fetchProducts();
   }, [limit]);
   // clear all filters
   const clearAll = () => {
     setLimit(10);
-    setSort('')
+    setSort("");
     toast.success("Filter removed successfully");
   };
 
@@ -160,7 +173,7 @@ const FilterShopBox = () => {
           <div className="col-sm-6">
             <div className="product-navtabs d-flex justify-content-end align-items-center">
               <div className="tp-shop-selector">
-                {limit !== 10 || sort !=="" ? (
+                {limit !== 10 || sort !== "" ? (
                   <button
                     onClick={clearAll}
                     className="btn btn-danger text-nowrap me-2 "
@@ -239,6 +252,7 @@ const FilterShopBox = () => {
                       item={item}
                       addToCart={addToCart}
                       addToWishlist={addToWishlist}
+                      soldProducts={soldProducts}
                     />
                   </Fragment>
                   // End all products
@@ -258,6 +272,7 @@ const FilterShopBox = () => {
                   : products.map((item, i) => (
                       <Fragment key={i}>
                         <ShopCard
+                          soldProducts={soldProducts}
                           item={item}
                           addToCart={addToCart}
                           addToWishlist={addToWishlist}

@@ -4,13 +4,14 @@ import React, { useMemo } from "react";
 import Link from "next/link";
 import { applyDiscount } from "@/lib/discountHandler";
 
-const ShopCard = React.memo(({ item, addToCart, addToWishlist }) => {
+const ShopCard = React.memo(({ item, addToCart, addToWishlist,soldProducts }) => {
   const { starCount, rating } = useMemo(() => {
     return {
       starCount: Math.floor(Math.random() * (4 - 3 + 1)) + 3,
       rating: Math.floor(Math.random() * (200 - 30 + 1)) + 30
     };
   }, [item._id]); 
+  const isSold = soldProducts.includes(item._id);
   return (
     <>
       <div className="col">
@@ -20,7 +21,7 @@ const ShopCard = React.memo(({ item, addToCart, addToWishlist }) => {
               className="tpproduct__thumbitem p-relative"
               style={{ height: "250px" }}
             >
-              <Link href={`/shop/${item._id}`}>
+              {/* <Link href={`/shop/${item._id}`}>
                 <img
                   src={`${item.images[0]}`}
                   alt="product-thumb"
@@ -32,7 +33,81 @@ const ShopCard = React.memo(({ item, addToCart, addToWishlist }) => {
                   alt="product-thumb"
                   style={{ height: "250px" }}
                 />
-              </Link>
+              </Link> */}
+  <div className={`product-wrapper ${isSold ? "blocked" : ""}`}>
+      {isSold && (
+        <div className="sold-overlay">
+          <h2>SOLD</h2>
+        </div>
+      )}
+
+      <Link
+        href={isSold ? "#" : `/shop/${item._id}`}
+        onClick={(e) => isSold && e.preventDefault()}
+      >
+        <img
+          src={item.images[0]}
+          alt="product-thumb"
+          className="product-image"
+        />
+        <img
+          className="thumbitem-secondary product-image"
+          src={item.images[1]}
+          alt="product-thumb"
+        />
+      </Link>
+
+      <style jsx>{`
+        .product-wrapper {
+          position: relative;
+          display: inline-block;
+        }
+
+        .product-image {
+          height: 250px;
+          object-fit: cover;
+          display: block;
+        }
+
+        .blocked {
+          cursor: not-allowed;
+        }
+
+        .sold-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.6);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          animation: slideDown 0.5s ease-out forwards;
+          z-index: 10;
+        }
+
+        .sold-overlay h2 {
+          color: #ff3b3b;
+          font-size: 3rem;
+          font-weight: bold;
+          margin: 0;
+        }
+
+        @keyframes slideDown {
+          0% {
+            transform: translateY(-100%);
+            opacity: 0;
+          }
+          100% {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+      `}</style>
+    </div>
+
+              
               <div className="tpproduct__thumb-bg">
                 <div className="tpproductactionbg">
                   <a

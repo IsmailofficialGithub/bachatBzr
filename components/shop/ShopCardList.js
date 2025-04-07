@@ -1,13 +1,15 @@
 import { applyDiscount } from "@/lib/discountHandler";
 import Link from "next/link";
-const ShopCardList = ({ item, addToCart, addToWishlist }) => {
+const ShopCardList = ({ item, addToCart, addToWishlist,soldProducts }) => {
+  const isSold = soldProducts.includes(item._id);
+  
   return (
     <>
       <div className="row mb-40">
         <div className="col-lg-4 col-md-12">
           <div className="tpproduct__thumb">
             <div className="tpproduct__thumbitem p-relative">
-              <Link href="/shop-details">
+              {/* <Link href="/shop-details">
                 <img
                   style={{ maxHeight: "400px", objectFit: "cover" }}
                   src={`${item?.images?.[0]}`}
@@ -19,7 +21,80 @@ const ShopCardList = ({ item, addToCart, addToWishlist }) => {
                   src={item?.images?.[1]}
                   alt={item.name}
                 />
-              </Link>
+              </Link> */}
+              <div className={`product-wrapper ${isSold ? "blocked" : ""}`}>
+      {isSold && (
+        <div className="sold-overlay">
+          <h2>SOLD</h2>
+        </div>
+      )}
+
+      <Link
+        href={isSold ? "#" : `/shop/${item._id}`}
+        onClick={(e) => isSold && e.preventDefault()}
+      >
+        <img
+          src={item.images[0]}
+          alt="product-thumb"
+          className="product-image"
+        />
+        <img
+          className="thumbitem-secondary product-image"
+          src={item.images[1]}
+          alt="product-thumb"
+        />
+      </Link>
+
+      <style jsx>{`
+        .product-wrapper {
+          position: relative;
+          display: inline-block;
+        }
+
+        .product-image {
+          height: 250px;
+          object-fit: cover;
+          display: block;
+        }
+
+        .blocked {
+          cursor: not-allowed;
+        }
+
+        .sold-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.6);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          animation: slideDown 0.5s ease-out forwards;
+          z-index: 10;
+        }
+
+        .sold-overlay h2 {
+          color: #ff3b3b;
+          font-size: 3rem;
+          font-weight: bold;
+          margin: 0;
+        }
+
+        @keyframes slideDown {
+          0% {
+            transform: translateY(-100%);
+            opacity: 0;
+          }
+          100% {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+      `}</style>
+    </div>
+
             </div>
           </div>
         </div>
