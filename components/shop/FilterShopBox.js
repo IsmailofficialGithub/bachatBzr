@@ -21,7 +21,8 @@ const FilterShopBox = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [totalPages, setTotalPages] = useState(1);
-  const [limit, setLimit] = useState(5);
+  const [limit, setLimit] = useState(10);
+  const [sort,setSort]=useState('');
   const page = useRef(pageParms);
 
   const handlePageChange = (newPage) => {
@@ -49,6 +50,24 @@ const FilterShopBox = () => {
       setLoading(false);
     }
   };
+  const handlesort=async()=>{
+    try {
+      setLoading(true);
+      const response=await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/product/sort?page=${page.current}&limit=${limit}&sort=${sort}`);
+      if(response.data.success){
+        setProducts(response.data.products);
+        setTotalPages(response.data.pagination.totalPages)
+      }else{
+        toast.error("Failed to sort product")
+      }
+      
+    } catch (error) {
+      console.log(error);
+      toast.error("SomeThing wents wrong")
+    }finally{
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
     fetchProducts(pageParms);
@@ -91,11 +110,6 @@ const FilterShopBox = () => {
     };
   }, []);
 
-  const { shopList, shopSort } = useSelector((state) => state.filter);
-  const { price, category, color, brand } = shopList || {};
-
-  const { sort, perPage } = shopSort;
-
   const dispatch = useDispatch();
 
   const addToCart = (id) => {
@@ -113,20 +127,23 @@ const FilterShopBox = () => {
   };
   // sort handler
   const sortHandler = (e) => {
-    console.log(e.target.value)
-    toast("sortHandle");
+    setSort(e.target.value)
+    handlesort();
   };
 
   // per page handler
   const perPageHandler = (e) => {
-    console.log(e.target.value)
-    setLimit(e.target.value)
-    toast("pagehandle");
+    setLimit(e.target.value);
   };
 
+  useEffect(() => {
+    fetchProducts()
+  }, [limit]);
   // clear all filters
   const clearAll = () => {
-    toast("clear");
+    setLimit(10);
+    setSort('')
+    toast.success("Filter removed successfully");
   };
 
   return (
@@ -143,18 +160,11 @@ const FilterShopBox = () => {
           <div className="col-sm-6">
             <div className="product-navtabs d-flex justify-content-end align-items-center">
               <div className="tp-shop-selector">
-                {price?.min !== 0 ||
-                price?.max !== 100 ||
-                category?.length !== 0 ||
-                color?.length !== 0 ||
-                brand?.length !== 0 ||
-                sort !== "" ||
-                perPage.start !== 0 ||
-                perPage.end !== 0 ? (
+                {limit !== 10 || sort !=="" ? (
                   <button
                     onClick={clearAll}
-                    className="btn btn-danger text-nowrap me-2"
-                    style={{ minHeight: "45px", marginBottom: "15px" }}
+                    className="btn btn-danger text-nowrap me-2 "
+                    style={{ minHeight: "20px" }}
                   >
                     Clear All
                   </button>
@@ -173,40 +183,12 @@ const FilterShopBox = () => {
                 <select
                   onChange={perPageHandler}
                   className="chosen-single form-select ms-3 "
-                  value={JSON.stringify(perPage)}
+                  value={limit}
                 >
-                  <option
-                    value={JSON.stringify({
-                      start: 0,
-                      end: 0,
-                    })}
-                  >
-                    All
-                  </option>
-                  <option
-                    value={JSON.stringify({
-                      start: 0,
-                      end: 10,
-                    })}
-                  >
-                    10 per page
-                  </option>
-                  <option
-                    value={JSON.stringify({
-                      start: 0,
-                      end: 20,
-                    })}
-                  >
-                    20 per page
-                  </option>
-                  <option
-                    value={JSON.stringify({
-                      start: 0,
-                      end: 30,
-                    })}
-                  >
-                    30 per page
-                  </option>
+                  <option value=""> ( Default )</option>
+                  <option value="15">15 per page</option>
+                  <option value="25">25 per page</option>
+                  <option value="35">35 per page</option>
                 </select>
               </div>
               <div className="tpproductnav tpnavbar product-filter-nav">
@@ -244,22 +226,24 @@ const FilterShopBox = () => {
                 activeIndex == 1 ? "tab-pane fade show active" : "tab-pane fade"
               }
             >
-              {loading
-                ? <div className="flex gap-14 flex-col">
-                  <ProductSkeleton2/>
-                  <ProductSkeleton2/>
-                  <ProductSkeleton2/>
-                  </div>
-                : products.map((item, i) => (
-                    <Fragment key={i}>
-                      <ShopCardList
-                        item={item}
-                        addToCart={addToCart}
-                        addToWishlist={addToWishlist}
-                      />
-                    </Fragment>
-                    // End all products
-                  ))}
+              {loading ? (
+                <div className="flex gap-14 flex-col">
+                  <ProductSkeleton2 />
+                  <ProductSkeleton2 />
+                  <ProductSkeleton2 />
+                </div>
+              ) : (
+                products.map((item, i) => (
+                  <Fragment key={i}>
+                    <ShopCardList
+                      item={item}
+                      addToCart={addToCart}
+                      addToWishlist={addToWishlist}
+                    />
+                  </Fragment>
+                  // End all products
+                ))
+              )}
             </div>
             <div
               className={
@@ -268,17 +252,9 @@ const FilterShopBox = () => {
             >
               <div className="row row-cols-xxl-4 row-cols-xl-4 row-cols-lg-3 row-cols-md-3 row-cols-sm-2 row-cols-1 tpproduct">
                 {loading
-                  ? products.length === 0
-                    ? Array.from({ length: 10 }).map((_, i) => (
-                        <ProductSkeleton key={i} />
-                      ))
-                    : products.map((item, i) => (
-                        <ShopCard
-                          item={item}
-                          addToCart={addToCart}
-                          addToWishlist={addToWishlist}
-                        />
-                      ))
+                  ? Array.from({ length: 10 }).map((_, i) => (
+                      <ProductSkeleton key={i} />
+                    ))
                   : products.map((item, i) => (
                       <Fragment key={i}>
                         <ShopCard

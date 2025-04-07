@@ -101,7 +101,7 @@ const ShopCardList = ({ item, addToCart, addToWishlist }) => {
                 <i className="fal fa-heart" />
               </a>
               <a onClick={() => addToCart(item._id)}>
-                <i className="fal fa-shopping-basket" />
+                <i className="fal fa-shopping-basket cursor-pointer" />
               </a>
             </div>
           </div>
