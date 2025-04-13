@@ -59,10 +59,6 @@ export default function Header3({
                 <div className="headertoplag d-flex align-items-center justify-content-end">
                   <div className="headertoplag__lang">
                     <ul>
-                      {/* <li>
-                                                <Link href="#"><i className="fal fa-user" /> Account</Link>
-                                                <Link className="order-tick" href="#"><i className="fal fa-plane-departure" />Track Your Order</Link>
-                                            </li> */}
                       <li>
                         <Link href={user ? "/user/account" : "/authentication"}>
                           <i className="fal fa-user" /> Account
@@ -130,7 +126,7 @@ export default function Header3({
                         <i className="fal fa-shopping-cart" />
                         <CartShow />
                       </button>
-                      <Link href="/authentication">
+                      <Link href={user ? "/user/dashboard" : "/authentication"}>
                         <i className="fal fa-user" />
                       </Link>
                       <Link

@@ -10,6 +10,9 @@ export const fetchAuthSession = createAsyncThunk(
     try {
       const { data, error } = await supabase.auth.getSession();
       if (error) throw error;
+      if(!data.session) {
+        return null;
+      }
       return data.session;
     } catch (error) {
       return rejectWithValue(error.message);

@@ -2,6 +2,7 @@
 
 import React, { FC, ReactNode } from 'react';
 import AdminDashboardMenu from './AdminDashboardMenu'; // Adjust the path as needed
+import "@/public/assets/css/tailwind-cdn.css";
 
 interface DashboardWrapperProps {
   children: ReactNode;
