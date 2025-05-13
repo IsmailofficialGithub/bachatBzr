@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 
-export async function GET(req: NextRequest) {
+export async function GET(req) {
   try {
     // ✅ Parse query parameters for pagination
     const { searchParams } = new URL(req.url);
@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
           message: "SomeThing wents wrong while fetching total orders",
           error: countError,
         },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
@@ -39,13 +39,14 @@ export async function GET(req: NextRequest) {
           message: "SomeThing wents wrong while fetching paginated orders",
           error: countError,
         },
-        { status: 500 },
+        { status: 500 }
       );
     }
+
     // ✅ Process each order to fetch product details
     for (const order of orders) {
       if (order.products) {
-        const productIds = order.products.map((p: { _id: string }) => p._id); // Extract product IDs
+        const productIds = order.products.map((p) => p._id); // Extract product IDs
         const { data: products, error: productError } = await supabase
           .from("products")
           .select("*")
@@ -56,6 +57,7 @@ export async function GET(req: NextRequest) {
         }
       }
     }
+
     return NextResponse.json({
       success: true,
       orders,
@@ -63,13 +65,13 @@ export async function GET(req: NextRequest) {
         page,
         limit,
         totalOrders: count,
-        totalPages: Math.ceil(count! / limit),
+        totalPages: Math.ceil(count / limit),
       },
     });
   } catch (error) {
     return NextResponse.json(
-      { error: "Internal Server Error", details: error },
-      { status: 500 },
+      { error: "Internal Server Error", details: error.message || error },
+      { status: 500 }
     );
   }
 }

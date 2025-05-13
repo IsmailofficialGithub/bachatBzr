@@ -1,5 +1,3 @@
-// Initialize Supabase
-
 import { supabaseAdmin } from "@/lib/supabase";
 import { NextResponse } from "next/server";
 
@@ -14,21 +12,21 @@ export async function GET(req) {
     if (page < 1 || pageSize < 1) {
       return NextResponse.json(
         { success: false, message: "Invalid pagination values" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
     // Fetch all users to calculate total count (Supabase does not provide a count directly)
     const { data: allUsers, error: countError } =
       await supabaseAdmin.auth.admin.listUsers({
-        page: 1, // Fetch first page to estimate
+        page: 1,
         perPage: 10000, // Large number to get all users
       });
 
     if (countError) {
       return NextResponse.json(
         { success: false, message: "Failed to count users" },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
@@ -45,16 +43,16 @@ export async function GET(req) {
       return NextResponse.json(
         {
           success: false,
-          message: "Failed to get Users from DataBase",
+          message: "Failed to get Users from database",
           error: error.message,
         },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
     return NextResponse.json({
       success: true,
-      message: "SuccessFully getting user",
+      message: "Successfully getting users",
       users: data.users,
       pagination: {
         page,
@@ -65,8 +63,8 @@ export async function GET(req) {
     });
   } catch (error) {
     return NextResponse.json(
-      { success: false, message: "Server Error", error: error },
-      { status: 500 },
+      { success: false, message: "Server Error", error },
+      { status: 500 }
     );
   }
 }

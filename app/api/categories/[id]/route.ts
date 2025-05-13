@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
-// Fetch a specific category
-export async function GET(req: Request, { params }: { params: { id: string } }) {
-  const { id } = params;
+// GET: Fetch a specific category
+export async function GET(req, context) {
+  const { id } = context.params;
 
   try {
     const { data, error } = await supabase
@@ -24,12 +24,14 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   }
 }
 
-// Update a specific category
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
-  const { id } = params;
-  const { name, description, parent_id } = await req.json();
+// PUT: Update a specific category
+export async function PUT(req, context) {
+  const { id } = context.params;
 
   try {
+    const body = await req.json();
+    const { name, description, parent_id } = body;
+
     const { error } = await supabase
       .from('categories')
       .update({ name, description, parent_id })
@@ -47,12 +49,15 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   }
 }
 
-// Delete a specific category
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
-  const { id } = params;
+// DELETE: Delete a specific category
+export async function DELETE(req, context) {
+  const { id } = context.params;
 
   try {
-    const { error } = await supabase.from('categories').delete().eq('id', id);
+    const { error } = await supabase
+      .from('categories')
+      .delete()
+      .eq('id', id);
 
     if (error) {
       console.error('Error deleting category:', error.message);

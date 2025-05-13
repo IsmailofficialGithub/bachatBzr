@@ -1,11 +1,8 @@
 import { supabase } from '@/lib/supabase'
 import { NextResponse } from 'next/server'
 
-export async function GET(
-  request: Request,
-  { params }: { params: { slug: string } }
-) {
-  const { slug } = params
+export async function GET(request, context) {
+  const { slug } = context.params
   const { searchParams } = new URL(request.url)
 
   const page = parseInt(searchParams.get('page') || '1')
@@ -24,8 +21,8 @@ export async function GET(
   try {
     const { data, error, count } = await supabase
       .from('products')
-      .select('*', { count: 'exact' }) // to also get total count
-      .eq("sold", false)
+      .select('*', { count: 'exact' }) // also get total count
+      .eq('sold', false)
       .contains('categories', JSON.stringify([slug]))
       .range(from, to)
 
@@ -47,9 +44,10 @@ export async function GET(
         totalPages: Math.ceil((count || 0) / limit),
       },
     })
-  } catch (err: any) {
+  } catch (err) {
+    console.error('Unexpected error:', err)
     return NextResponse.json(
-      { success: false, message: 'Unexpected Error', err },
+      { success: false, message: 'Unexpected Error', error: err.message || err },
       { status: 500 }
     )
   }

@@ -1,8 +1,8 @@
 import { applyDiscount } from "@/lib/discountHandler";
 import { supabase } from "@/lib/supabase";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-export async function POST(req: NextRequest) {
+export async function POST(req) {
   try {
     const {
       user_id,
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     ) {
       return NextResponse.json(
         { error: "Missing required fields" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
     if (productsError || !products) {
       return NextResponse.json(
         { error: "Error fetching products", details: productsError.message },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
@@ -51,6 +51,7 @@ export async function POST(req: NextRequest) {
         ? applyDiscount(product.price, product.discounted_price)
         : product.price;
     });
+
     let discount = 0;
     let voucherDiscount = null;
     const shippingFee = 150 * product_ids.length;
@@ -79,7 +80,7 @@ export async function POST(req: NextRequest) {
       if (!transaction_id) {
         return NextResponse.json(
           { error: "Transaction ID is required for non-COD payments" },
-          { status: 400 },
+          { status: 400 }
         );
       }
     }
@@ -99,7 +100,7 @@ export async function POST(req: NextRequest) {
           message: "Falied to Add Order",
           error: error.message,
         },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
@@ -140,7 +141,7 @@ export async function POST(req: NextRequest) {
         .in("_id", product_ids);
       return NextResponse.json(
         { error: "Error creating order", details: orderError.message },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
@@ -148,7 +149,7 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       { error: "Internal Server Error", details: error.message || error },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

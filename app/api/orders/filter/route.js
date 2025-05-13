@@ -1,7 +1,7 @@
 import { supabase } from "@/lib/supabase";
 import { NextResponse } from "next/server";
 
-export async function GET(req: Request) {
+export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
     const status = searchParams.get("status"); // Get order status from query
@@ -70,7 +70,7 @@ export async function GET(req: Request) {
     );
   } catch (error) {
     return NextResponse.json(
-      { error: (error as Error).message },
+      { error: error.message || error },
       { status: 500 }
     );
   }

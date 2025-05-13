@@ -1,8 +1,8 @@
-// app/api/products/route.ts
+// app/api/products/route.js
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase'; // Adjust path as necessary
 
-export async function GET(request: Request) {
+export async function GET(request) {
   const { searchParams } = new URL(request.url);
 
   const page = parseInt(searchParams.get('page') || '1');
@@ -29,13 +29,14 @@ export async function GET(request: Request) {
         { status: 500 }
       );
     }
-    console.log(sort)
+
+    console.log(sort);
 
     // Fetch paginated data
     const { data: products, error } = await supabase
       .from('products')
       .select('*')
-      .eq("sold",false)
+      .eq("sold", false)
       .order('created_at', { ascending: sort === 'asc' })
       .range(from, to);
 
@@ -65,7 +66,7 @@ export async function GET(request: Request) {
       },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (error) {
     return NextResponse.json(
       {
         success: false,

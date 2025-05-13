@@ -2,14 +2,7 @@ import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { deleteImagesFromCloudinary } from "@/lib/helper";
 
-interface Params {
-  id: string;
-}
-
-export const DELETE = async (
-  request: Request,
-  { params }: { params: Params },
-) => {
+export const DELETE = async (request, { params }) => {
   try {
     const { id } = params;
 
@@ -19,7 +12,7 @@ export const DELETE = async (
           success: false,
           message: "Product ID is required to delete the product.",
         },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -37,7 +30,7 @@ export const DELETE = async (
           error: fetchError.message,
           detail: fetchError.details,
         },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
@@ -47,13 +40,13 @@ export const DELETE = async (
           success: false,
           message: "No product found with the given ID.",
         },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
     // Deleting images from Cloudinary storage
     const deletingAssets = await deleteImagesFromCloudinary(
-      existingProduct.images,
+      existingProduct.images
     );
 
     if (!deletingAssets.success) {
@@ -63,7 +56,7 @@ export const DELETE = async (
           message: "Failed to delete images from Cloudinary.",
           imgUrl: existingProduct?.images,
         },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
@@ -80,7 +73,7 @@ export const DELETE = async (
           message: "Error deleting product from the database.",
           error: deletingProduct.error,
         },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
@@ -89,7 +82,7 @@ export const DELETE = async (
         success: true,
         message: "Product successfully deleted.",
       },
-      { status: 200 },
+      { status: 200 }
     );
   } catch (error) {
     console.error("Error deleting product:", error);
@@ -99,7 +92,7 @@ export const DELETE = async (
         message: "Something went wrong while deleting the product.",
         error: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 };

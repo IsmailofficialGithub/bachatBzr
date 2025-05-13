@@ -5,25 +5,17 @@ import {
   uploadImageToCloudinary,
 } from "@/lib/helper";
 
-interface UpdateProductResponse {
-  success: boolean;
-  message: string;
-  updatedProduct?: object;
-  error?: string;
-}
-
-export async function PUT(request: Request, { params }): Promise<NextResponse> {
+export async function PUT(request, { params }) {
   try {
     const { id } = await params;
- const formData = await request.formData();
- 
+    const formData = await request.formData();
 
-    const name = formData.get("name") as string | null;
-    const short_description = formData.get("short_description") as string | null;
-    const long_description = formData.get("long_description") as string | null;
-    const categories = formData.get("categories") as string | null;
-    const price = formData.get("price") as string | null;
-    const condition = formData.get("product_condition") as string | null
+    const name = formData.get("name");
+    const short_description = formData.get("short_description");
+    const long_description = formData.get("long_description");
+    const categories = formData.get("categories");
+    const price = formData.get("price");
+    const condition = formData.get("product_condition");
 
     if (
       !name ||
@@ -34,17 +26,22 @@ export async function PUT(request: Request, { params }): Promise<NextResponse> {
       !condition
     ) {
       return NextResponse.json(
-        { success: false, message: "All required fields (name, short_description, long_description, categories, price, condition) must be provided." },
-        { status: 400 },
+        {
+          success: false,
+          message:
+            "All required fields (name, short_description, long_description, categories, price, condition) must be provided.",
+        },
+        { status: 400 }
       );
     }
 
     if (!id) {
       return NextResponse.json(
         { error: "Product ID is required in the URL." },
-        { status: 400 },
+        { status: 400 }
       );
     }
+
     // Fetch existing product
     const { data: existingProduct, error: fetchError } = await supabase
       .from("products")
@@ -59,22 +56,19 @@ export async function PUT(request: Request, { params }): Promise<NextResponse> {
           message: "Error fetching product.",
           error: fetchError,
         },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
     if (!existingProduct) {
       return NextResponse.json(
         { success: false, message: "No product found with the given ID." },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
- 
-    
-
-    const newImages = formData.getAll("newImages") as File[] | null;
-    const oldImageUrl = formData.get("oldImageUrl") as string | null;
+    const newImages = formData.getAll("newImages");
+    const oldImageUrl = formData.get("oldImageUrl");
 
     // Manage images || delete old images from cloudinary
     if (oldImageUrl) {
@@ -83,12 +77,12 @@ export async function PUT(request: Request, { params }): Promise<NextResponse> {
         : [oldImageUrl];
 
       const validImagesToDelete = deletingImages.filter((url) =>
-        existingProduct.images.includes(url),
+        existingProduct.images.includes(url)
       );
 
       if (validImagesToDelete.length > 0) {
         const { success } = await deleteImagesFromCloudinary(
-          validImagesToDelete,
+          validImagesToDelete
         );
         if (!success) {
           return NextResponse.json({
@@ -97,10 +91,11 @@ export async function PUT(request: Request, { params }): Promise<NextResponse> {
           });
         }
         existingProduct.images = existingProduct.images.filter(
-          (url) => !validImagesToDelete.includes(url),
+          (url) => !validImagesToDelete.includes(url)
         );
       }
     }
+
     // upload new images from cloudinary
     for (const file of newImages ?? []) {
       const newImageUrl = await uploadImageToCloudinary(file);
@@ -110,16 +105,16 @@ export async function PUT(request: Request, { params }): Promise<NextResponse> {
     }
 
     // Convert FormData to an updates object
-    const updates: { [key: string]: any } = {};
+    const updates = {};
     formData.forEach((value, key) => {
       if (key !== "newImages" && key !== "oldImageUrl") {
         updates[key] = value;
       }
     });
+
     if (updates.tags) {
       updates.tags = JSON.parse(updates.tags);
     }
-   
 
     // Check for unavailable fields and set them to null in updates
     const fieldsToCheck = [
@@ -143,10 +138,11 @@ export async function PUT(request: Request, { params }): Promise<NextResponse> {
 
     if (updates.additional_information) {
       updates.additional_information = JSON.parse(
-        updates.additional_information,
+        updates.additional_information
       );
     }
     updates.categories = JSON.parse(updates.categories);
+
     if (newImages) {
       updates.images = existingProduct.images;
     }
@@ -156,7 +152,9 @@ export async function PUT(request: Request, { params }): Promise<NextResponse> {
       .from("products")
       .update(updates)
       .eq("_id", id);
+
     console.log(updateError);
+
     if (updateError) {
       await deleteImagesFromCloudinary(updates.images);
 
@@ -166,23 +164,23 @@ export async function PUT(request: Request, { params }): Promise<NextResponse> {
           message: "Error updating product.",
           error: updateError.message,
         },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
-    return NextResponse.json<UpdateProductResponse>(
+    return NextResponse.json(
       {
         success: true,
         message: "Product updated successfully!",
         updatedProduct: updates,
       },
-      { status: 200 },
+      { status: 200 }
     );
   } catch (error) {
     console.error("Error updating product:", error);
     return NextResponse.json(
       { error: "An unexpected error occurred." },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

@@ -1,7 +1,7 @@
 import { supabaseAdmin } from "@/lib/supabase";
 import { NextResponse } from "next/server";
 
-export async function GET(req: Request) {
+export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url);
     const role = searchParams.get("role");
@@ -19,11 +19,12 @@ export async function GET(req: Request) {
           message: "Failed to get data from database",
           error: error.message,
         },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
     let users = data.users || [];
+
     // Filter by role if specified
     if (role && (role === "admin" || role === "user")) {
       users = users.filter((user) => user?.user_metadata?.role === role);
@@ -35,7 +36,7 @@ export async function GET(req: Request) {
 
     return NextResponse.json({
       success: true,
-      message: "successFully getting data",
+      message: "Successfully getting data",
       users: paginatedUsers,
       totalUsers,
       currentPage: page,
@@ -43,8 +44,12 @@ export async function GET(req: Request) {
     });
   } catch (error) {
     return NextResponse.json(
-      { success: false, message: "Internal Server Error", error },
-      { status: 500 },
+      {
+        success: false,
+        message: "Internal Server Error",
+        error,
+      },
+      { status: 500 }
     );
   }
 }

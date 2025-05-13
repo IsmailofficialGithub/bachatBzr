@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 
-export async function GET(request: Request) {
+export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page")) || 1;
@@ -13,7 +13,7 @@ export async function GET(request: Request) {
     const { data, error, count } = await supabase
       .from("products")
       .select("*", { count: "exact" })
-      .eq("sold",false)
+      .eq("sold", false)
       .range(start, end);
 
     if (error) {
@@ -32,7 +32,7 @@ export async function GET(request: Request) {
           totalPages: Math.ceil(count / limit),
         },
       },
-      { status: 200 },
+      { status: 200 }
     );
   } catch (error) {
     return NextResponse.json(
@@ -40,7 +40,7 @@ export async function GET(request: Request) {
         success: false,
         error: error.message,
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

@@ -1,17 +1,14 @@
 import { supabaseAdmin } from "@/lib/supabase";
 import { NextResponse } from "next/server";
 
-export async function GET(
-  req: Request,
-  { params }: { params: { id: string } },
-) {
+export async function GET(req, { params }) {
   try {
-    const userId =await params.id;
+    const userId = await params.id;
 
     if (!userId) {
       return NextResponse.json(
         { success: false, error: "User ID is required" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -25,7 +22,7 @@ export async function GET(
           message: "Error while getting data from database",
           error: error.message,
         },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
@@ -35,18 +32,18 @@ export async function GET(
     if (!user) {
       return NextResponse.json(
         { success: false, error: "User not found" },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
     return NextResponse.json(
       { success: true, message: "Successfully get users details", user },
-      { status: 200 },
+      { status: 200 }
     );
   } catch (error) {
     return NextResponse.json(
       { success: false, message: "Internal Server Error", error },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

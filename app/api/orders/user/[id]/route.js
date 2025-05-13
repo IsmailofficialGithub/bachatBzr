@@ -1,9 +1,9 @@
 import { supabase } from "@/lib/supabase";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-export async function GET(req:NextRequest,{ params }: { params: { id: string } }) {
-  const userId = params.id  ;;
-  // Ensure userId is valid before querying
+export async function GET(req, { params }) {
+  const userId = params.id;
+
   if (!userId) {
     return NextResponse.json(
       {
@@ -14,7 +14,6 @@ export async function GET(req:NextRequest,{ params }: { params: { id: string } }
     );
   }
 
-
   try {
     // Fetch orders from Supabase for the given userId
     const { data, error } = await supabase
@@ -23,7 +22,7 @@ export async function GET(req:NextRequest,{ params }: { params: { id: string } }
       .eq("user_id", userId);
 
     if (error) {
-      console.error("Error fetching orders:", error.message); // Log error
+      console.error("Error fetching orders:", error.message);
       return NextResponse.json(
         {
           success: false,
@@ -34,7 +33,6 @@ export async function GET(req:NextRequest,{ params }: { params: { id: string } }
       );
     }
 
-    // Return successful response with orders data
     return NextResponse.json(
       {
         success: true,
@@ -44,7 +42,7 @@ export async function GET(req:NextRequest,{ params }: { params: { id: string } }
       { status: 200 }
     );
   } catch (error) {
-    console.error("Something went wrong:", error); // Log unexpected errors
+    console.error("Something went wrong:", error);
     return NextResponse.json(
       {
         success: false,
