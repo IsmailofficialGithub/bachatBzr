@@ -45,6 +45,7 @@ export async function GET(req: NextRequest) {
         .select("*")
         .eq("_id", item._id)
         .single();
+        console.log(products,error)
 
       if (error) {
         return NextResponse.json(

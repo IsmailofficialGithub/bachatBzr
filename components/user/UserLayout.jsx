@@ -95,7 +95,7 @@ export default function UserLayout({ children, title }) {
 
           {/* Main Content */}
           <div
-            className="w-full lg:w-3/4 p-6 lg:p-8 bg-gray-50"
+            className="w-full lg:w-3/4 p-3 lg:p-8 bg-gray-50"
             style={{ background: theme.color.primary }}
           >
             {session?children:<UserNotLogin/>}

@@ -21,13 +21,13 @@ export async function POST(request) {
 
     // Destructure and validate tags
     const { tags } = body;
-    
+
     // Validate that tags exist
-    if (!tags) {
+    if (!tags ) {
       return NextResponse.json(
         { 
           success: false,
-          message: 'Missing required field: tags',
+          message: 'Missing required fields: tags ',
           details: 'Please provide a tags array in the request body'
         },
         { status: 400 }
@@ -62,7 +62,7 @@ export async function POST(request) {
     const { data, error } = await supabase
       .from('products')
       .select('*')
-      .contains('tags', tags);
+      .contains('tags', tags)
       
     // Handle Supabase query errors
     if (error) {

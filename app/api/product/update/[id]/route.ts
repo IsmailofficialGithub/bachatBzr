@@ -1,12 +1,9 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import {
-  
   deleteImagesFromCloudinary,
   uploadImageToCloudinary,
 } from "@/lib/helper";
-import { json } from "node:stream/consumers";
-
 
 interface UpdateProductResponse {
   success: boolean;
@@ -18,6 +15,29 @@ interface UpdateProductResponse {
 export async function PUT(request: Request, { params }): Promise<NextResponse> {
   try {
     const { id } = await params;
+ const formData = await request.formData();
+ 
+
+    const name = formData.get("name") as string | null;
+    const short_description = formData.get("short_description") as string | null;
+    const long_description = formData.get("long_description") as string | null;
+    const categories = formData.get("categories") as string | null;
+    const price = formData.get("price") as string | null;
+    const condition = formData.get("product_condition") as string | null
+
+    if (
+      !name ||
+      !short_description ||
+      !long_description ||
+      !categories ||
+      !price ||
+      !condition
+    ) {
+      return NextResponse.json(
+        { success: false, message: "All required fields (name, short_description, long_description, categories, price, condition) must be provided." },
+        { status: 400 },
+      );
+    }
 
     if (!id) {
       return NextResponse.json(
@@ -31,7 +51,7 @@ export async function PUT(request: Request, { params }): Promise<NextResponse> {
       .select("*")
       .eq("_id", id)
       .single();
-     
+
     if (fetchError) {
       return NextResponse.json(
         {
@@ -50,12 +70,11 @@ export async function PUT(request: Request, { params }): Promise<NextResponse> {
       );
     }
 
-    // Parse form data
-    const formData = await request.formData();
+ 
+    
 
     const newImages = formData.getAll("newImages") as File[] | null;
     const oldImageUrl = formData.get("oldImageUrl") as string | null;
-
 
     // Manage images || delete old images from cloudinary
     if (oldImageUrl) {
@@ -68,7 +87,6 @@ export async function PUT(request: Request, { params }): Promise<NextResponse> {
       );
 
       if (validImagesToDelete.length > 0) {
-
         const { success } = await deleteImagesFromCloudinary(
           validImagesToDelete,
         );
@@ -84,9 +102,9 @@ export async function PUT(request: Request, { params }): Promise<NextResponse> {
       }
     }
     // upload new images from cloudinary
-    for (const file of newImages ??[] ) {
+    for (const file of newImages ?? []) {
       const newImageUrl = await uploadImageToCloudinary(file);
-      if(newImageUrl.success){
+      if (newImageUrl.success) {
         existingProduct.images.push(newImageUrl.secure_url);
       }
     }
@@ -98,24 +116,50 @@ export async function PUT(request: Request, { params }): Promise<NextResponse> {
         updates[key] = value;
       }
     });
+    if (updates.tags) {
+      updates.tags = JSON.parse(updates.tags);
+    }
+   
 
+    // Check for unavailable fields and set them to null in updates
+    const fieldsToCheck = [
+      "price",
+      "short_description",
+      "long_description",
+      "offer_name",
+      "categories",
+      "discounted_price",
+      "product_condition",
+      "problems",
+      "additional_information",
+      "tags",
+    ];
+    fieldsToCheck.forEach((field) => {
+      const value = formData.get(field);
+      if (!formData.has(field) || value === "") {
+        updates[field] = null;
+      }
+    });
 
-
+    if (updates.additional_information) {
+      updates.additional_information = JSON.parse(
+        updates.additional_information,
+      );
+    }
     updates.categories = JSON.parse(updates.categories);
     if (newImages) {
       updates.images = existingProduct.images;
     }
 
-   
-    console.log("updates", updates);
     // Update product in Supabase
     const { error: updateError } = await supabase
       .from("products")
       .update(updates)
       .eq("_id", id);
+    console.log(updateError);
     if (updateError) {
-     await deleteImagesFromCloudinary(updates.images)
-     
+      await deleteImagesFromCloudinary(updates.images);
+
       return NextResponse.json(
         {
           success: false,

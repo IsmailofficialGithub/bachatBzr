@@ -55,7 +55,7 @@ export default function About() {
                                     </div>
                                 </div>
                                 <div className="tpabout__logo">
-                                    <Link href="/"><img src="/assets/img/banner/about-img-3.png" alt="" /></Link>
+                                    <Link href="/"><img src="/assets/img/logo/logo.png" alt="" width="35%"/></Link>
                                 </div>
                             </div>
                             <div className="row">
@@ -118,7 +118,7 @@ export default function About() {
                                     </div>
                                 </div>
                             </div>
-                            <div className="swiper-container tp-team-active">
+                            <div className="swiper-container tp-team-active " >
                                 <Swiper {...swiperOptions}>
                                     <SwiperSlide>
                                         <div className="tpteam__item p-relative mb-40">
@@ -126,8 +126,8 @@ export default function About() {
                                                 <img src="/assets/img/testimonial/team-1.jpg" alt="" />
                                             </div>
                                             <div className="tpteam__content">
-                                                <h4 className="tpteam__position">Founder</h4>
-                                                <h5 className="tpteam__title">Rosalina D. Willson</h5>
+                                                <h4 className="tpteam__position">CEO , Founder , Developer , Designer </h4>
+                                                <h5 className="tpteam__title">M.Ismail Abbasi</h5>
                                             </div>
                                         </div>
                                     </SwiperSlide>
@@ -137,12 +137,12 @@ export default function About() {
                                                 <img src="/assets/img/testimonial/team-2.jpg" alt="" />
                                             </div>
                                             <div className="tpteam__content">
-                                                <h4 className="tpteam__position">CEO</h4>
-                                                <h5 className="tpteam__title">Ukolilix X. Xilanorix</h5>
+                                                <h4 className="tpteam__position">CEO , Founder , Product Manager , Investor</h4>
+                                                <h5 className="tpteam__title">Raja Mubashir Shafi</h5>
                                             </div>
                                         </div>
-                                    </SwiperSlide>
-                                    <SwiperSlide>
+                                   </SwiperSlide>
+                                     {/* <SwiperSlide>
                                         <div className="tpteam__item p-relative mb-40">
                                             <div className="tpteam__thumb">
                                                 <img src="/assets/img/testimonial/team-3.jpg" alt="" />
@@ -185,7 +185,7 @@ export default function About() {
                                                 <h5 className="tpteam__title">Ukolilix X. Xilanorix</h5>
                                             </div>
                                         </div>
-                                    </SwiperSlide>
+                                    </SwiperSlide> */}
                                 </Swiper>
                             </div>
                         </div>

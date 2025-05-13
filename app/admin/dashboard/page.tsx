@@ -1,5 +1,5 @@
 "use client"
-import "@/app/style/tailwand.css";
+import "@/public/assets/css/tailwind-cdn.css";
 import DashboardWrapper from "@/app/components/DashboardWrapper";
 import React from "react";
 

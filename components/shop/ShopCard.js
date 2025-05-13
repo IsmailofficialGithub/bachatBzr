@@ -21,19 +21,6 @@ const ShopCard = React.memo(({ item, addToCart, addToWishlist,soldProducts }) =>
               className="tpproduct__thumbitem p-relative"
               style={{ height: "250px" }}
             >
-              {/* <Link href={`/shop/${item._id}`}>
-                <img
-                  src={`${item.images[0]}`}
-                  alt="product-thumb"
-                  style={{ height: "250px", objectFit: "cover" }}
-                />
-                <img
-                  className="thumbitem-secondary"
-                  src={`${item.images[1]}`}
-                  alt="product-thumb"
-                  style={{ height: "250px" }}
-                />
-              </Link> */}
   <div className={`product-wrapper ${isSold ? "blocked" : ""}`}>
       {isSold && (
         <div className="sold-overlay">
@@ -46,11 +33,13 @@ const ShopCard = React.memo(({ item, addToCart, addToWishlist,soldProducts }) =>
         onClick={(e) => isSold && e.preventDefault()}
       >
         <img
+        loading="lazy"
           src={item.images[0]}
           alt="product-thumb"
           className="product-image"
         />
         <img
+        loading="lazy"
           className="thumbitem-secondary product-image"
           src={item.images[1]}
           alt="product-thumb"
@@ -117,7 +106,7 @@ const ShopCard = React.memo(({ item, addToCart, addToWishlist,soldProducts }) =>
                     <i className="fal fa-shopping-basket" />
                   </a>
                  
-                  <Link href={`shop/${item._id}`}>
+                  <Link href={`/shop/${item._id}`} target="_blank">
                     <i className="fal fa-eye" />
                   </Link>
                   <a
@@ -135,8 +124,9 @@ const ShopCard = React.memo(({ item, addToCart, addToWishlist,soldProducts }) =>
               <Link href={`/shop/${item._id}`}>{item.name}</Link>
             </h3>
             <div className="tpproduct__priceinfo p-relative">
-              <div className="tpproduct__ammount">
+              <div className="tpproduct__ammount"style={{display: "flex", justifyContent: "space-between"}}>
                 <span>PKR {item.discounted_price?applyDiscount(item.price,item.discounted_price):item.price}.00</span>
+                <span>{item.product_condition}/10</span>
               </div>
             </div>
           </div>

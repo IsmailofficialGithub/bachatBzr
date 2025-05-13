@@ -21,11 +21,11 @@ export const createOrder = async (information: OrderInformation): Promise<OrderR
         const response = await axios.post(`/api/orders/add`, information);
 
         if (response.data.success) {
-            toast.success("Order created successfully");
-
             // Dispatch the action to update the Redux state
             store.dispatch(orderCreatedCart(information.product_ids));
             store.dispatch(orderCreatedWishlist(information.product_ids))
+            toast.success("Order created successfully");
+
 
             return {
                 success: true,

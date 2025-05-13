@@ -3,15 +3,15 @@ import { addCart } from "@/features/shopSlice";
 import { addWishlist } from "@/features/wishlistSlice";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
-import ShopCard from "./ShopCard";
 import { fetchRandomProducts } from "@/util/api";
 import { toast } from "sonner";
-
+import ShopCardMain from "./shopCardMain";
+import ProductCardSkeleton from "../skeleton/ProductCardSkeleton";
 
 const FilterShopBox2 = ({ tab }) => {
-  const [FirstReRender,setFirstReRender] = useState(true)
   const dataFetchedRef = useRef(false);
   const [products, setProducts] = useState([]);
+  const [loading,setloading] = useState(true);
   const [filteredProducts, setFilteredProducts] = useState([]);
 
   // Function to filter products based on the tab
@@ -23,14 +23,12 @@ const FilterShopBox2 = ({ tab }) => {
   };
 
   const loadProducts = useCallback(async () => {
+    setloading(true);
     const response = await fetchRandomProducts();
     if (response.success) {
       setProducts(response.data);
-    } else {
-      toast.error("Failed to fetch products", {
-        description: "Could not retrieve product data",
-      });
     }
+    setloading(false);
   }, []);
   // Fetch products on component mount
   useEffect(() => {
@@ -42,10 +40,9 @@ const FilterShopBox2 = ({ tab }) => {
 
   // Filter products whenever the tab or products change
   useEffect(() => {
-      setFilteredProducts(handleProductFilter(tab));
+    setFilteredProducts(handleProductFilter(tab));
   }, [tab, products]);
 
- 
   const dispatch = useDispatch();
 
   // Add to cart function
@@ -72,11 +69,9 @@ const FilterShopBox2 = ({ tab }) => {
     }
   };
 
- 
-
   // Render products
   const content = filteredProducts.map((item, i) => (
-    <ShopCard
+    <ShopCardMain
       key={i}
       item={item}
       addToCart={addToCart}
@@ -84,13 +79,19 @@ const FilterShopBox2 = ({ tab }) => {
     />
   ));
 
-  
-
   return (
     <>
-      {filteredProducts.length > 0
-        ? content
-        : "No product now avaliable at this Query"}
+      {filteredProducts.length > 0 ? (
+          content
+      ) : (
+        loading ? (
+          Array.from({ length: 10 }).map((_, index) => (
+            <ProductCardSkeleton key={index} />
+          ))
+        ) : (
+          <div>No product now available at this Query</div>
+        )
+      )}
     </>
   );
 };

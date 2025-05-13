@@ -1,8 +1,8 @@
 "use client";
-
 import React, { FC, ReactNode } from 'react';
 import AdminDashboardMenu from './AdminDashboardMenu'; // Adjust the path as needed
-import "@/public/assets/css/tailwind-cdn.css";
+import '@/app/admin/dashboard/admin.css'
+// Import the custom CSS
 
 interface DashboardWrapperProps {
   children: ReactNode;
@@ -10,22 +10,12 @@ interface DashboardWrapperProps {
 
 const DashboardWrapper: FC<DashboardWrapperProps> = ({ children }) => {
   return (
-    <div
-      className="
-        grid h-screen 
-        sm:grid-cols-[0fr_4fr] 
-        md:grid-cols-[1fr_3fr] 
-        lg:grid-cols-[minmax(200px,auto)_1fr] 
-        grid-cols-[0fr_4fr]
-      "
-    >
-      {/* Sidebar / First Grid Cell */}
-      <div>
+    <div className="dashboard-wrapper">
+      <div className="sidebar">
         <AdminDashboardMenu />
       </div>
 
-      {/* Main Content / Second Grid Cell */}
-      <div className="bg-[#16404D] text-white shadow-lg p-3 flex-1 overflow-y-auto min-h-0">
+      <div className="main-content">
         {children}
       </div>
     </div>

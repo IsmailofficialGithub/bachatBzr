@@ -34,7 +34,6 @@ export async function PATCH(req: NextRequest) {
           return null;
       }
   const email=data?.user?.email;
-  console.log(email)
       // Compose Email Content
       const emailSubject = "🚀 Important Update: Your Order Status Has Changed";
 

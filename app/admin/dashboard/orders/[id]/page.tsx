@@ -57,7 +57,7 @@ interface OrderDetails {
 const OrderDetails = () => {
   const router = useRouter();
   const[ loading,setLoading]=useState(false);
-  const [OrderDetails, setOrderDetails] = useState<OrderDetails>([]);
+  const [OrderDetails, setOrderDetails] = useState<OrderDetails | null>(null);
   const { id } = useParams();
   const gettingOrderDetails = async () => {
     setLoading(true)

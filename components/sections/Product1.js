@@ -1,7 +1,6 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import FilterShopBox2 from "../shop/FilterShopBox2";
-import { fetchRandomProducts } from "@/util/api";
 export default function Product1() {
   const [activeIndex, setActiveIndex] = useState(1);
   const handleOnClick = (index) => {
@@ -71,6 +70,7 @@ export default function Product1() {
             >
               <div className="row row-cols-xxl-5 row-cols-xl-4 row-cols-lg-3 row-cols-md-2 row-cols-sm-2 row-cols-1">
                 <FilterShopBox2 tab={activeIndex}/>
+
               </div>
             </div>
             <div

@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/pagination";
 
 const PaginationComponent = ({ 
-  currentPage, 
+  currentPage , 
   totalPages, 
   onPageChange,
   className = "",
@@ -87,6 +87,7 @@ const PaginationComponent = ({
       items.push(
         <PaginationItem key="ellipsis-2">
           <PaginationEllipsis />
+          
         </PaginationItem>
       );
     }
@@ -112,7 +113,7 @@ const PaginationComponent = ({
   if (totalPages <= 1) return null;
 
   return (
-    <div className={className}>
+    <div className={className} >
       <Pagination>
         <PaginationContent className="flex items-center justify-center gap-2 cursor-pointer">
           <PaginationItem>
@@ -126,7 +127,7 @@ const PaginationComponent = ({
           
           <PaginationItem>
             <PaginationNext 
-              onClick={() => currentPage < totalPages && handlePageChange(currentPage + 1)}
+              onClick={() => { currentPage < totalPages && handlePageChange(currentPage + 1); }}
               className={currentPage >= totalPages ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
             />
           </PaginationItem>

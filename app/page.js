@@ -5,7 +5,7 @@ import Product1 from "@/components/sections/Product1"
 import Shop from "@/components/sections/Shop"
 import Slider1 from "@/components/sections/Slider1"
 export const metadata = {
-  title: 'Bachat Bazr',
+  title: 'BachatBzr',
   description: 'Get every things in effordable price',
 }
 export default function Home() {

@@ -1,0 +1,141 @@
+/* Reset margin and padding for all elements */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  .dashboard-wrapper {
+    display: grid;
+    height: 100vh;
+    grid-template-columns: 0fr 4fr;
+  }
+  
+  @media (min-width: 640px) {
+    .dashboard-wrapper {
+      grid-template-columns: 0fr 4fr;
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .dashboard-wrapper {
+      grid-template-columns: minmax(200px, auto) 1fr;
+    }
+  }
+  
+  .sidebar {
+    /* Sidebar styling */
+  }
+  
+  .main-content {
+    background-color: #16404D;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 16px;
+    flex-grow: 1;
+    overflow-y: auto;
+    min-height: 0;
+  }
+
+  /* adminDashboardMenu */
+  /* admin.css */
+
+.admin-container {
+  min-height: 100vh;
+  background-color: #f7fafc; /* light gray */
+  width: 100%;
+}
+
+.admin-hamburger-btn {
+  position: fixed;
+  top: 0.5rem;
+  right: 0.5rem;
+  padding: 0.5rem;
+  z-index: 50;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.admin-hamburger-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.admin-sidebar {
+  position: fixed;
+  z-index: 40;
+  width: 15rem;
+  height: 100vh;
+  background-color: #fb923c; /* orange */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out;
+}
+
+.admin-sidebar.open {
+  transform: translateX(0);
+}
+
+.admin-sidebar.closed {
+  transform: translateX(-100%);
+}
+
+.admin-sidebar-content {
+  padding: 1rem;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.admin-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #1f2937; /* dark gray */
+  margin-bottom: 2rem;
+}
+
+.admin-close-btn {
+  cursor: pointer;
+  font-weight: bold;
+  display: block;
+}
+
+.admin-nav-link {
+  display: block;
+  padding: 0.5rem 1rem;
+  margin-bottom: 0.5rem;
+  border-radius: 0.5rem;
+  color: #4b5563;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.admin-nav-link:hover {
+  background-color: #f3f4f6; /* light hover */
+}
+
+.admin-nav-link.active {
+  background-color: #3b82f6;
+  color: white;
+}
+
+/* Desktop styles */
+@media (min-width: 768px) {
+  .admin-sidebar {
+    position: relative;
+    transform: translateX(0) !important;
+  }
+
+  .admin-hamburger-btn,
+  .admin-close-btn {
+    display: none !important;
+  }
+}
+
+
+/*  admin user  */
+
+

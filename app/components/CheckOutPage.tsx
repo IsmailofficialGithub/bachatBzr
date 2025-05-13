@@ -62,7 +62,6 @@ const CheckOutPage = ({ amount, orderDetails }) => {
       } else {
         const updatedOrderDetails = { ...orderDetails, transaction_id: paymentIntent.id };
        await createOrder(updatedOrderDetails);
-        router.push("/user/orders");
       }
     } catch (error) {
       toast.error(error.message);

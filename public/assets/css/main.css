@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+
 @charset "UTF-8";
 
 /************ TABLE OF CONTENTS ***************
@@ -61,7 +59,8 @@
     --tp-grey-8: #f6f6f6;
     --tp-grey-9: #999999;
     --tp-text-body: #040404;
-    --tp-text-primary: #d51243;
+    /* --tp-text-primary: #d51243; pink */
+    --tp-text-primary: #f9a253;
     --tp-text-secondary: #777777;
     --tp-text-tertiary: #adadad;
     --tp-text-4: #a0a0a0;
@@ -871,6 +870,7 @@ only screen and (min-width: 576px) and (max-width: 767px) {
     .tp-breadcrumb__bg {
         background-position: left;
     }
+   
 }
 
 .tp-breadcrumb__title {
@@ -5733,6 +5733,13 @@ only screen and (min-width: 1200px) and (max-width: 1399px) {
     .platinamdell {
         padding-top: 0px;
     }
+   
+}
+@media (min-width: 767px) {
+    .swiper-wrapper{
+        justify-content: center;
+    }
+   
 }
 
 @media only screen and (min-width: 576px) and (max-width: 767px) {

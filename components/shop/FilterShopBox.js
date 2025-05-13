@@ -46,7 +46,6 @@ const FilterShopBox = () => {
       }
     } catch (error) {
       setError("An error occurred while fetching products");
-      console.error(error);
     } finally {
       setLoading(false);
     }

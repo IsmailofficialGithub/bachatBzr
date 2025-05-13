@@ -12,8 +12,6 @@ const CartItems = () => {
         dispatch(deleteCart(id));
     };
 
-    
-
     return (
         <>
             {cart?.map((item) => (

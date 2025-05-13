@@ -1,3 +1,4 @@
+import Image from "next/image"
 import Link from "next/link"
 
 export default function Footer1() {
@@ -11,7 +12,7 @@ export default function Footer1() {
                                 <div className="col-lg-3 col-md-4 col-sm-6">
                                     <div className="footer-widget footer-col-1 mb-40">
                                         <div className="footer-logo mb-30">
-                                            <Link href="/"><img src="/assets/img/logo.jpg" alt="logo" width={100} /></Link>
+                                            <Link href="/"><Image src="/assets/img/logo/logo.png" alt="logo" width={220} height={150}/></Link>
                                         </div>
                                         <div className="footer-content">
                                             <p>Elegant pink origami design three <br /> dimensional view and decoration co-exist.
@@ -24,8 +25,8 @@ export default function Footer1() {
                                         <h4 className="footer-widget__title mb-30">Information</h4>
                                         <div className="footer-widget__links">
                                             <ul>
-                                                <li><Link href="#">Custom Service</Link></li>
-                                                <li><Link href="#">FAQs</Link></li>
+                                                <li><Link href="/contact">Custom Service</Link></li>
+                                                <li><Link href="/faqs">FAQs</Link></li>
                                                 <li><Link href="/track">Ordering Tracking</Link></li>
                                                 <li><Link href="/contact">Contacts</Link></li>
                                                 <li><Link href="#">Events</Link></li>
@@ -107,7 +108,7 @@ export default function Footer1() {
                             <div className="row">
                                 <div className="col-xl-6 col-lg-7 col-md-5 col-sm-12">
                                     <div className="footer-copyright__content">
-                                        <span>Copyright {new Date().getFullYear()} <Link href="/">©SMARTSwap</Link>. All rights reserved. Developed by Ismail Abbasi ,Powered by smartSwap.</span>
+                                        <span>Copyright {new Date().getFullYear()} <Link href="/">©BachatBzr</Link>. All rights reserved. Developed by Ismail Abbasi , Powered by BachatBzr.</span>
                                     </div>
                                 </div>
                                 <div className="col-xl-6 col-lg-5 col-md-7 col-sm-12">

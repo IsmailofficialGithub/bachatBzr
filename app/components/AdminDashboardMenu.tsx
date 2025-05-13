@@ -1,10 +1,9 @@
-// app/layout.tsx
+// app/layout.tsx or app/admin/dashboard/AdminDashboardMenu.tsx
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { X } from "lucide-react";
-
-
+import '@/app/admin/dashboard/admin.css';
 
 export default function AdminDashboardMenu() {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,17 +19,15 @@ export default function AdminDashboardMenu() {
 
   return (
     <>
-      <div className="min-h-screen bg-gray-100 w-full">
+      <div className="admin-container">
         {/* Mobile Hamburger Button */}
-        {isOpen ? (
-          ""
-        ) : (
+        {!isOpen && (
           <button
-            className="md:hidden fixed top-2 right-2 p-2 z-50"
-            onClick={() => setIsOpen(!isOpen)}
+            className="admin-hamburger-btn"
+            onClick={() => setIsOpen(true)}
           >
             <svg
-              className="w-6 h-6"
+              className="admin-hamburger-icon"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -46,22 +43,13 @@ export default function AdminDashboardMenu() {
         )}
 
         {/* Sidebar */}
-        <div
-          className={`fixed md:relative z-40 w-60 h-screen bg-orange-400 shadow-lg transform transition-transform duration-200 ease-in-out 
-          ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}
-        >
-          <div className="p-4">
-            <div className="flex flex-row justify-between">
-              <h1 className="text-2xl font-bold text-gray-800 mb-8">
-                Admin Panel
-              </h1>
+        <div className={`admin-sidebar ${isOpen ? "open" : "closed"}`}>
+          <div className="admin-sidebar-content">
+            <div className="admin-header">
+              <h1 className="admin-title">Admin Panel</h1>
               <X
-                className={`font-bold cursor-pointer ${
-                  isOpen ? "block" : "hidden"
-                }`}
-                onClick={() => {
-                  setIsOpen(false);
-                }}
+                className="admin-close-btn"
+                onClick={() => setIsOpen(false)}
               />
             </div>
             <nav>
@@ -69,11 +57,8 @@ export default function AdminDashboardMenu() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`block px-4 py-2 mb-2 rounded-lg transition-colors
-                  ${
-                    pathname === item.href
-                      ? "bg-blue-500 text-white"
-                      : "text-gray-600 hover:bg-gray-100"
+                  className={`admin-nav-link ${
+                    pathname === item.href ? "active" : ""
                   }`}
                   onClick={() => setIsOpen(false)}
                 >
@@ -83,8 +68,6 @@ export default function AdminDashboardMenu() {
             </nav>
           </div>
         </div>
-
-        {/* Main Content */}
       </div>
     </>
   );

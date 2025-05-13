@@ -101,7 +101,7 @@ export default function Header3({
               <div className="col-xl-2 col-lg-3">
                 <div className="logo">
                   <Link href="/">
-                    <img src="/assets/img/logo/logo.png" alt="logo" />
+                    <img src="/assets/img/logo/logo.png" alt="logo" width={200}/>
                   </Link>
                 </div>
               </div>
@@ -164,7 +164,7 @@ export default function Header3({
                             category.parent_id ? "menu-item-has-children" : ""
                           }
                         >
-                          <Link href="/shop-2">
+                          <Link href={`/category/${category.name}`}>
                             <i class="fal fa-gift" /> {category.name}
                           </Link>
                         </li>

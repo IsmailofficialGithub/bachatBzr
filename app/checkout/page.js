@@ -11,6 +11,7 @@ import StripePayment from "@/app/components/stripPayment";
 import { createOrder } from "@/lib/createorderApiCall";
 import { Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
+import EmptyCart from "@/app/components/EmptyCart";
 export default function Checkout() {
   const router=useRouter()
   const [totalAmount, setTotalAmount] = useState();
@@ -175,7 +176,7 @@ e.preventDefault()
     }
     
  await createOrder(orderDetails);
-   router.push(`/user/order`) 
+   router.push(`/user/orders`) 
  setLoading(false)
 
   };
@@ -275,15 +276,13 @@ e.preventDefault()
     };
     gettingSession();
   }, []);
-  if(cart.length<1 || cart===undefined)return(
-   <Layout headerStyle={3} footerStyle={1} breadcrumbTitle="Checkout">
-    <div style={{background:'pink' ,display:"flex",gap:"1rem",flexDirection:"column",justifyContent:"center",alignItems:"center" ,width:"full"}}>
-    <h3>Wellcome To BachatBzr ....</h3>
-    <h5>NO item are available in your cart .</h5>
-    <h6>Select some item for checkout</h6>
-   </div>
-   </Layout>
-  )
+ if (cart.length < 1 || cart === undefined) {
+  return (
+    <Layout headerStyle={3} footerStyle={1} breadcrumbTitle="Checkout">
+      <EmptyCart />
+    </Layout>
+  );
+}
 
   return (
     <>

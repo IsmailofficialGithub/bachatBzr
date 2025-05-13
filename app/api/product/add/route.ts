@@ -5,6 +5,7 @@ import {
   deleteImagesFromCloudinary,
 } from "@/lib/helper";
 
+
 export const POST = async (request: Request): Promise<NextResponse> => {
   try {
     // Parse incoming form data
@@ -20,8 +21,10 @@ export const POST = async (request: Request): Promise<NextResponse> => {
     const discounted_price = formData.get("discounted_price") as string | null;
     const offer_name = formData.get("offer_name") as string | null;
     const problem = formData.get("problem") as string | null;
+    const additional_information=formData.get("additional_information") as object | null
+    const tags= formData.get("tags") as Array<string> | null;
     const imageFiles = formData.getAll("images") as File[];
-  
+    console.log(tags)
     // Validate required fields
     if (!name || !price || imageFiles.length === 0 || !short_description || !long_description ||!categories ) {
       return NextResponse.json(
@@ -43,7 +46,7 @@ export const POST = async (request: Request): Promise<NextResponse> => {
       );
     }
 
-    // Prepare product object
+     // Prepare product object
     const product = {
       name,
       short_description,
@@ -51,12 +54,14 @@ export const POST = async (request: Request): Promise<NextResponse> => {
       product_condition,
       categories: Array.isArray(categories) ? categories : [categories],
       price,
-      problems:problem??null,
-      discounted_price: discounted_price ?? null,
-      offer_name: offer_name ?? null,
+      problems: problem ?? null,
+      discounted_price: !discounted_price || discounted_price === "" ? null : discounted_price,
+      offer_name: !offer_name || offer_name === "" ? null : offer_name,
+      additional_information: JSON.parse(additional_information),
       images: uploadedUrls,
+      tags: JSON.parse(tags),
     };
-
+    console.log(product)
     // Insert product into Supabase
     const { data, error } = await supabase.from("products").insert([product]);
 
@@ -71,11 +76,12 @@ export const POST = async (request: Request): Promise<NextResponse> => {
 
     // Success response
     return NextResponse.json(
-      { success: true, message: "Product added successfully!", data },
-      { status: 201 }
+      { success: true, message: "Product added successfully!" 
+        ,data
+      },
+      { status: 200 }
     );
   } catch (error) {
-    console.error("Error adding product:", error);
 
     return NextResponse.json(
       { error: "Something went wrong while adding the product." },

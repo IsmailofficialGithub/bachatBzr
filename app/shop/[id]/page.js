@@ -60,6 +60,7 @@ const ShopSingleDynamicV1 = () => {
     setActiveIndex(index);
   };
 
+  useEffect(()=>{console.log(relatedTags),[relatedTags]})
   const fetchingProduct = async () => {
     setLoading(true);
     try {
@@ -68,12 +69,13 @@ const ShopSingleDynamicV1 = () => {
       );
       if (response.data.success) {
         setProduct(response.data.product);
+        console.log(response.data)
         setRelatedTags(response.data.product.tags);
       } else {
-        toast.success("SomeThing wents wronge while fetching Product");
+        toast.error("SomeThing went wrong while fetching Product");
       }
     } catch (error) {
-      toast.success("SomeThing wents wronge while fetching Product");
+      toast.error("SomeThing went wrong while fetching Product");
     } finally {
       setLoading(false);
     }
@@ -460,13 +462,15 @@ const ShopSingleDynamicV1 = () => {
                             href={`${process.env.NEXT_PUBLIC_API_URL}/shop/${relatedproduct._id}`}
                           >
                             <div >
-                               
                               <img
-                              
+                              loading="lazy"
+                                style={{objectFit:"cover",width:"100%",height:"250px" }}
                                 src={relatedproduct.images[0]}
                                 alt="product-thumb"
                               />
                               <img
+                              loading="lazy"
+                                style={{objectFit:"cover",width:"100%",height:"250px" }}
                                 className="product-thumb-secondary"
                                 src={relatedproduct.images[1]}
                                 alt=""
@@ -500,7 +504,8 @@ const ShopSingleDynamicV1 = () => {
                                 {relatedproduct.discounted_price ? (
                                   <>
                                     <span>
-                                      PKR
+                                      PKR 
+                                      {' '}
                                       {applyDiscount(
                                         relatedproduct.price,
                                         relatedproduct.discounted_price,
