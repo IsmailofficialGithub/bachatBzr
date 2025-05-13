@@ -1,20 +1,13 @@
- import cloudinary from "./cloudinary";
+import cloudinary from "./cloudinary";
 
-interface UploadImageResult {
-  success: boolean;
-  message?: string;
-  secure_url?: string;
-}
-
-const fileToBuffer = async (file: File): Promise<Buffer> => {
+// Convert a File object to Buffer
+const fileToBuffer = async (file) => {
   const arrayBuffer = await file.arrayBuffer();
   return Buffer.from(arrayBuffer);
 };
 
 // Upload a single image to Cloudinary
-export const uploadImageToCloudinary = async (
-  image: string | Buffer | File,
-): Promise<UploadImageResult> => {
+export const uploadImageToCloudinary = async (image) => {
   try {
     if (image instanceof File) {
       const buffer = await fileToBuffer(image);
@@ -37,15 +30,10 @@ export const uploadImageToCloudinary = async (
 };
 
 // Upload multiple images to Cloudinary
-export const uploadImagesToCloudinary = async (
-  images: (string | Buffer | File)[],
-): Promise<UploadImageResult[]> => {
+export const uploadImagesToCloudinary = async (images) => {
   try {
-    const uploadPromises = images.map((image) =>
-      uploadImageToCloudinary(image),
-    );
+    const uploadPromises = images.map((image) => uploadImageToCloudinary(image));
     const uploadResults = await Promise.all(uploadPromises);
-
     return uploadResults;
   } catch (error) {
     console.error("Error uploading images to Cloudinary:", error);
@@ -54,11 +42,8 @@ export const uploadImagesToCloudinary = async (
 };
 
 // Delete multiple images from Cloudinary
-export const deleteImagesFromCloudinary = async (
-  urls: string[],
-): Promise<{ success: boolean; results: any[] }> => {
+export const deleteImagesFromCloudinary = async (urls) => {
   try {
-    // Extract public IDs from URLs
     const publicIds = urls.map((url) => {
       const parts = url.split("/");
       return `${parts.slice(-2).join("/")}`.split(".")[0];
@@ -72,7 +57,7 @@ export const deleteImagesFromCloudinary = async (
         } catch (error) {
           return { publicId, error };
         }
-      }),
+      })
     );
 
     return {
@@ -89,16 +74,13 @@ export const deleteImagesFromCloudinary = async (
 };
 
 // Delete a single image from Cloudinary
-export const deleteImageFromCloudinary = async (
-  url: string,
-): Promise<{ success: boolean; result: any }> => {
+export const deleteImageFromCloudinary = async (url) => {
   try {
-    // Extract public ID from the URL
     const parts = url.split("/");
-    const fileName = parts[parts.length - 1]; // Extract "file.ext"
-    const publicId = fileName.split(".")[0]; // Remove extension
-    const folder = parts[parts.length - 2]; // Extract folder if applicable
-    const fullPublicId = `${folder}/${publicId}`; // Combine folder and file name
+    const fileName = parts[parts.length - 1];
+    const publicId = fileName.split(".")[0];
+    const folder = parts[parts.length - 2];
+    const fullPublicId = `${folder}/${publicId}`;
 
     const result = await cloudinary.uploader.destroy(fullPublicId);
 
@@ -108,4 +90,3 @@ export const deleteImageFromCloudinary = async (
     return { success: false, result: error };
   }
 };
-``

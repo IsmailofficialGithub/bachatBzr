@@ -1,4 +1,5 @@
 "use client";
+
 import DashboardWrapper from "@/app/components/DashboardWrapper";
 import "@/public/assets/css/tailwind-cdn.css";
 import React, { useEffect, useState } from "react";
@@ -15,28 +16,19 @@ import {
 } from "@/components/ui/select";
 import axios from "axios";
 import { toast } from "react-toastify";
-
 import { Loader, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-interface Category {
-  id: number;
-  name: string;
-  description: string;
-  parent_id: number | null;
-  created_at: string;
-  updated_at: string;
-}
-
 const Page = () => {
   const router = useRouter();
   const params = useParams();
+
   const [selectedImage, setSelectedImage] = useState(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
   const [categoriesLoading, setCategoriesLoading] = useState(false);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [categories, setCategories] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [shortDescription, setShortDescription] = useState("");
@@ -45,59 +37,53 @@ const Page = () => {
   const [condition, setCondition] = useState("");
   const [discountedPrice, setDiscountedPrice] = useState("");
   const [problems, setProblems] = useState("");
-  const [imageFiles, setImageFile] = useState<string[]>([]);
-  const [imageUrl, setImageUrl] = useState<string[]>([]);
-  const [deletedUrls, setDeletedUrls] = useState<string[]>([]);
+  const [imageFiles, setImageFile] = useState([]);
+  const [imageUrl, setImageUrl] = useState([]);
+  const [deletedUrls, setDeletedUrls] = useState([]);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [newCategory, setNewCategory] = useState({
     name: "",
     description: "",
-    parent_id: null as number | null,
+    parent_id: null,
   });
-  const [specifications, setSpecifications] = useState<Record<string, string>>(
-    {},
-  );
-  const [tags, setTags] = useState<string[]>([]);
+  const [specifications, setSpecifications] = useState({});
+  const [tags, setTags] = useState([]);
   const [currentTag, setCurrentTag] = useState("");
-  const [currentSpec, setCurrentSpec] = useState({
-    key: "",
-    value: "",
-  });
- const handleCreateCategory = async () => {
-  try {
-    if (!newCategory.name.trim()) {
-      toast.error("Category name is required");
-      return;
-    }
+  const [currentSpec, setCurrentSpec] = useState({ key: "", value: "" });
 
-    setCategoriesLoading(true);
-    const response = await axios.post('/api/categories', {
-      name: newCategory.name,
-      description: newCategory.description,
-      parent_id: newCategory.parent_id
-    });
+  const handleCreateCategory = async () => {
+    try {
+      if (!newCategory.name.trim()) {
+        toast.error("Category name is required");
+        return;
+      }
 
-    if (response.data.success) {
-      toast.success("Category created successfully");
-      setCategories([...categories, response.data.categories]);
-      setIsCategoryModalOpen(false);
-      setNewCategory({ name: "", description: "", parent_id: null });
-    } else {
-      toast.error(response.data.error || "Failed to create category");
+      setCategoriesLoading(true);
+      const response = await axios.post("/api/categories", newCategory);
+
+      if (response.data.success) {
+        toast.success("Category created successfully");
+        setCategories([...categories, response.data.categories]);
+        setIsCategoryModalOpen(false);
+        setNewCategory({ name: "", description: "", parent_id: null });
+      } else {
+        toast.error(response.data.error || "Failed to create category");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.error || "Failed to create category");
+    } finally {
+      setCategoriesLoading(false);
     }
-  } catch (error: any) {
-    toast.error(error.response?.data?.error || "Failed to create category");
-  } finally {
-    setCategoriesLoading(false);
-  }
-};
-  const handleCategorySelect = (value: string) => {
+  };
+
+  const handleCategorySelect = (value) => {
     setSelectedCategories((prev) =>
       prev.includes(value)
         ? prev.filter((cat) => cat !== value)
-        : [...prev, value],
+        : [...prev, value]
     );
   };
+
   const handleAddTag = () => {
     if (currentTag.trim() && !tags.includes(currentTag.trim())) {
       setTags([...tags, currentTag.trim()]);
@@ -105,27 +91,27 @@ const Page = () => {
     }
   };
 
-  const handleRemoveTag = (tagToRemove: string) => {
+  const handleRemoveTag = (tagToRemove) => {
     setTags(tags.filter((tag) => tag !== tagToRemove));
   };
 
   const addSpecification = () => {
     if (currentSpec.key.trim() && currentSpec.value.trim()) {
-      setSpecifications((prev) => ({
-        ...prev,
+      setSpecifications({
+        ...specifications,
         [currentSpec.key]: currentSpec.value,
-      }));
+      });
       setCurrentSpec({ key: "", value: "" });
     }
   };
 
-  const removeSpecification = (key: string) => {
+  const removeSpecification = (key) => {
     const newSpecs = { ...specifications };
     delete newSpecs[key];
     setSpecifications(newSpecs);
   };
 
-  const handleSpecChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSpecChange = (e) => {
     const { name, value } = e.target;
     setCurrentSpec((prev) => ({
       ...prev,
@@ -153,7 +139,6 @@ const Page = () => {
   const fetchingData = async () => {
     try {
       setLoading(true);
-
       const response = await axios.get(`/api/product/getSingle/${params.id}`);
       if (response.data.success) {
         const productData = response.data.product;
@@ -169,45 +154,33 @@ const Page = () => {
         setProblems(productData.problems);
         setTags(productData.tags || []);
 
-        // Convert specifications to object format
         if (productData.additional_information) {
           if (Array.isArray(productData.additional_information)) {
-            const specsObj: Record<string, string> = {};
-            productData.additional_information.forEach(
-              (item: { key: string; value: string }) => {
-                specsObj[item.key] = item.value;
-              },
-            );
+            const specsObj = {};
+            productData.additional_information.forEach((item) => {
+              specsObj[item.key] = item.value;
+            });
             setSpecifications(specsObj);
           } else {
             setSpecifications(productData.additional_information);
           }
         }
       } else {
-        toast.error(
-          `Failed to retrieve Products Metadata . ${
-            response.data?.message ?? "Error while getting data"
-          }`,
-        );
+        toast.error("Failed to retrieve Products Metadata");
       }
-    } catch (error: any) {
-      console.log(error);
-      toast.error(
-        `Failed to retrieve Products Metadata . ${
-          error.response?.data?.message ?? "Error while getting data"
-        }`,
-      );
+    } catch (error) {
+      toast.error("Error while getting product data");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleImageDelete = (oldUrl: string) => {
+  const handleImageDelete = (oldUrl) => {
     setImageUrl((prevImages) => prevImages.filter((url) => url !== oldUrl));
     setDeletedUrls((prevDeleted) => [...prevDeleted, oldUrl]);
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (e) => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
       const imageUrls = files.map((file) => URL.createObjectURL(file));
@@ -215,7 +188,7 @@ const Page = () => {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (
       !name ||
@@ -225,9 +198,7 @@ const Page = () => {
       !price ||
       !condition
     ) {
-      return toast.error(
-        "All required fields (name, short_description, long_description, categories, price, condition) must be provided.",
-      );
+      return toast.error("All required fields must be filled");
     }
 
     try {
@@ -244,27 +215,22 @@ const Page = () => {
       formDataToSend.append("oldImageUrl", JSON.stringify(deletedUrls));
       formDataToSend.append("categories", JSON.stringify(selectedCategories));
       formDataToSend.append("tags", JSON.stringify(tags));
-
-      // Append specifications as a single JSON object
       formDataToSend.append(
         "additional_information",
-        JSON.stringify(specifications),
+        JSON.stringify(specifications)
       );
 
-      if (imageFiles && imageFiles.length > 0) {
-        const blobUrlToFile = async (
-          blobUrl: string,
-          fileName: string,
-        ): Promise<File> => {
+      if (imageFiles.length > 0) {
+        const blobUrlToFile = async (blobUrl, fileName) => {
           const response = await fetch(blobUrl);
           const blob = await response.blob();
           return new File([blob], fileName, { type: blob.type });
         };
 
         const convertedFiles = await Promise.all(
-          imageFiles.map(async (blobUrl, index) => {
-            return blobUrlToFile(blobUrl, `image_${index + 1}.jpg`);
-          }),
+          imageFiles.map((blobUrl, index) =>
+            blobUrlToFile(blobUrl, `image_${index + 1}.jpg`)
+          )
         );
 
         convertedFiles.forEach((file) => {
@@ -277,23 +243,17 @@ const Page = () => {
         formDataToSend,
         {
           headers: { "Content-Type": "multipart/form-data" },
-        },
+        }
       );
 
       if (response.data.success) {
         router.push("/admin/dashboard/products");
-        toast.success("Success . Product updated successfully");
+        toast.success("Product updated successfully");
       } else {
         toast.error(`Failed to update product: ${response.data.message}`);
       }
-    } catch (error: any) {
-      console.error("error", error.response.data.message);
-      toast.error(
-        error?.response?.data?.message ||
-          error?.response?.data?.error ||
-          error?.message ||
-          "Something went wrong",
-      );
+    } catch (error) {
+      toast.error("Something went wrong");
     } finally {
       setLoading(false);
     }

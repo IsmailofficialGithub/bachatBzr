@@ -8,56 +8,10 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
-interface Product {
-  _id: string;
-  name: string;
-  price: number;
-}
-interface TotalAmount {
-  totalPrice?: number;
-  final_total?: number;
-  shipping_fee?: number;
-  cash_on_delivery_fee?: number;
-}
-
-interface ProductDetails {
-  no: number;
-  name: string;
-  short_description: string;
-  long_description: string;
-  product_condition: string;
-  categories: string[];
-  price: number;
-  discounted_price: number | null;
-  offer_name: string | null;
-  images: string[];
-  created_at: string;
-  updated_at: string;
-  _id: string;
-  problems: string | null;
-}
-
-interface OrderDetails {
-  id: string;
-  user_id: string;
-  products: Product[];
-  total_amount: TotalAmount;
-  order_status: string;
-  payment_status: string;
-  payment_method: string;
-  transaction_id: string;
-  delivery_address: string;
-  created_at: string;
-  updated_at: string;
-  phone: number;
-  Receiver: string;
-  productsDetails: ProductDetails[];
-}
-
 const OrderDetails = () => {
   const router = useRouter();
   const[ loading,setLoading]=useState(false);
-  const [OrderDetails, setOrderDetails] = useState<OrderDetails | null>(null);
+  const [OrderDetails, setOrderDetails] = useState(null);
   const { id } = useParams();
   const gettingOrderDetails = async () => {
     setLoading(true)
@@ -89,22 +43,22 @@ const OrderDetails = () => {
         <div className="bg-green-400 rounded-lg shadow-md p-6 mb-6 border border-[#16404d]/10">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
             <h1 className="text-2xl font-bold text-gray-800 mb-2 md:mb-0">
-              Order #{OrderDetails.id}
+              Order #{OrderDetails?.id}
             </h1>
             <div className="flex gap-4">
               <span
                 className={`px-4 py-1 ${
-                  OrderDetails.payment_status === "pending"
+                  OrderDetails?.payment_status === "pending"
                     ? " px-4 py-1 bg-[#fb923c]/20 text-[#fb923c] rounded-full"
                     : "px-4 py-1 bg-[#16404d] text-white rounded-full"
                 } rounded-full text-sm font-medium`}
               >
-                {OrderDetails.payment_status}
+                {OrderDetails?.payment_status}
               </span>
             </div>
           </div>
          {
-          !OrderDetails.productsDetails? <Loader className="animate-spin items-center justify-items-center w-16 h-16 text-blue-500" />:
+          !OrderDetails?.productsDetails? <Loader className="animate-spin items-center justify-items-center w-16 h-16 text-blue-500" />:
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-gray-600">
           <div>
             <p className="text-sm">Order Date</p>
@@ -118,12 +72,12 @@ const OrderDetails = () => {
           </div>
           <div>
             <p className="text-sm">Payment Method</p>
-            <p className="font-medium">{OrderDetails.payment_method}</p>
+            <p className="font-medium">{OrderDetails?.payment_method}</p>
           </div>
-          {OrderDetails.transaction_id ? (
+          {OrderDetails?.transaction_id ? (
             <div>
               <p className="text-sm">Transaction ID</p>
-              <p className="font-medium">{OrderDetails.transaction_id}</p>
+              <p className="font-medium">{OrderDetails?.transaction_id}</p>
             </div>
           ) : (
             ""
@@ -141,15 +95,15 @@ const OrderDetails = () => {
             <div className="space-y-2">
               <p>
                 <span className="font-medium">Receiver:</span>{" "}
-                {OrderDetails.Receiver}
+                {OrderDetails?.Receiver}
               </p>
               <p>
                 <span className="font-medium">Phone:</span>
-                {OrderDetails.phone}
+                {OrderDetails?.phone}
               </p>
               <p>
                 <span className="font-medium">Address:</span>{" "}
-                {OrderDetails.delivery_address}
+                {OrderDetails?.delivery_address}
               </p>
             </div>
           </div>
@@ -162,16 +116,16 @@ const OrderDetails = () => {
             <div className="space-y-2">
               <p>
                 <span className="font-medium">Payment Status:</span>
-                {OrderDetails.payment_status}
+                {OrderDetails?.payment_status}
               </p>
               <p>
                 <span className="font-medium">Payment Method:</span>
-                {OrderDetails.payment_method}
+                {OrderDetails?.payment_method}
               </p>
-              {OrderDetails.payment_method !== "cash_on_delivery" && (
+              {OrderDetails?.payment_method !== "cash_on_delivery" && (
                 <p>
                   <span className="font-medium">Transaction ID:</span>
-                 {OrderDetails.transaction_id}
+                 {OrderDetails?.transaction_id}
                 </p>
               )}
             </div>
@@ -182,14 +136,14 @@ const OrderDetails = () => {
         <div className="bg-green-400 rounded-lg shadow-md p-6 border border-[#16404d]/10 flex flex-col ">
           <h2 className="text-lg font-semibold mb-6 text-[#16404d]">
             Products (
-            {OrderDetails.products ? OrderDetails.products.length : "0"})
+            {OrderDetails?.products ? OrderDetails?.products.length : "0"})
           </h2>
 
           <div className="space-y-6">
-            {!OrderDetails.productsDetails ? (
+            {!OrderDetails?.productsDetails ? (
               <Loader className="animate-spin items-center justify-items-center w-16 h-16 text-blue-500" />
             ) : (
-              OrderDetails.productsDetails.map((product) => (
+              OrderDetails?.productsDetails.map((product) => (
                 <div
                   key={product._id}
                   className="border-b pb-6 last:border-b-0 border-[#16404d]/10"
@@ -307,7 +261,7 @@ const OrderDetails = () => {
             {/* Product Items */}
             <div className="md:col-span-2">
               <div className="space-y-4">
-                {OrderDetails.productsDetails?.map((product) => (
+                {OrderDetails?.productsDetails?.map((product) => (
                   <div
                     key={product._id}
                     className="flex justify-between items-center border-b pb-4 last:border-b-0"

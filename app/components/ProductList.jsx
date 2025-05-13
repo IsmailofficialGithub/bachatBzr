@@ -34,9 +34,9 @@ import {
 import { useRouter } from "next/navigation";
 import { applyDiscount } from "@/lib/discountHandler";
 
-export const ProductList: React.FC = () => {
+export const ProductList = () => {
   const router = useRouter();
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const limit = 30;
@@ -45,14 +45,12 @@ export const ProductList: React.FC = () => {
   const fetchingProducts = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(
-        `/api/product/get?page=${page}&limit=${limit}`,
-      );
+      const response = await axios.get(`/api/product/get?page=${page}&limit=${limit}`);
       if (response?.data.success) {
         setProducts(response.data.data);
         setTotalPages(response.data.pagination.totalPages || 1);
       }
-    } catch (error: any) {
+    } catch (error) {
       console.log(error);
       toast("Error while fetching products", {
         description: error?.response?.data?.message ?? "Request timeout",
@@ -62,17 +60,13 @@ export const ProductList: React.FC = () => {
     }
   };
 
-  const deleteProduct = async (id: number, name: string) => {
-    const shouldDelete = window.confirm(
-      `Are you sure you want to delete "${name}"?`,
-    );
+  const deleteProduct = async (id, name) => {
+    const shouldDelete = window.confirm(`Are you sure you want to delete "${name}"?`);
     if (!shouldDelete) return;
 
     const originalProducts = [...products];
     try {
-      // Optimistic UI update
       setProducts(products.filter((p) => p._id !== id));
-
       const response = await axios.delete(`/api/product/delete/${id}`);
       if (response.data.success) {
         toast.success("Product deleted", {
@@ -81,13 +75,11 @@ export const ProductList: React.FC = () => {
       } else {
         throw new Error(response.data.message || "Deletion failed");
       }
-    } catch (error: any) {
-      // Revert if failed
+    } catch (error) {
       setProducts(originalProducts);
       console.log(error);
       toast.error("Deletion failed", {
-        description:
-          error?.response?.data?.message ?? "Could not delete product",
+        description: error?.response?.data?.message ?? "Could not delete product",
       });
     }
   };
@@ -96,13 +88,9 @@ export const ProductList: React.FC = () => {
     fetchingProducts();
     const productChannel = supabase
       .channel("realtime:public:products")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "products" },
-        () => {
-          fetchingProducts();
-        },
-      )
+      .on("postgres_changes", { event: "*", schema: "public", table: "products" }, () => {
+        fetchingProducts();
+      })
       .subscribe();
 
     return () => {
@@ -110,22 +98,21 @@ export const ProductList: React.FC = () => {
     };
   }, [page]);
 
-  const formatPrice = (price: number) => {
+  const formatPrice = (price) => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "PKR",
     }).format(price);
   };
 
-  const getConditionColor = (condition: number) => {
+  const getConditionColor = (condition) => {
     if (condition >= 8) return "bg-green-100 text-green-800";
     if (condition >= 5) return "bg-yellow-100 text-yellow-800";
     return "bg-red-100 text-red-800";
   };
 
-  const handleRowClick = (productId: number, e: React.MouseEvent) => {
-    // Prevent navigation if clicking on buttons or links
-    const target = e.target as HTMLElement;
+  const handleRowClick = (productId, e) => {
+    const target = e.target;
     if (target.closest("button, a")) {
       return;
     }
@@ -139,8 +126,7 @@ export const ProductList: React.FC = () => {
           <div>
             <CardTitle>Product Inventory</CardTitle>
             <CardDescription>
-              {products.length} {products.length === 1 ? "product" : "products"}{" "}
-              in stock
+              {products.length} {products.length === 1 ? "product" : "products"} in stock
             </CardDescription>
           </div>
           <Button asChild>
@@ -204,25 +190,16 @@ export const ProductList: React.FC = () => {
                       </TableCell>
                       <TableCell>
                         <div className="line-clamp-2 text-sm text-muted-foreground">
-                          {product.short_description
-                            ?.split(" ")
-                            .slice(0, 4)
-                            .join(" ") + "..."}
+                          {product.short_description?.split(" ").slice(0, 4).join(" ") + "..."}
                         </div>
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-wrap gap-1 max-w-[200px]">
-                          {product.categories
-                            ?.slice(0, 2)
-                            .map((cat: string) => (
-                              <Badge
-                                key={cat}
-                                variant="outline"
-                                className="truncate"
-                              >
-                                {cat}
-                              </Badge>
-                            ))}
+                          {product.categories?.slice(0, 2).map((cat) => (
+                            <Badge key={cat} variant="outline" className="truncate">
+                              {cat}
+                            </Badge>
+                          ))}
                           {product.categories?.length > 2 && (
                             <Badge variant="secondary">
                               +{product.categories.length - 2}
@@ -231,23 +208,14 @@ export const ProductList: React.FC = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge
-                          className={`${getConditionColor(
-                            product.product_condition,
-                          )} px-2 py-1 rounded-full`}
-                        >
+                        <Badge className={`${getConditionColor(product.product_condition)} px-2 py-1 rounded-full`}>
                           {product.product_condition}/10
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right font-medium">
                         {product.discounted_price ? (
                           <>
-                            {formatPrice(
-                              applyDiscount(
-                                product.price,
-                                product.discounted_price,
-                              ),
-                            )}
+                            {formatPrice(applyDiscount(product.price, product.discounted_price))}
                             <div className="text-xs text-muted-foreground line-through">
                               {formatPrice(product.price)}
                             </div>
@@ -267,23 +235,14 @@ export const ProductList: React.FC = () => {
                         )}
                       </TableCell>
                       <TableCell className="text-right">
-                        <div
-                          className="flex gap-2 justify-end"
-                          onClick={(e) => e.stopPropagation()}
-                        >
+                        <div className="flex gap-2 justify-end" onClick={(e) => e.stopPropagation()}>
                           <Button variant="outline" size="sm" asChild>
-                            <Link
-                              href={`/admin/dashboard/products/update/${product._id}`}
-                            >
-                              Edit
-                            </Link>
+                            <Link href={`/admin/dashboard/products/update/${product._id}`}>Edit</Link>
                           </Button>
                           <Button
                             variant="destructive"
                             size="sm"
-                            onClick={() =>
-                              deleteProduct(product._id, product.name)
-                            }
+                            onClick={() => deleteProduct(product._id, product.name)}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -317,9 +276,7 @@ export const ProductList: React.FC = () => {
                     ))}
                     <PaginationItem>
                       <PaginationNext
-                        onClick={() =>
-                          setPage((prev) => Math.min(totalPages, prev + 1))
-                        }
+                        onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
                         disabled={page >= totalPages}
                       />
                     </PaginationItem>
