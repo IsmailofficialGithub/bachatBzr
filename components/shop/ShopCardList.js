@@ -169,7 +169,7 @@ const ShopCardList = ({ item, addToCart, addToWishlist,soldProducts }) => {
             <p>{item.long_description}.</p>
 
             <div className="tpproduct__action">
-              <Link className="quckview" href={`${process.env.NEXT_PUBLIC_API_URL}/shop/${item._id}`}>
+              <Link className="quckview" href={`/shop/${item._id}`}>
                 <i className="fal fa-eye" />
               </Link>
               <a onClick={() => addToWishlist(item._id)} className="wishlist">

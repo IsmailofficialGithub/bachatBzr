@@ -127,7 +127,7 @@ const OrderPage = () => {
   const gettingOrders = async (userid) => {
     try {
       setLoading(true);
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/orders/user/${userid}`);
+      const response = await axios.get(`/api/orders/user/${userid}`);
       if (response.data.success) {
         setOrders(response.data.data);
       } else {

@@ -6,6 +6,10 @@ const nextConfig = {
             protocol: 'https',
               hostname: 'res.cloudinary.com',
             },
+          {
+            protocol: 'https',
+              hostname: 'bachatbzr.com',
+            },
             {
               protocol: 'https',
               hostname: 'avatar.iran.liara.run',

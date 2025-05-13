@@ -52,7 +52,7 @@ const CheckOutPage = ({ amount, orderDetails }) => {
         elements,
         clientSecret,
         confirmParams: {
-          return_url: `${process.env.NEXT_PUBLIC_API_URL}/payment-success?amount=${amount}`,
+          return_url: `/payment-success?amount=${amount}`,
         },
         redirect:"if_required"
       });

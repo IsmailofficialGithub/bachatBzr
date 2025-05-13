@@ -35,7 +35,7 @@ const FilterShopBox = () => {
     setLoading(true);
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/product/get?page=${page.current}&limit=${limit}`,
+        `/api/product/get?page=${page.current}&limit=${limit}`,
       );
 
       if (response.data.success) {

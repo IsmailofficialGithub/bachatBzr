@@ -17,7 +17,7 @@ const OrderDetails = () => {
     setLoading(true)
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/orders/singleOrder?orderId=${id}`,
+        `/api/orders/singleOrder?orderId=${id}`,
       );
       if (response.data.success) {
         setOrderDetails(response.data.data);

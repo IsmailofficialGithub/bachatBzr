@@ -67,11 +67,11 @@ export default function Checkout() {
     return productTotal;
   };
 
-  // useEffect(()=>{
-  //  if(cart.length<1 || cart===undefined){
-  //   router.push(`/shop`);
-  //  } 
-  // },[cart])
+  useEffect(()=>{
+   if(cart.length<1 || cart===undefined){
+    router.push(`/shop`);
+   } 
+  },[cart])
   useEffect(() => {
     if (cashOnDelivery) {
       setTotalAmount(calculateTotals(true) + 50);

@@ -65,7 +65,7 @@ const ShopSingleDynamicV1 = () => {
     setLoading(true);
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/product/getSingle/${id}`,
+        `/api/product/getSingle/${id}`,
       );
       if (response.data.success) {
         setProduct(response.data.product);
@@ -83,7 +83,7 @@ const ShopSingleDynamicV1 = () => {
   const fetchingRelatedProduct = async (tags) => {
     try {
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/product/relatedProduct`,
+        `/api/product/relatedProduct`,
         { tags },
       );
       if (response.data.success) {

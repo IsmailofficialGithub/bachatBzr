@@ -57,7 +57,7 @@ const SingleCategories = () => {
     setloading(true);
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/categories/product/${slug}?page=${page.current}&limit=${limit}`,
+        `/api/categories/product/${slug}?page=${page.current}&limit=${limit}`,
       );
       if (response.data.success) {
         if (response.data.data.length > 0) {
