@@ -28,16 +28,17 @@ const ProfilePage = () => {
   useEffect(() => {
     const fetchSession = async () => {
       const session = await dispatch(fetchAuthSession());
+      console.log(session);
       if (session?.payload.user) {
         const user = session.payload.user;
         const name =
           user?.name ||
           user?.user_metadata?.name ||
           user?.user_metadata?.address?.firstName ||
-          "";
-        const email = user.email;
-        const phone = user.phone || user.user_metadata?.address.phone || "";
-        const avatar = user.user_metadata?.avatar || "";
+          "BachatBzr user";
+        const email = user?.email;
+        const phone = user?.phone || user.user_metadata?.address?.phone || "";
+        const avatar = user?.user_metadata?.avatar || "https://avatar.iran.liara.run/public/31";
         setProfile((prev) => ({ ...prev, name, email, phone, avatar }));
       }
     };
@@ -119,7 +120,7 @@ const ProfilePage = () => {
       const { error } = await supabase.auth.resetPasswordForEmail(
         profile.email,
         {
-          redirectTo: `${process.env.NEXT_PUBLIC_API_URL}/user/update-password`, // 👈 Must match your frontend route
+          redirectTo: `/user/update-password`, // 👈 Must match your frontend route
         },
       );
       if (error) {
@@ -139,11 +140,6 @@ const ProfilePage = () => {
       // setShowPasswordForm(false)
     }
   };
-
-  useEffect(() => {
-    console.log(profile);
-  }, [profile]);
-
   return (
     <div
       className="min-h-screen w-full p-4 md:p-8"

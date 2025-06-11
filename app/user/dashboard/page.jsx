@@ -31,7 +31,7 @@ export default function Dashboard() {
           };
           setuser(user);
           const response = await axios.post(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/orders/user-stats`,
+            `/api/orders/user-stats`,
             {
               userId: userid,
             },

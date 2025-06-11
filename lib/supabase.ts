@@ -7,5 +7,7 @@ const SUPABASE_SERVICE_ROLE_KEY:string = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e
 // const supabaseUrl = process.env.SUPABASE_URL!;
 // const supabaseKey:string = process.env.SUPABASE_KEY!;
 
+
+
 export const supabase = createClient(supabaseUrl, supabaseKey);
 export const supabaseAdmin=createClient(supabaseUrl,SUPABASE_SERVICE_ROLE_KEY)

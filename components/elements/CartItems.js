@@ -1,7 +1,9 @@
 'use client'
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
-import { addQty, deleteCart } from "@/features/shopSlice";
+import {  deleteCart } from "@/features/shopSlice";
+import { applyDiscount } from "@/lib/discountHandler";
+import { Button } from "../ui/button";
 
 const CartItems = () => {
     const { cart } = useSelector((state) => state.shop) || {};
@@ -29,15 +31,18 @@ const CartItems = () => {
                         </Link>
                     </td>
 
-                    <td className="product-price">PKR {item.price}</td>
+                    <td className="product-price">
+                        {item.discounted_price &&<p>PKR {applyDiscount(item.price,item.discounted_price)}</p>}
+                        <p className={item.discounted_price&& 'line-through'}>PKR {item.price}</p>
+                    </td>
 
                     <td className="product-remove">
-                        <button
+                        <Button variant="secondary"
                             onClick={() => deleteCartHandler(item?._id)}
                             className="remove"
                         >
                             <span className="flaticon-dustbin">Remove</span>
-                        </button>
+                        </Button>
                     </td>
                 </tr>
             ))}

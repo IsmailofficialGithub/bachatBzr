@@ -1,5 +1,6 @@
 "use client";
 import { addQty, deleteCart } from "@/features/shopSlice";
+import { applyDiscount } from "@/lib/discountHandler";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -15,7 +16,7 @@ export default function HeaderCart({ isCartSidebar, handleCartSidebar }) {
   // qty handler
   let total = 0;
   cart?.forEach((item) => {
-    const price = item.price;
+    const price = item.discounted_price? applyDiscount(item.price,item.discounted_price):item.price;
     total = total + price;
   });
   return (
@@ -49,10 +50,12 @@ export default function HeaderCart({ isCartSidebar, handleCartSidebar }) {
                       </div>
                       <div className="tpcart__content">
                         <span className="tpcart__content-title">
-                          <Link href="/shop-details">{item.name}</Link>
+                          <Link href={`/shop/${item._id}`}>{item.name}</Link>
                         </span>
                         <div className="tpcart__cart-price">
-                          <span className="new-price">PKR {item?.price}</span>
+                         {item.discounted_price &&  <span className="new-price">PKR {applyDiscount(item.price,item.discounted_price)}</span>}
+                         <br/>
+                          <span className={`new-price ${item.discounted_price&& "line-through"}`}>PKR  {item?.price}</span>
                         </div>
                       </div>
                     </div>

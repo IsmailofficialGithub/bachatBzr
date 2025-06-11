@@ -2,12 +2,13 @@
 import CartShow from "@/components/elements/CartShow";
 import WishListShow from "@/components/elements/WishListShow";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import HeaderMobSticky from "../HeaderMobSticky";
 import HeaderSticky from "../HeaderSticky";
 import HeaderTabSticky from "../HeaderTabSticky";
-import axios from "axios";
 import { useSelector } from "react-redux";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 export default function Header3({
   scroll,
@@ -17,24 +18,51 @@ export default function Header3({
   handleCartSidebar,
 }) {
   const { user } = useSelector((state) => state.auth);
+  const { categories } = useSelector((state) => state?.categories);
   const [isToggled, setToggled] = useState(false);
-  const [categories, setCategories] = useState([]);
   const handleToggle = () => setToggled(!isToggled);
+  const [query, setQuery] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const router=useRouter()
 
-  const fetchingCategories = async () => {
+  const debounce = (func, delay) => {
+    const timer = useRef(null);
+
+    return (...args) => {
+      if (timer.current) clearTimeout(timer.current);
+      timer.current = setTimeout(() => {
+        func(...args);
+      }, delay);
+    };
+  };
+
+  // Function to fetch suggestions
+  const fetchSuggestions = async (searchTerm) => {
+    if (!searchTerm) return setSuggestions([]);
+
     try {
-      const response = await axios.get(`/api/categories`);
-      if (response.data.success) {
-        setCategories(response.data.data);
+      const res = await axios.get(`api/product/searchSuggestion?q=${searchTerm}`);
+      const result = res.data;
+
+      if (result.success) {
+        setSuggestions(result.data);
+      } else {
+        setSuggestions([]);
       }
     } catch (error) {
-      console.log(error);
+      console.error("Axios fetch error:", error.message);
+      setSuggestions([]);
     }
   };
 
-  useEffect(() => {
-    fetchingCategories();
-  }, []);
+  // Debounced version of the API call
+  const debouncedFetch = useCallback(debounce(fetchSuggestions, 500), []);
+
+  const handleChange = (e) => {
+    const value = e.target.value;
+    setQuery(value);
+    debouncedFetch(value);
+  };
 
   return (
     <>
@@ -60,13 +88,16 @@ export default function Header3({
                   <div className="headertoplag__lang">
                     <ul>
                       <li>
-                        <Link href={user ? "/user/account" : "/authentication"}>
+                        <Link
+                          href={
+                            user
+                              ? `/${user?.user_metadata?.role}/dashboard`
+                              : "/authentication"
+                          }
+                        >
                           <i className="fal fa-user" /> Account
                         </Link>
-                        <Link
-                          className="order-tick"
-                          href={user ? "/user/account" : "/authentication"}
-                        >
+                        <Link className="order-tick" href={"/track"}>
                           <i className="fal fa-plane-departure" /> Track Your
                           Order
                         </Link>
@@ -101,21 +132,45 @@ export default function Header3({
               <div className="col-xl-2 col-lg-3">
                 <div className="logo">
                   <Link href="/">
-                    <img src="/assets/img/logo/logo.png" alt="logo" width={200}/>
+                    <img
+                      src="/assets/img/logo/logo.png"
+                      alt="logo"
+                      width={200}
+                    />
                   </Link>
                 </div>
               </div>
               <div className="col-xl-10 col-lg-9">
                 <div className="header-meta-info d-flex align-items-center justify-content-between">
                   <div className="header-search-bar">
-                    <form action="#">
-                      <div className="search-info p-relative">
-                        <button className="header-search-icon">
-                          <i className="fal fa-search" />
-                        </button>
-                        <input type="text" placeholder="Search products..." />
-                      </div>
-                    </form>
+                    <div className="search-info p-relative">
+                      <input
+                        type="text"
+                        placeholder="Search products..."
+                        value={query}
+                        onChange={handleChange}
+                      />
+                      <button className="header-search-icon" onClick={()=>{query && router.push(`/shop?q=${query}`);setSuggestions([])}}>
+                        <i className="fal fa-search" /> 
+                      </button>
+
+                      {/* Suggestions Dropdown */}
+                      {suggestions.length > 0 && (
+                        <ul className="suggestion-list absolute bg-white border mt-2 p-2 rounded shadow">
+                          {suggestions.map((item, idx) => (
+                            <li
+                              key={idx}
+                              className="py-1 px-2 hover:bg-gray-100 cursor-pointer"
+                              onClick={()=>{router.push(`/shop?q=${item}`)}}
+                            >
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                        
+                      )}
+                     
+                    </div>
                   </div>
                   <div className="header-meta header-brand d-flex align-items-center">
                     <div className="header-meta__social d-flex align-items-center ml-25">
@@ -126,7 +181,13 @@ export default function Header3({
                         <i className="fal fa-shopping-cart" />
                         <CartShow />
                       </button>
-                      <Link href={user ? "/user/dashboard" : "/authentication"}>
+                      <Link
+                        href={
+                          user
+                            ? `/${user?.user_metadata?.role}/dashboard`
+                            : "/authentication"
+                        }
+                      >
                         <i className="fal fa-user" />
                       </Link>
                       <Link
@@ -143,7 +204,10 @@ export default function Header3({
             </div>
           </div>
         </div>
-        <div className="main-menu-area tertiary-main-menu mt-25 d-none d-xl-block">
+        <div
+          className="main-menu-area tertiary-main-menu mt-25 d-none d-xl-block"
+          style={{ marginLeft: "5%", marginRight: "5%" }}
+        >
           <div className="container">
             <div className="row align-items-center">
               <div className="col-xl-2 col-lg-3">
@@ -157,7 +221,7 @@ export default function Header3({
                     style={{ display: `${isToggled ? "block" : "none"}` }}
                   >
                     <ul className="cat-menu__list">
-                      {categories.map((category) => (
+                      {categories?.map((category) => (
                         <li
                           key={category.id}
                           className={
@@ -326,16 +390,25 @@ export default function Header3({
         scroll={scroll}
         isCartSidebar={isCartSidebar}
         handleCartSidebar={handleCartSidebar}
+        AccountredirectUrl={
+          user ? `/${user?.user_metadata?.role}/dashboard` : "/authentication"
+        }
       />
       <HeaderTabSticky
         scroll={scroll}
         isMobileMenu={isMobileMenu}
+        AccountredirectUrl={
+          user ? `/${user?.user_metadata?.role}/dashboard` : "/authentication"
+        }
         handleMobileMenu={handleMobileMenu}
         isCartSidebar={isCartSidebar}
         handleCartSidebar={handleCartSidebar}
       />
       <HeaderMobSticky
         scroll={scroll}
+        AccountredirectUrl={
+          user ? `/${user?.user_metadata?.role}/dashboard` : "/authentication"
+        }
         isMobileMenu={isMobileMenu}
         handleMobileMenu={handleMobileMenu}
         isCartSidebar={isCartSidebar}

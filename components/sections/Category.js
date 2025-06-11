@@ -41,14 +41,14 @@ export default function Category() {
 
   return (
     <>
-      <section className="category-area pt-70 bg-green-500" style={{ backgroundColor: "green" }}>
+      <section className="category-area pt-70 bg-green-500" style={{ backgroundColor: "#f9a253" }}>
         <div className="container">
           <div className="row">
             <div className="col-md-12">
               <div className="tpsection mb-40">
                 <h4 className="tpsection__title">
                   Top{" "}
-                  <span className="text-green-600" style={{ color: "orange" }}>
+                  <span className="text-green-600" style={{ color: "white" }}>
                     {" "}
                     Categories{" "}
                     <img src="/assets/img/icon/title-shape-01.jpg" alt="" />

@@ -13,6 +13,7 @@ import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import SocialShare from "@/components/socialShare/socialShare";
 import { Loader } from "lucide-react";
+import SingleProductSkeleton from '@/components/skeleton/singleProductSkeleton'
 
 const swiperOptions = {
   modules: [Autoplay, Pagination, Navigation],
@@ -60,7 +61,6 @@ const ShopSingleDynamicV1 = () => {
     setActiveIndex(index);
   };
 
-  useEffect(()=>{console.log(relatedTags),[relatedTags]})
   const fetchingProduct = async () => {
     setLoading(true);
     try {
@@ -133,15 +133,16 @@ const ShopSingleDynamicV1 = () => {
 
   return (
     <>
-      <Layout headerStyle={3} footerStyle={1} breadcrumbTitle="Shop Details">
+      <Layout headerStyle={3} footerStyle={1} breadcrumbTitle="Product Details">
         <section className="product-area pt-80 pb-50">
           <div className="container">
             <div className="row">
-              <div className="col-lg-5 col-md-12" >
+            
+               <div className="col-lg-5 col-md-12" >
                 {/* all Images logic */}
-                <div className="tpproduct-details__list-img">
+              <div className="tpproduct-details__list-img">
                   {loading
-                    ? "Loading images"
+                    ? <SingleProductSkeleton type={"image"}/>
                     : product?.images?.map((image, index) => (
                         <div
                           className="tpproduct-details__list-img-item"
@@ -156,14 +157,17 @@ const ShopSingleDynamicV1 = () => {
                 </div>
               </div>
               <div className="col-lg-5 col-md-7">
-                <div className="tpproduct-details__content tpproduct-details__sticky">
+                {
+                  loading?
+                  <SingleProductSkeleton type={"content"}/>
+                  :
+
+                  <div className="tpproduct-details__content tpproduct-details__sticky">
                   <div className="tpproduct-details__tag-area d-flex align-items-center mb-5">
                     <span className="tpproduct-details__tag">
-                      {loading ? (
-                        <Loader className="animate-spin" />
-                      ) : (
+                      {
                         product.name
-                      )}
+                      }
                     </span>
                     <div className="tpproduct-details__rating">
                       <Link href="#">
@@ -194,20 +198,15 @@ const ShopSingleDynamicV1 = () => {
                     )}
                     <span>
                       PKR{" "}
-                      {loading ? (
-                        <Loader className="animate-spin" />
-                      ) : (
+                      {
                         applyDiscount(product.price, product.discounted_price)
-                      )}
+                      }
                     </span>
                   </div>
                   <div className="tpproduct-details__pera">
                     <p>
-                      {loading ? (
-                        <Loader className="animate-spin" />
-                      ) : (
-                        product.short_description
-                      )}{" "}
+                      {product.short_description
+                      }{" "}
                     </p>
                   </div>
                   {!product ? (
@@ -232,9 +231,7 @@ const ShopSingleDynamicV1 = () => {
                   </div>
                   <div className="tpproduct-details__information tpproduct-details__categories">
                     <p>Categories:</p>
-                    {loading ? (
-                      <Loader className="animate-spin" />
-                    ) : (
+                    {
                       product?.categories?.map((category, index) => (
                         <span key={index}>
                           <Link href={`/categories/${category}`}>
@@ -244,21 +241,16 @@ const ShopSingleDynamicV1 = () => {
                           {/* Adds comma except for the last item */}
                         </span>
                       ))
-                    )}
+                    }
                   </div>
                   <div className="tpproduct-details__information tpproduct-details__categories">
                     <p>Condition:</p>
-                    {loading ? (
-                      <Loader className="animate-spin" />
-                    ) : (
-                      <span>{product.product_condition} / 10</span>
-                    )}
+                    { <span>{product.product_condition} / 10</span>
+                    }
                   </div>
                   <div className="tpproduct-details__information tpproduct-details__tags">
                     <p>Tags:</p>
-                    {loading ? (
-                      <Loader className="animate-spin" />
-                    ) : product.tags?.length > 0 ? (
+                    { product.tags?.length > 0 ? (
                       product.tags.map((tag, index) => (
                         <span key={index}>
                           <Link href="">{tag}</Link>
@@ -271,7 +263,10 @@ const ShopSingleDynamicV1 = () => {
                   </div>
                   <SocialShare title={`Check out ${product.name}`} />
                 </div>
+                }
               </div>
+            
+             
               <div className="col-lg-2 col-md-5">
                 <div className="tpproduct-details__condation">
                   <ul>
@@ -459,7 +454,7 @@ const ShopSingleDynamicV1 = () => {
                       <div className="tpproduct pb-15 mb-30">
                         <div className="tpproduct__thumb p-relative sm:bg-slate-600">
                           <Link
-                            href={`${process.env.NEXT_PUBLIC_API_URL}/shop/${relatedproduct._id}`}
+                            href={`/shop/${relatedproduct._id}`}
                           >
                             <div >
                               <img

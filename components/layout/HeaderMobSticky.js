@@ -1,10 +1,10 @@
 import Link from "next/link"
 import CartShow from "../elements/CartShow"
 
-export default function HeaderMobSticky({ scroll, isMobileMenu, handleMobileMenu, isCartSidebar, handleCartSidebar }) {
+export default function HeaderMobSticky({ scroll, isMobileMenu, handleMobileMenu, isCartSidebar, handleCartSidebar,AccountredirectUrl }) {
     return (
         <>
-            <div id="header-mob-sticky" className={`tp-md-lg-header d-md-none pt-20 pb-20 ${scroll ? "header-sticky" : ""}`}>
+            <div id="header-mob-sticky" className={`tp-md-lg-header d-md-none  ${scroll ? "header-sticky" : ""}`}>
                 <div className="container">
                     <div className="row align-items-center">
                         <div className="col-3 d-flex align-items-center">
@@ -14,7 +14,7 @@ export default function HeaderMobSticky({ scroll, isMobileMenu, handleMobileMenu
                         </div>
                         <div className="col-6">
                             <div className="logo text-center">
-                                <Link href="/"><img src="/assets/img/logo/logo.png" alt="logo" width={200}/></Link>
+                                <Link href="/"><img src="/assets/img/logo/logo.png" alt="logo" width={100}/></Link>
                             </div>
                         </div>
                         <div className="col-3">
@@ -25,7 +25,7 @@ export default function HeaderMobSticky({ scroll, isMobileMenu, handleMobileMenu
                                             <i className="fal fa-shopping-cart" />
                                             <CartShow />
                                         </button>
-                                        <Link href="/authentication"><i className="fal fa-user" /></Link>
+                                        <Link href={AccountredirectUrl}><i className="fal fa-user" /></Link>
                                     </div>
                                 </div>
                             </div>

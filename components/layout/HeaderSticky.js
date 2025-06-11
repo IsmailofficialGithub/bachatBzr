@@ -2,7 +2,7 @@ import Link from "next/link"
 import CartShow from "../elements/CartShow"
 import WishListShow from "../elements/WishListShow"
 
-export default function HeaderSticky({ scroll, isCartSidebar, handleCartSidebar }) {
+export default function HeaderSticky({ scroll, isCartSidebar, handleCartSidebar,AccountredirectUrl }) {
     return (
         <>
             <div id="header-sticky" className={`logo-area tp-sticky-one mainmenu-5 ${scroll ? "header-sticky" : ""}`}>
@@ -95,7 +95,7 @@ export default function HeaderSticky({ scroll, isCartSidebar, handleCartSidebar 
                                         <i className="fal fa-shopping-cart" />
                                         <CartShow />
                                     </button>
-                                    <Link href="/authentication"><i className="fal fa-user" /></Link>
+                                    <Link href={AccountredirectUrl}><i className="fal fa-user" /></Link>
                                     <Link href="/wishlist" className="header-cart p-relative tp-cart-toggle">
                                         <i className="fal fa-heart" />
                                         <WishListShow />

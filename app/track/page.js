@@ -1,12 +1,39 @@
 "use client"
 import Layout from "@/components/layout/Layout"
+import axios from "axios";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 export default function Track() {
     const router = useRouter();
     const [orderId, setOrderId] = useState('');
     const [email, setEmail] = useState('');
+    const [orderDetail, setOrderDetail] = useState([])
+    const [loading, setLoading] = useState(false)
     const [isAutoFilled, setIsAutoFilled] = useState(false);
+
+
+    const gettingOrderDetails=async()=>{
+        setLoading(true)
+        if(!orderId || orderId === ""){
+            return toast.error("Order Id is required");
+        }
+        try {
+            const response=await axios.post('/api/lapord/shipment',{
+                shipment_order_id:[orderId]
+            })
+            if(response.data.success){
+          setOrderDetail(response.data.order);
+            }else{
+                toast.error(`Failed to get order details . ${response.data.message || response.data.error || ""}`)
+            }
+            
+        } catch (error) {
+            console.log('error',error)
+        }finally{
+            setLoading(false)
+        }
+    }
 
     // Extract order ID from URL hash when component mounts
     useEffect(() => {
@@ -21,16 +48,15 @@ export default function Track() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Add your tracking logic here
-        console.log('Tracking order:', orderId, 'with email:', email);
-        // You would typically make an API call here to fetch order details
+gettingOrderDetails();
+      
     };
 
     return (
         
         <>
             <Layout headerStyle={3} footerStyle={1} breadcrumbTitle="Track">
-                <section className="track-area pt-80 pb-80">
+                <section className="track-area pt-3 pb-3">
                     <div className="container">
                         <div className="row justify-content-center">
                             <div className="col-md-7">
@@ -60,8 +86,8 @@ export default function Track() {
                                                 <input type="email" placeholder="Billing email" value={email} onChange={((e)=>{setEmail(e.target.value)})}/>
                                             </form>
                                         </div>
-                                        <div className="tptrack__btn">
-                                            <button className="tptrack__submition" onClick={handleSubmit}>Track Now<i className="fal fa-long-arrow-right" /></button>
+                                        <div className={`tptrack__btn ${!orderId || !email ? 'hidden' : ''}`}>
+                                            <button className={`tptrack__submition `} onClick={handleSubmit} disabled={!orderId || !email}>Track Now {loading?<i class="fas fa-spinner fa-spin"></i>:<i className="fal fa-long-arrow-right " />}</button>
                                         </div>
                                     </div>
                                 </div>

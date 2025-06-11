@@ -10,18 +10,20 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { supabase } from "@/lib/supabase";
 import PaginationComponent from "@/app/components/pagination";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import ProductSkeleton from "../skeleton/ShopSkeleton";
 import ProductSkeleton2 from "../skeleton/ShopSkeleton2";
+import { Button } from "../ui/button";
 const FilterShopBox = () => {
   const searchParams = useSearchParams();
   const pageParms = searchParams.get("page") || "1";
-
+  const searchQuery = searchParams.get("q") || "";
+  const router = useRouter();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [totalPages, setTotalPages] = useState(1);
-  const [limit, setLimit] = useState(10);
+  const [limit, setLimit] = useState(20);
   const [sort, setSort] = useState("");
   const [soldProducts, setSoldProducts] = useState([]);
   const page = useRef(pageParms);
@@ -34,9 +36,17 @@ const FilterShopBox = () => {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(
-        `/api/product/get?page=${page.current}&limit=${limit}`,
-      );
+      let response;
+
+      if (!searchQuery || searchQuery.trim() === "") {
+        response = await axios.get(
+          `/api/product/get?page=${page.current}&limit=${limit}`,
+        );
+      } else {
+        response = await axios.get(
+          `/api/product/searchQuery?q=${searchQuery}&?page=${page.current}&limit=${limit}`,
+        );
+      }
 
       if (response.data.success) {
         setProducts(response.data.data);
@@ -54,7 +64,7 @@ const FilterShopBox = () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/product/sort?page=${page.current}&limit=${limit}&sort=${sort}`,
+        `/api/product/sort?page=${page.current}&limit=${limit}&sort=${sort}`,
       );
       if (response.data.success) {
         setProducts(response.data.products);
@@ -69,9 +79,8 @@ const FilterShopBox = () => {
     }
   };
 
- 
   useEffect(() => {
-    fetchProducts(pageParms)
+    fetchProducts(pageParms);
     const productSubscription = supabase
       .channel("realtime:products")
       .on(
@@ -80,10 +89,10 @@ const FilterShopBox = () => {
         (payload) => {
           const newProduct = payload.new;
           const oldProduct = payload.old;
-  
+
           setProducts((prevProducts) => {
             let updatedProducts = [...prevProducts];
-  
+
             if (payload.eventType === "INSERT") {
               updatedProducts = [newProduct, ...prevProducts];
             } else if (payload.eventType === "UPDATE") {
@@ -91,36 +100,35 @@ const FilterShopBox = () => {
               if (newProduct.sold && !oldProduct.sold) {
                 // Trigger sold animation
                 setSoldProducts((prev) => [...prev, newProduct._id]);
-  
+
                 // Remove after 30 seconds
                 setTimeout(() => {
                   setProducts((prev) =>
-                    prev.filter((p) => p._id !== newProduct._id)
+                    prev.filter((p) => p._id !== newProduct._id),
                   );
                 }, 30000);
               }
-  
+
               // Always update product in list
               updatedProducts = prevProducts.map((p) =>
-                p._id === newProduct._id ? newProduct : p
+                p._id === newProduct._id ? newProduct : p,
               );
             } else if (payload.eventType === "DELETE") {
               updatedProducts = prevProducts.filter(
-                (p) => p._id !== oldProduct._id
+                (p) => p._id !== oldProduct._id,
               );
             }
-  
+
             return updatedProducts;
           });
-        }
+        },
       )
       .subscribe();
-  
+
     return () => {
       supabase.removeChannel(productSubscription);
     };
   }, []);
-  
 
   const dispatch = useDispatch();
 
@@ -132,6 +140,9 @@ const FilterShopBox = () => {
     const item = products?.find((item) => item._id === id);
     dispatch(addWishlist({ product: item }));
   };
+  useEffect(() => {
+    fetchProducts();
+  }, [searchQuery]);
 
   const [activeIndex, setActiveIndex] = useState(2);
   const handleOnClick = (index) => {
@@ -244,7 +255,7 @@ const FilterShopBox = () => {
                   <ProductSkeleton2 />
                   <ProductSkeleton2 />
                 </div>
-              ) : (
+              ) : products.length > 0 ? (
                 products.map((item, i) => (
                   <Fragment key={i}>
                     <ShopCardList
@@ -256,6 +267,26 @@ const FilterShopBox = () => {
                   </Fragment>
                   // End all products
                 ))
+              ) : (
+                <>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      gap: "10px",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <p>
+                      {" "}
+                      NO PRODUCT AVALIABLE{" "}
+                      {searchQuery && `at this query "${searchQuery}"`}{" "}
+                    </p>
+
+                    <Button onClick={() => router.push("/shop")}>Shop</Button>
+                  </div>
+                </>
               )}
             </div>
             <div
@@ -264,20 +295,31 @@ const FilterShopBox = () => {
               }
             >
               <div className="row row-cols-xxl-4 row-cols-xl-4 row-cols-lg-3 row-cols-md-3 row-cols-sm-2 row-cols-1 tpproduct">
-                {loading
-                  ? Array.from({ length: 10 }).map((_, i) => (
-                      <ProductSkeleton key={i} />
-                    ))
-                  : products.map((item, i) => (
-                      <Fragment key={i}>
-                        <ShopCard
-                          soldProducts={soldProducts}
-                          item={item}
-                          addToCart={addToCart}
-                          addToWishlist={addToWishlist}
-                        />
-                      </Fragment>
-                    ))}
+                {loading ? (
+                  Array.from({ length: 10 }).map((_, i) => (
+                    <ProductSkeleton key={i} />
+                  ))
+                ) : products.length > 0 && !loading ? (
+                  products.map((item, i) => (
+                    <Fragment key={i}>
+                      <ShopCard
+                        soldProducts={soldProducts}
+                        item={item}
+                        addToCart={addToCart}
+                        addToWishlist={addToWishlist}
+                      />
+                    </Fragment>
+                  ))
+                ) : (
+                  <>
+                    <div style={{ display: "flex", justifyContent: "center" }}>
+                      {" "}
+                      NO PRODUCT AVALIABLE{" "}
+                      {searchQuery && `at this query "${searchQuery}"`}{" "}
+                    </div>
+                    <Button onClick={() => router.push("/shop")}>Shop</Button>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -285,7 +327,7 @@ const FilterShopBox = () => {
       </div>
 
       <PaginationComponent
-        currentPage={page}
+        currentPage={page.current}
         totalPages={totalPages}
         onPageChange={handlePageChange}
         className="mt-8 "

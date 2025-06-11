@@ -1,13 +1,14 @@
 'use client'
 import CartItems from "@/components/elements/CartItems"
 import Layout from "@/components/layout/Layout"
+import { applyDiscount } from "@/lib/discountHandler"
 import Link from "next/link"
 import { useSelector } from "react-redux"
 export default function Cart() {
     const { cart } = useSelector((state) => state.shop) || {}
     let total = 0
     cart?.forEach((item) => {
-        const price = item.price;
+        const price = item.discounted_price ?applyDiscount(item.price,item.discounted_price):item.price;
         total = total + price
     })
     return (

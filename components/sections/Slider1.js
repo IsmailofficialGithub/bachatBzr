@@ -40,11 +40,12 @@ export default function Slider1() {
                                             <div className="tp-slide-item">
                                                 <div className="tp-slide-item__content">
                                                     <h4 className="tp-slide-item__sub-title">Shoes</h4>
-                                                    <h3 className="tp-slide-item__title mb-25">Up To
-                                                        <i>60% Off
+                                                    <h3 className="tp-slide-item__title mb-25"> Up To
+                                                        <i> 60% Off   
                                                             <img src="/assets/img/icon/title-shape-02.jpg" alt="" />
                                                         </i>
-                                                        latest Creations
+
+                                                        Latest Creations
                                                     </h3>
                                                     <Link className="tp-slide-item__slide-btn tp-btn" href="/shop">Shop Now <i className="fal fa-long-arrow-right" /></Link>
                                                 </div>

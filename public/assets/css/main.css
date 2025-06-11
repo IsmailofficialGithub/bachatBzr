@@ -1140,7 +1140,24 @@ only screen and (min-width: 576px) and (max-width: 767px) {
     display: inline-block;
     padding: 0 30px;
 }
-
+.suggestion-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 50;
+  width: 100%;
+  list-style: none;
+}
+.suggestion-list li{
+    padding: 10px;
+    background: var(--tp-common-white);
+    cursor: pointer;
+}
+.suggestion-list li:hover{
+    background: var( --tp-grey-1);
+   
+}
+  
 /*----------------------------------------*/
 /*  00. HEADER CSS START
 /*----------------------------------------*/
@@ -2461,6 +2478,13 @@ a.wishlist, a.add-to-cart {
 
 .tpcart__cart-price .new-price {
     color: var(--tp-text-primary);
+}
+.line-through{
+ text-decoration: line-through red ;
+}
+.flex{
+    display:flex;
+    flex-direction: column;
 }
 
 .tpcart__total-price {

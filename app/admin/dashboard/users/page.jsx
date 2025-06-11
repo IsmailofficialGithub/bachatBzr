@@ -2,6 +2,7 @@
 import DashboardWrapper from "@/app/components/DashboardWrapper";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
+import { createBrowserClient } from '@supabase/ssr'
 import {
   Table,
   TableBody,
@@ -39,8 +40,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { supabase } from "@/lib/supabase";
 
 const Users = () => {
+ 
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [totalPages, setTotalPages] = useState(1);
@@ -53,7 +56,10 @@ const Users = () => {
     setRole(value);
     try {
       const response = await axios.get(
-        `/api/user/filter?role=${value === "all" ? "" : value}&page=${page}&limit=10`
+        `/api/user/filter?role=${value === "all" ? "" : value}&page=${page}&limit=10`,
+        {
+          withCredentials: true,
+        }
       );
       if (response.data.success) {
         if (response.data.users.length > 0) {
@@ -72,9 +78,20 @@ const Users = () => {
 
   const fetchUsers = async () => {
     setLoading(true);
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        toast.error('Please login first')
+        router.push('/authentication')
+        return
+      }
     try {
       const response = await axios.get(
-        `/api/user/get?page=${page}&pageSize=25`
+        `/api/user/get?page=${page}&pageSize=25`,{
+           headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json'
+        }
+        }
       );
       if (response.data.success) {
         setTotalPages(response.data.pagination.totalPages);

@@ -23,7 +23,6 @@ const PaginationComponent = ({
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
       onPageChange(newPage);
-      
       // Update URL with query parameter
       const url = new URL(window.location);
       url.searchParams.set('page', newPage);
@@ -127,7 +126,9 @@ const PaginationComponent = ({
           
           <PaginationItem>
             <PaginationNext 
-              onClick={() => { currentPage < totalPages && handlePageChange(currentPage + 1); }}
+              onClick={() => { currentPage < totalPages && handlePageChange(currentPage + 1);
+
+               }}
               className={currentPage >= totalPages ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
             />
           </PaginationItem>

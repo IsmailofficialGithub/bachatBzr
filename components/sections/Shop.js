@@ -31,6 +31,32 @@ const swiperOptions = {
         },
     },
 }
+const imagesData=[
+    {
+        Imageurl:"/assets/img/instagram/instagram-01.jpg",
+        redirectUrl:"#"
+    },
+    {
+        Imageurl:"/assets/img/instagram/instagram-02.jpg",
+        redirectUrl:"#"
+    },
+    {
+        Imageurl:"/assets/img/instagram/instagram-03.jpg",
+        redirectUrl:"#"
+    },
+    {
+        Imageurl:"/assets/img/instagram/instagram-04.jpg",
+        redirectUrl:"#"
+    },
+    {
+        Imageurl:"/assets/img/instagram/instagram-05.jpg",
+        redirectUrl:"#"
+    },
+    {
+        Imageurl:"/assets/img/instagram/instagram-06.jpg",
+        redirectUrl:"#"
+    },
+]
 
 export default function Shop() {
     return (
@@ -41,43 +67,23 @@ export default function Shop() {
                         <div className="col-md-12">
                             <div className="tpsectionarea text-center mb-35">
                                 <h5 className="tpsectionarea__subtitle">Follow On</h5>
-                                <h4 className="tpsectionarea__title"><i className="fab fa-instagram" /> SmartSwap</h4>
+                                <h4 className="tpsectionarea__title"><i className="fab fa-instagram" /> BachatBzr</h4>
                             </div>
                         </div>
                     </div>
                     <div className="shopareaitem">
                         <div className="shopslider-active swiper-container">
                             <Swiper {...swiperOptions}>
-                                <SwiperSlide className="tpshopitem">
-                                    <Link className="popup-image" href="#">
-                                        <img src="/assets/img/instagram/instagram-01.jpg" alt="shop-thumb" />
+                               {
+                                imagesData.map((image,index)=>(
+                                     <SwiperSlide className="tpshopitem" key={index}>
+                                    <Link className="popup-image" href={image.redirectUrl}>
+                                        <img src={image.Imageurl} alt="shop-thumb" />
                                     </Link>
                                 </SwiperSlide>
-                                <SwiperSlide className="tpshopitem">
-                                    <Link className="popup-image" href="#">
-                                        <img src="/assets/img/instagram/instagram-02.jpg" alt="shop-thumb" />
-                                    </Link>
-                                </SwiperSlide>
-                                <SwiperSlide className="tpshopitem">
-                                    <Link className="popup-image" href="#">
-                                        <img src="/assets/img/instagram/instagram-03.jpg" alt="shop-thumb" />
-                                    </Link>
-                                </SwiperSlide>
-                                <SwiperSlide className="tpshopitem">
-                                    <Link className="popup-image" href="#">
-                                        <img src="/assets/img/instagram/instagram-04.jpg" alt="shop-thumb" />
-                                    </Link>
-                                </SwiperSlide>
-                                <SwiperSlide className="tpshopitem">
-                                    <Link className="popup-image" href="#">
-                                        <img src="/assets/img/instagram/instagram-05.jpg" alt="shop-thumb" />
-                                    </Link>
-                                </SwiperSlide>
-                                <SwiperSlide className="tpshopitem">
-                                    <Link className="popup-image" href="#">
-                                        <img src="/assets/img/instagram/instagram-06.jpg" alt="shop-thumb" />
-                                    </Link>
-                                </SwiperSlide>
+                                ))
+                               }
+                              
                             </Swiper>
                         </div>
                     </div>

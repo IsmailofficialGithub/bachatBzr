@@ -2,7 +2,7 @@ import Link from "next/link"
 import CartShow from "../elements/CartShow"
 import WishListShow from "../elements/WishListShow"
 
-export default function HeaderTabSticky({ scroll, isMobileMenu, handleMobileMenu, isCartSidebar, handleCartSidebar }) {
+export default function HeaderTabSticky({ scroll, isMobileMenu, handleMobileMenu, isCartSidebar, handleCartSidebar ,AccountredirectUrl}) {
     return (
         <>
             <div id="header-tab-sticky" className={`tp-md-lg-header d-none d-md-block d-xl-none pt-30 pb-30 ${scroll ? "header-sticky" : ""}`}>
@@ -13,7 +13,7 @@ export default function HeaderTabSticky({ scroll, isMobileMenu, handleMobileMenu
                                 <button className="tp-menu-toggle" onClick={handleMobileMenu}><i className="far fa-bars" /></button>
                             </div>
                             <div className="logo">
-                                <Link href="/"><img src="/assets/img/logo/logo.png" alt="logo" width={150} /></Link>
+                                <Link href="/"><img src="/assets/img/logo/logo.png" alt="logo" width={100} /></Link>
                             </div>
                         </div>
                         <div className="col-lg-9 col-md-8">
@@ -31,7 +31,7 @@ export default function HeaderTabSticky({ scroll, isMobileMenu, handleMobileMenu
                                         <i className="fal fa-shopping-cart" />
                                         <CartShow />
                                     </button>
-                                    <Link href="/authentication"><i className="fal fa-user" /></Link>
+                                    <Link href={AccountredirectUrl}><i className="fal fa-user" /></Link>
                                     <Link href="/wishlist" className="header-cart p-relative tp-cart-toggle">
                                         <i className="fal fa-heart" />
                                         <WishListShow />

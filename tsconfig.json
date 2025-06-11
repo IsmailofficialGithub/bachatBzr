@@ -31,7 +31,7 @@
     ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx"
-  ],
+, "lib/auth-token.js"  ],
   "exclude": [
     "node_modules"
   ]

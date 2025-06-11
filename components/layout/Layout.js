@@ -47,8 +47,11 @@ export default function Layout({
   }, []);
   return (
     <>
+
+   
       <AuthInitializer />
       <DataBg />  {/*// for breadcrumbTitle background */}
+
       {headerStyle == 3 ? (
         <Header3
           scroll={scroll}
@@ -66,6 +69,7 @@ export default function Layout({
           handleCartSidebar={handleCartSidebar}
         />
       )}
+
 
       <Sidebar
         isMobileMenu={isMobileMenu}
@@ -87,5 +91,6 @@ export default function Layout({
 
       <BackToTop />
     </>
+
   );
 }

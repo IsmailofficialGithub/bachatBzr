@@ -126,7 +126,8 @@ e.preventDefault()
   const handleAddOrder = async (e) => {
     e.preventDefault();
     setLoading(true)
-    const errors = [];
+    try {
+      const errors = [];
     const requiredFields = [
       "firstName",
       "lastName",
@@ -177,7 +178,12 @@ e.preventDefault()
     
  await createOrder(orderDetails);
    router.push(`/user/orders`) 
+      
+    } catch (error) {
+      toast.error("Internel server Error")
+    }finally{
  setLoading(false)
+    }
 
   };
 
@@ -251,6 +257,7 @@ e.preventDefault()
 
   
   useEffect(() => {
+    console.log(cart,"cart")
     setOrderDetails({
       user_id: session?.user?.id,
       Receiver: `${address.firstName} ${address.lastName}`,
@@ -746,7 +753,7 @@ e.preventDefault()
                             </div>
                           </div>
 
-                          {/* Online payment */}
+                                                 {/* card payment */}
                           <div className="accordion-item">
                             <input
                               type="checkbox"
@@ -787,40 +794,6 @@ e.preventDefault()
                           </div>
                         </div>
 
-                        {/* card payment */}
-                        {/* <div className="accordion-item">
-                            <input
-                              type="checkbox"
-                              onChange={(e) => {
-                                if (e.target.checked) {
-                                  handleClick(2);
-                                } else {
-                                  handleClick(1);
-                                }
-                              }}
-                            />
-                            <label>Online transition</label>
-                            <div
-                              id="bankOne"
-                              className={
-                                isActive.key == 2
-                                  ? "accordion-collapse collapse show"
-                                  : "accordion-collapse collapse"
-                              }
-                            >
-                              <div className="accordion-body">
-                                <div
-                                  className="accordion-body flex content-center"
-                                  style={{
-                                    display: "flex",
-                                    justifyContent: "center",
-                                  }}
-                                >
-                                  <StripePayment amount={1000} />
-                                </div>
-                              </div>
-                            </div>
-                          </div> */}
 
                         {/* </div> */}
                         {cashOnDelivery ? (
@@ -830,7 +803,7 @@ e.preventDefault()
                             disabled={session?false:true}
                               onClick={handleAddOrder}
                               className="tp-btn tp-color-btn w-100 banner-animation"
-                              style={{cursor:"not-allowed"}}
+                              style={{cursor:"pointer"}}
                             >
                               {loading?<Loader className="animate-spin"/>:session?"Place order":"Please login"}
                             </button>

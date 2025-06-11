@@ -1,11 +1,11 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import Layout from "@/components/layout/Layout";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import { supabase } from "@/lib/supabase";
-
+import { useDispatch } from 'react-redux';
+import { updateAuthState } from "@/features/auth/authSlice";
 export default function SignIn() {
   const [isSignUp, setIsSignUp] = useState(true);
   const [email, setEmail] = useState("");
@@ -13,6 +13,9 @@ export default function SignIn() {
   const [showOtpField, setShowOtpField] = useState(false);
   const [message, setMessage] = useState({ text: "", status: "neutral" });
   const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useDispatch();
+  
+  
 
   // Step 1: Initial signup with email and password
   const handleInitialSignUp = async (e) => {
@@ -46,7 +49,8 @@ export default function SignIn() {
           options: {
             emailRedirectTo: `${process.env.NEXT_PUBLIC_API_URL}`,
             data: {
-              email_confirmed: false, // Custom metadata to track verification status
+              email_confirmed: false,
+              role:'user' // Custom metadata to track verification status
             },
           },
         });
@@ -98,12 +102,13 @@ export default function SignIn() {
         password,
       });
 
+      console.log(error)
       if (error) {
-        console.error("Login error:", error);
         toast.error(error.message);
         setMessage({ text: `Failed , ${error.message}`, status: "error" });
       } else {
         toast.success("Login successful!");
+        dispatch(updateAuthState({ user: data.user, session: data.session }));
         // Check if email is confirmed
         if (data.user.user_metadata?.email_verified === false) {
           // Send a new OTP for verification
@@ -118,10 +123,11 @@ export default function SignIn() {
           setShowOtpField(true);
         } else {
           // Redirect user or update UI state
-          window.location.href = '/'; // Uncomment to redirect
+          router.push('/') // Uncomment to redirect
         }
       }
     } catch (error) {
+      console.log(error)
       toast.error("Something went wrong during authentication");
       setMessage({
         text: "An unexpected error occurred. Please try again later.",
@@ -131,7 +137,6 @@ export default function SignIn() {
       setIsLoading(false);
     }
   };
-
   // Handle Google authentication
   const handleGoogleSignIn = async () => {
     setIsLoading(true);
@@ -139,13 +144,15 @@ export default function SignIn() {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${process.env.NEXT_PUBLIC_API_URL}`,
+          redirectTo: `/`,
         },
       });
 
       if (error) {
         console.error("Google sign-in error:", error);
         toast.error(error.message);
+      }else{
+
       }
       // The redirect will happen automatically, so no success handling needed here
     } catch (error) {
@@ -199,10 +206,10 @@ export default function SignIn() {
 
       if (data?.session) {
         // User is already logged in, redirect or update UI
-        window.location.href = `${process.env.NEXT_PUBLIC_API_URL}`; // Uncomment to redirect
-       setTimeout(() => {
-        toast.error("You already login , Please logout to access this page");
-       }, 1000);
+        router.push(process.env.NEXT_PUBLIC_API_URL)
+        setTimeout(() => {
+          toast.error("You already login , Please logout to access this page");
+        }, 1000);
       }
     };
 
