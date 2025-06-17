@@ -3,7 +3,6 @@ next js middleware not set[creatingClientmiddleware[createMiddlewareClient]]
 
 protect api (server,client) side [admin,user,manager]
 slider is not working fine [Slider1.js]
-shop/id page loader or skekelon
 .env supabase key are dublicate and also remove keys from supabase.ts key
 add head tags in all pages
 add right url while redirect from forget opt link to bachatbzr.com
@@ -11,11 +10,15 @@ add login url correct
 change role also in user table from authentication tab and auto delete user from both authenction and user table
 stripe is not working fine
 increase time when product sold outs
+check product is not sold in api  .eq("sold", false)
+delete api is not working
 
 
 
 
 
+import "@/public/assets/css/tailwind-cdn.css"
+//
 /// role check logic in client side while sending api
 
  const response = await axios.get(

@@ -62,6 +62,7 @@ export async function POST(request) {
     const { data, error } = await supabase
       .from('products')
       .select('*')
+       .eq("sold", false)
       .contains('tags', tags)
       
     // Handle Supabase query errors

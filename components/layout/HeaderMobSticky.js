@@ -1,5 +1,7 @@
 import Link from "next/link"
 import CartShow from "../elements/CartShow"
+import NotificationListShow from "../elements/NotificationListShow"
+import { Bell } from "lucide-react"
 
 export default function HeaderMobSticky({ scroll, isMobileMenu, handleMobileMenu, isCartSidebar, handleCartSidebar,AccountredirectUrl }) {
     return (
@@ -25,7 +27,15 @@ export default function HeaderMobSticky({ scroll, isMobileMenu, handleMobileMenu
                                             <i className="fal fa-shopping-cart" />
                                             <CartShow />
                                         </button>
-                                        <Link href={AccountredirectUrl}><i className="fal fa-user" /></Link>
+                                        <Link
+                        href="/notifications"
+                        className="header-cart p-relative tp-cart-toggle"
+                      >
+                       <Bell size={23} strokeWidth={1.3} />
+
+                        <NotificationListShow />
+                      </Link>
+                                        <Link href={AccountredirectUrl}><i className="fal fa-user"  /></Link>
                                     </div>
                                 </div>
                             </div>

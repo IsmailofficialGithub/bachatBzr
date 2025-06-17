@@ -1,6 +1,7 @@
 "use client";
 import CartShow from "@/components/elements/CartShow";
 import WishListShow from "@/components/elements/WishListShow";
+import NotificationListShow from "@/components/elements/NotificationListShow";
 import Link from "next/link";
 import { useCallback, useRef, useState } from "react";
 import HeaderMobSticky from "../HeaderMobSticky";
@@ -9,6 +10,7 @@ import HeaderTabSticky from "../HeaderTabSticky";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { Bell } from "lucide-react";
 
 export default function Header3({
   scroll,
@@ -60,9 +62,16 @@ export default function Header3({
 
   const handleChange = (e) => {
     const value = e.target.value;
+    console.log(value)
     setQuery(value);
     debouncedFetch(value);
   };
+  const handleSearchClick=(e)=>{
+    e.preventDefault()
+    console.log("click 1")
+    query && router.push(`/shop?q=${query}`);
+    setSuggestions([])
+  }
 
   return (
     <>
@@ -150,7 +159,7 @@ export default function Header3({
                         value={query}
                         onChange={handleChange}
                       />
-                      <button className="header-search-icon" onClick={()=>{query && router.push(`/shop?q=${query}`);setSuggestions([])}}>
+                      <button className="header-search-icon" onClick={handleSearchClick}>
                         <i className="fal fa-search" /> 
                       </button>
 
@@ -174,6 +183,9 @@ export default function Header3({
                   </div>
                   <div className="header-meta header-brand d-flex align-items-center">
                     <div className="header-meta__social d-flex align-items-center ml-25">
+
+                     
+
                       <button
                         className="header-cart p-relative tp-cart-toggle"
                         onClick={handleCartSidebar}
@@ -181,7 +193,23 @@ export default function Header3({
                         <i className="fal fa-shopping-cart" />
                         <CartShow />
                       </button>
+                     
                       <Link
+                        href="/wishlist"
+                        className="header-cart p-relative tp-cart-toggle"
+                      >
+                        <i className="fal fa-heart" />
+                        <WishListShow />
+                      </Link>
+                       <Link
+                        href="/notifications"
+                        className="header-cart p-relative tp-cart-toggle"
+                      >
+                       <Bell size={23} strokeWidth={1.3} />
+
+                        <NotificationListShow />
+                      </Link>
+                       <Link
                         href={
                           user
                             ? `/${user?.user_metadata?.role}/dashboard`
@@ -190,13 +218,8 @@ export default function Header3({
                       >
                         <i className="fal fa-user" />
                       </Link>
-                      <Link
-                        href="/wishlist"
-                        className="header-cart p-relative tp-cart-toggle"
-                      >
-                        <i className="fal fa-heart" />
-                        <WishListShow />
-                      </Link>
+                      
+                      
                     </div>
                   </div>
                 </div>
@@ -390,17 +413,21 @@ export default function Header3({
         scroll={scroll}
         isCartSidebar={isCartSidebar}
         handleCartSidebar={handleCartSidebar}
+        searchClick={handleSearchClick}
+        InputChange={handleChange}
         AccountredirectUrl={
           user ? `/${user?.user_metadata?.role}/dashboard` : "/authentication"
         }
       />
       <HeaderTabSticky
         scroll={scroll}
+        searchClick={handleSearchClick}
         isMobileMenu={isMobileMenu}
         AccountredirectUrl={
           user ? `/${user?.user_metadata?.role}/dashboard` : "/authentication"
         }
         handleMobileMenu={handleMobileMenu}
+         InputChange={handleChange}
         isCartSidebar={isCartSidebar}
         handleCartSidebar={handleCartSidebar}
       />

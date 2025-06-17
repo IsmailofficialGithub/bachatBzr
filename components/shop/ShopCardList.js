@@ -9,19 +9,6 @@ const ShopCardList = ({ item, addToCart, addToWishlist,soldProducts }) => {
         <div className="col-lg-4 col-md-12">
           <div className="tpproduct__thumb">
             <div className="tpproduct__thumbitem p-relative">
-              {/* <Link href="/shop-details">
-                <img
-                  style={{ maxHeight: "400px", objectFit: "cover" }}
-                  src={`${item?.images?.[0]}`}
-                  alt={item.name}
-                />
-                <img
-                  style={{ maxHeight: "400px", objectFit: "cover" }}
-                  className="thumbitem-secondary"
-                  src={item?.images?.[1]}
-                  alt={item.name}
-                />
-              </Link> */}
               <div className={`product-wrapper ${isSold ? "blocked" : ""}`}>
       {isSold && (
         <div className="sold-overlay">
@@ -101,7 +88,7 @@ const ShopCardList = ({ item, addToCart, addToWishlist,soldProducts }) => {
         <div className="col-lg-8 col-md-12">
           <div className="filter-product ml-20 pt-30">
             <h3 className="filter-product-title">
-              <Link href="/shop-details">
+              <Link href={`/shop/${item._id}`} >
                 {item?.name}{" "}
                 {item?.discounted_price ? (
                   <span style={{ color: "rgb(213 18 67)", marginLeft: "4px" }}>

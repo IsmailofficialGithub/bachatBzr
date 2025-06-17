@@ -19,7 +19,7 @@ const ShopCard = React.memo(({ item, addToCart, addToWishlist,soldProducts }) =>
           <div className="tpproduct__thumb">
             <div
               className="tpproduct__thumbitem p-relative"
-              style={{ height: "250px" }}
+                style={{ height:"249px", width: "100%" }}
             >
   <div className={`product-wrapper ${isSold ? "blocked" : ""}`}>
       {isSold && (
@@ -33,12 +33,15 @@ const ShopCard = React.memo(({ item, addToCart, addToWishlist,soldProducts }) =>
         onClick={(e) => isSold && e.preventDefault()}
       >
         <img
+        style={{ height: "250px" }}
+        width={'full'}
         loading="lazy"
           src={item.images[0]}
           alt="product-thumb"
           className="product-image"
         />
         <img
+        style={{ height: "250px" }}
         loading="lazy"
           className="thumbitem-secondary product-image"
           src={item.images[1]}
@@ -82,6 +85,7 @@ const ShopCard = React.memo(({ item, addToCart, addToWishlist,soldProducts }) =>
           font-weight: bold;
           margin: 0;
         }
+          
 
         @keyframes slideDown {
           0% {
@@ -120,8 +124,9 @@ const ShopCard = React.memo(({ item, addToCart, addToWishlist,soldProducts }) =>
             </div>
           </div>
           <div className="tpproduct__content-area">
-            <h3 className="tpproduct__title mb-5">
+            <h3 className="tpproduct__title mb-5 " >
               <Link href={`/shop/${item._id}`}>{item.name}</Link>
+              {item.discounted_price && <span>{item.discounted_price}% OFF</span>}
             </h3>
             <div className="tpproduct__priceinfo p-relative">
               <div className="tpproduct__ammount"style={{display: "flex", justifyContent: "space-between"}}>

@@ -14,6 +14,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import ProductSkeleton from "../skeleton/ShopSkeleton";
 import ProductSkeleton2 from "../skeleton/ShopSkeleton2";
 import { Button } from "../ui/button";
+import { PriceFilterPopover } from "@/app/components/PriceFilterPopover";
 const FilterShopBox = () => {
   const searchParams = useSearchParams();
   const pageParms = searchParams.get("page") || "1";
@@ -23,17 +24,63 @@ const FilterShopBox = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [totalPages, setTotalPages] = useState(1);
-  const [limit, setLimit] = useState(20);
-  const [sort, setSort] = useState("");
+  const [limit, setLimit] = useState(25);
   const [soldProducts, setSoldProducts] = useState([]);
+  const [priceFilter, setPriceFilter] = useState({ min: null, max: null });
   const page = useRef(pageParms);
+  const handlePriceFilterChange = async (newFilter) => {
+    setLoading(true);
+    const wasFilterActive =
+      priceFilter.min !== null || priceFilter.max !== null;
+    if (!wasFilterActive) {
+      page.current = 1; // Reset to first page only when applying filter for the first time
+    }
+    setPriceFilter(newFilter);
+    try {
+      let query = `/api/product/priceFilter?page=${page.current}&limit=${limit}&`;
+      const max = Number(newFilter.max);
+      const min = Number(newFilter.min);
+      // Only add min/max if they are not null and not zero
+      if ((min === null || min === 0) && (max === null || max === 0)) {
+        return toast.error("Please provide at least one price filter");
+      }
+      if (min !== null && min !== 0) query += `min=${min}&`;
+      if (max !== null && max !== 0) query += `max=${max}&`;
+
+      // Remove trailing '&' or '?' if present
+      query = query.replace(/[&?]$/, "");
+
+      const response = await axios.get(query);
+      if (response.data.success) {
+        setProducts(response.data.data);
+        setTotalPages(response.data.pagination.totalPages);
+        toast.success("Filter applied successfully");
+      }
+    } catch (error) {
+      console.error("Error applying filter:", error);
+      toast.error("Failed to apply filter" + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleDeletePriceFilter = () => {
+    setPriceFilter({ min: null, max: null });
+    page.current = 1;
+    fetchProducts();
+    toast.success("Filter removed successfully");
+  };
 
   const handlePageChange = (newPage) => {
     page.current = newPage;
-    fetchProducts();
+    if (priceFilter.min !== null || priceFilter.max !== null) {
+      // Use price filter pagination
+      handlePriceFilterChange(priceFilter);
+    } else {
+      // Use regular pagination
+      fetchProducts();
+    }
   };
-
-  const fetchProducts = async () => {
+  const fetchProducts = async (newFilter) => {
     setLoading(true);
     try {
       let response;
@@ -43,37 +90,30 @@ const FilterShopBox = () => {
           `/api/product/get?page=${page.current}&limit=${limit}`,
         );
       } else {
-        response = await axios.get(
-          `/api/product/searchQuery?q=${searchQuery}&?page=${page.current}&limit=${limit}`,
-        );
+        if(newFilter){
+          setPriceFilter(newFilter);
+        }
+         response = await axios.get("/api/product/searchQuery", {
+          params: {
+            q: searchQuery,
+            page: page.current,
+            limit: limit,
+            ...(newFilter && newFilter.min ? { min: newFilter.min } : {}),
+            ...(newFilter && newFilter.max ? { max: newFilter.max } : {}),
+          },
+        });
       }
 
       if (response.data.success) {
         setProducts(response.data.data);
         setTotalPages(response.data.pagination.totalPages);
       } else {
+        toast.error("Failed to fetch products" + response.data?.message);
         setError("Failed to fetch products");
       }
     } catch (error) {
       setError("An error occurred while fetching products");
-    } finally {
-      setLoading(false);
-    }
-  };
-  const handlesort = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get(
-        `/api/product/sort?page=${page.current}&limit=${limit}&sort=${sort}`,
-      );
-      if (response.data.success) {
-        setProducts(response.data.products);
-        setTotalPages(response.data.pagination.totalPages);
-      } else {
-        toast.error("Failed to sort product");
-      }
-    } catch (error) {
-      toast.error("SomeThing wents wrong");
+      toast.error("An error occurred while fetching products");
     } finally {
       setLoading(false);
     }
@@ -148,11 +188,6 @@ const FilterShopBox = () => {
   const handleOnClick = (index) => {
     setActiveIndex(index);
   };
-  // sort handler
-  const sortHandler = (e) => {
-    setSort(e.target.value);
-    handlesort();
-  };
 
   // per page handler
   const perPageHandler = (e) => {
@@ -164,8 +199,7 @@ const FilterShopBox = () => {
   }, [limit]);
   // clear all filters
   const clearAll = () => {
-    setLimit(10);
-    setSort("");
+    setLimit(25);
     toast.success("Filter removed successfully");
   };
 
@@ -182,8 +216,18 @@ const FilterShopBox = () => {
           </div>
           <div className="col-sm-6">
             <div className="product-navtabs d-flex justify-content-end align-items-center">
+              <div>
+                {" "}
+                <PriceFilterPopover
+                  onFilterChange={searchQuery? fetchProducts:handlePriceFilterChange}
+                  onClearFilter={handleDeletePriceFilter}
+                  initialMin={priceFilter.min || ""}
+                  initialMax={priceFilter.max || ""}
+                />
+              </div>
+
               <div className="tp-shop-selector">
-                {limit !== 10 || sort !== "" ? (
+                {limit !== 25 ? (
                   <button
                     onClick={clearAll}
                     className="btn btn-danger text-nowrap me-2 "
@@ -194,20 +238,11 @@ const FilterShopBox = () => {
                 ) : undefined}
 
                 <select
-                  value={sort}
-                  className="chosen-single form-select"
-                  onChange={sortHandler}
-                >
-                  <option value="">Sort by (default)</option>
-                  <option value="asc">Newest</option>
-                  <option value="des">Oldest</option>
-                </select>
-
-                <select
                   onChange={perPageHandler}
                   className="chosen-single form-select ms-3 "
                   value={limit}
                 >
+                  wellcome to the filter
                   <option value=""> ( Default )</option>
                   <option value="15">15 per page</option>
                   <option value="25">25 per page</option>
@@ -312,12 +347,18 @@ const FilterShopBox = () => {
                   ))
                 ) : (
                   <>
-                    <div style={{ display: "flex", justifyContent: "center" }}>
-                      {" "}
-                      NO PRODUCT AVALIABLE{" "}
-                      {searchQuery && `at this query "${searchQuery}"`}{" "}
-                    </div>
-                    <Button onClick={() => router.push("/shop")}>Shop</Button>
+                    {searchQuery && (
+                      <>
+                        <div
+                          style={{ display: "flex", justifyContent: "center" }}
+                        >
+                          NO PRODUCT AVALIABLE at this query "${searchQuery}"
+                        </div>
+                        <Button onClick={() => router.push("/shop")}>
+                          Shop
+                        </Button>
+                      </>
+                    )}
                   </>
                 )}
               </div>

@@ -2,7 +2,7 @@
 
 export async function middleware(req) {
  
-  console.log('Authenticated user:')
+  // console.log('Authenticated user:')
 
 }
 

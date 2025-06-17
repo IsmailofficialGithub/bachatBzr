@@ -134,7 +134,7 @@ const ShopSingleDynamicV1 = () => {
   return (
     <>
       <Layout headerStyle={3} footerStyle={1} breadcrumbTitle="Product Details">
-        <section className="product-area pt-80 pb-50">
+        <section className="product-area pt-6 pb-6 ">
           <div className="container">
             <div className="row">
             
@@ -166,7 +166,7 @@ const ShopSingleDynamicV1 = () => {
                   <div className="tpproduct-details__tag-area d-flex align-items-center mb-5">
                     <span className="tpproduct-details__tag">
                       {
-                        product.name
+                        product?.name
                       }
                     </span>
                     <div className="tpproduct-details__rating">
@@ -423,7 +423,7 @@ const ShopSingleDynamicV1 = () => {
             </div>
           </div>
         </div>
-        <div className="related-product-area pt-65 pb-50 related-product-border">
+        <div className="related-product-area pt-80 pb-50 related-product-border">
           <div className="container">
             <div className="row align-items-center">
               <div className="col-sm-6">

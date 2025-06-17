@@ -2482,10 +2482,10 @@ a.wishlist, a.add-to-cart {
 .line-through{
  text-decoration: line-through red ;
 }
-.flex{
+/* .flex{
     display:flex;
     flex-direction: column;
-}
+} */
 
 .tpcart__total-price {
     font-weight: 600;
@@ -3994,6 +3994,15 @@ only screen and (min-width: 768px) and (max-width: 991px),
     font-weight: 400;
     color: var(--tp-text-secondary);
     margin-bottom: 12px;
+     display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.tpproduct__title span {
+    color:red;
+    font-weight:'bold'
 }
 
 .tpproduct__title a {
