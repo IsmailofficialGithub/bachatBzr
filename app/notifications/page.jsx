@@ -439,6 +439,7 @@ const NotificationsCenter = () => {
           {loading ? <Loader2 className="h-4 w-4 animate-spin ml-2" /> : null}
         </button>
       </div>
+      
 
       {/* Filters */}
       <div className="flex items-center justify-between mb-4">
