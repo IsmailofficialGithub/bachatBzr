@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase"; // Adjust the import path as necessary
+import { supabase } from "@/lib/supabaseSetup"; // Adjust the import path as necessary
 
 export async function GET(req) {
   const { searchParams } = new URL(req.url);

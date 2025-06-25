@@ -1,6 +1,6 @@
 // src/redux/features/authSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabaseSetup';
 import { toast } from 'react-toastify';
 
 

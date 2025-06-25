@@ -2,7 +2,7 @@
 import Layout from "@/components/layout/Layout";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabaseSetup";
 import { toast } from "react-toastify";
 import { Button } from "@/components/ui/button";
 import { useSelector } from "react-redux";

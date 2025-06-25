@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Layout from "@/components/layout/Layout";
 import Link from "next/link";
 import { toast } from "react-toastify";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabaseSetup";
 import { useDispatch } from "react-redux";
 import { updateAuthState } from "@/features/auth/authSlice";
 import { useRouter } from "next/navigation";

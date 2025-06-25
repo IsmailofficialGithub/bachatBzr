@@ -4,7 +4,7 @@
 import { useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { fetchAuthSession, updateAuthState } from '@/features/auth/authSlice';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabaseSetup';
 
 export default function AuthInitializer() {
   const dispatch = useDispatch();

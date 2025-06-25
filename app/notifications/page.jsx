@@ -12,7 +12,7 @@ import {
   Trash2,
 } from "lucide-react";
 import axios from "axios";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabaseSetup";
 import "@/public/assets/css/tailwind-cdn.css";
 import Layout from "@/components/layout/Layout";
 

@@ -33,7 +33,7 @@ import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { axiosFetcher } from "@/lib/fetcher";
 import { useSelector } from "react-redux";
-import { supabase } from "@/lib/supabase"; // Adjust path to your supabase client
+import { supabase } from "@/lib/supabaseSetup"; // Adjust path to your supabase client
 import { toast } from "react-toastify";
 
 export default function NotificationListShow() {

@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabaseSetup";
 import { Button } from "@/components/ui/button";
 import {
   Table,

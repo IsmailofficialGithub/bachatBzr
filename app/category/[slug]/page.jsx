@@ -10,7 +10,7 @@ import ProductSkeleton from "@/components/skeleton/ProductCardSkeleton";
 import { addCart } from "@/features/shopSlice";
 import { addWishlist } from "@/features/wishlistSlice";
 import NoProductsAvailable from "../../../components/Product/noProductAvaliable";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabaseSetup";
 import PaginationComponent from "@/app/components/pagination";
 
 const SingleCategories = () => {

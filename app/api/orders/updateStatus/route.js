@@ -72,10 +72,10 @@ export async function PATCH(req) {
             <p>Please log in to view your order and track its progress.</p>
             <p>Thank you for choosing SmartSwap!</p>
             <p>
-              🌐 <strong>Website:</strong> <a href="https://www.yourwebsite.com">www.yourwebsite.com</a><br>
-              📘 <strong>Facebook:</strong> <a href="https://www.facebook.com/yourpage">Facebook</a><br>
-              🐦 <strong>Twitter:</strong> <a href="https://twitter.com/yourprofile">Twitter</a><br>
-              📸 <strong>Instagram:</strong> <a href="https://www.instagram.com/yourprofile">Instagram</a>
+              🌐 <strong>Website:</strong> <a href="https://www.bachatbzr.com">www.bachatbzr.com</a><br>
+              📘 <strong>Facebook:</strong> <a href="https://www.facebook.com/bachatbzr">Facebook</a><br>
+              🐦 <strong>Tiktok:</strong> <a href="https://twitter.com/bachatbzr">Tiktok</a><br>
+              📸 <strong>Instagram:</strong> <a href="https://www.instagram.com/bachatbzr">Instagram</a>
             </p>
             <p><strong>Best regards,</strong><br>The SmartSwap Team</p>
           </div>

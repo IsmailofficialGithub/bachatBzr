@@ -9,7 +9,7 @@ import ShopCard from "./ShopCard";
 import ShopCardList from "./ShopCardList";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabaseSetup";
 import PaginationComponent from "@/app/components/pagination";
 import { useRouter, useSearchParams } from "next/navigation";
 import ProductSkeleton from "../skeleton/ShopSkeleton";
@@ -277,10 +277,8 @@ const FilterShopBox = () => {
         </div>
       </div>
 
-      {products.length > 0 &&(
-        <ProductGrid Products={products}/>
-      )}
-      {/* <div className="row mb-50">
+     
+      <div className="row mb-50">
         <div className="col-lg-12">
           <div className="tab-content" id="nav-tabContent">
             <div
@@ -333,43 +331,14 @@ const FilterShopBox = () => {
                 activeIndex == 2 ? "tab-pane fade show active" : "tab-pane fade"
               }
             >
-              <div className="row row-cols-xxl-4 row-cols-xl-4 row-cols-lg-3 row-cols-md-3 row-cols-sm-2 row-cols-1 tpproduct">
-                {loading ? (
-                  Array.from({ length: 10 }).map((_, i) => (
-                    <ProductSkeleton key={i} />
-                  ))
-                ) : products.length > 0 && !loading ? (
-                  products.map((item, i) => (
-                    <Fragment key={i}>
-                      <ShopCard
-                        soldProducts={soldProducts}
-                        item={item}
-                        addToCart={addToCart}
-                        addToWishlist={addToWishlist}
-                      />
-                    </Fragment>
-                  ))
-                ) : (
-                  <>
-                    {searchQuery && (
-                      <>
-                        <div
-                          style={{ display: "flex", justifyContent: "center" }}
-                        >
-                          NO PRODUCT AVALIABLE at this query "${searchQuery}"
-                        </div>
-                        <Button onClick={() => router.push("/shop")}>
-                          Shop
-                        </Button>
-                      </>
-                    )}
-                  </>
-                )}
-              </div>
+             {products.length > 0 &&(
+        <ProductGrid Products={products} addToCart={addToCart} addToWishlist={addToWishlist}/>
+      )}
+              
             </div>
           </div>
         </div>
-      </div> */}
+      </div>
 
       <PaginationComponent
         currentPage={page.current}

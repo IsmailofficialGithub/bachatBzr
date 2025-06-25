@@ -4,7 +4,7 @@ import Image from "next/image";
 import theme from "@/data.js";
 import { useDispatch } from "react-redux";
 import { fetchAuthSession } from "@/features/auth/authSlice";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabaseSetup";
 import { toast } from "react-toastify";
 
 const ProfilePage = () => {

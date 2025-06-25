@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabaseSetup';
 
 // GET: Fetch a specific category
 export async function GET(req, context) {

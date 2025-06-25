@@ -1,6 +1,7 @@
+
 "use client";
 import DashboardWrapper from "@/app/components/DashboardWrapper";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -16,6 +17,8 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { Loader, Trash2 } from "lucide-react";
 import Image from "next/image";
+import Cropper from "react-easy-crop";
+import { readFile, createImage } from "@/lib/imageUtils";
 
 const Page = () => {
   const [categories, setCategories] = useState([]);
@@ -32,6 +35,14 @@ const Page = () => {
     problems: "",
     imageFiles: [],
   });
+
+  // Image cropping state
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [croppingMode, setCroppingMode] = useState(false);
+  const [croppedImages, setCroppedImages] = useState([]);
 
   const [specifications, setSpecifications] = useState({});
   const [categoriesLoading, setCategoriesLoading] = useState(false);
@@ -81,11 +92,7 @@ const Page = () => {
     fetchingCategories();
   }, []);
 
-  useEffect(() => {
-    return () => {
-      imagePreviews.forEach((url) => URL.revokeObjectURL(url));
-    };
-  }, [imagePreviews]);
+ 
 
   const handleCreateCategory = async () => {
     setCategoriesLoading(true);
@@ -116,19 +123,122 @@ const Page = () => {
     }
   };
 
-  const handleChange = (e) => {
-    const { name, value, files, type } = e.target;
+const handleChange = (e) => {
+  const { name, value, files, type } = e.target;
 
-    if (type === "file" && files) {
-      const fileList = Array.from(files);
-      setFormData((prev) => ({ ...prev, [name]: fileList }));
+  console.log('file change')
+  if (type === "file" && files) {
+    // Clean up previous URLs before creating new ones
+    imagePreviews.forEach((url) => URL.revokeObjectURL(url));
+    
+    const fileList = Array.from(files);
+    setFormData((prev) => ({ ...prev, [name]: fileList }));
 
-      const previewUrls = fileList.map((file) => URL.createObjectURL(file));
-      setImagePreviews(previewUrls);
-    } else {
-      setFormData((prev) => ({ ...prev, [name]: value }));
+    const previewUrls = fileList.map((file) => URL.createObjectURL(file));
+    setImagePreviews(previewUrls);
+    setCroppedImages(new Array(fileList.length)); // Initialize with proper length
+    setCroppingMode(true);
+    setCurrentImageIndex(0);
+  } else {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  }
+};
+
+
+  const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  }, []);
+
+const getCroppedImg = async (imageSrc, pixelCrop) => {
+  try {
+    const image = await createImage(imageSrc);
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    // Set canvas dimensions
+    canvas.width = 800;
+    canvas.height = 800;
+
+    ctx.drawImage(
+      image,
+      pixelCrop.x,
+      pixelCrop.y,
+      pixelCrop.width,
+      pixelCrop.height,
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+
+    return new Promise((resolve, reject) => {
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            reject(new Error('Canvas is empty'));
+            return;
+          }
+          // Convert blob to File object with proper name
+          const file = new File([blob], `cropped_image_${Date.now()}.jpg`, {
+            type: 'image/jpeg',
+          });
+          resolve(file);
+        },
+        'image/jpeg',
+        0.9
+      );
+    });
+  } catch (error) {
+    console.error('Error in getCroppedImg:', error);
+    throw error;
+  }
+};
+
+const saveCroppedImage = useCallback(async () => {
+  try {
+    if (!croppedAreaPixels) {
+      toast.error('Please select a crop area');
+      return;
     }
-  };
+
+    const croppedFile = await getCroppedImg(
+      imagePreviews[currentImageIndex],
+      croppedAreaPixels
+    );
+
+    // Update cropped images array
+    const newCroppedImages = [...croppedImages];
+    newCroppedImages[currentImageIndex] = croppedFile;
+    setCroppedImages(newCroppedImages);
+
+    // Move to next image or finish
+    if (currentImageIndex < imagePreviews.length - 1) {
+      setCurrentImageIndex(currentImageIndex + 1);
+      setCrop({ x: 0, y: 0 });
+      setZoom(1);
+      setCroppedAreaPixels(null);
+    } else {
+      // All images processed - update previews and finish
+      const finalPreviews = imagePreviews.map((originalPreview, index) => {
+        if (newCroppedImages[index]) {
+          URL.revokeObjectURL(originalPreview);
+          return URL.createObjectURL(newCroppedImages[index]);
+        }
+        return originalPreview;
+      });
+      setImagePreviews(finalPreviews);
+      setCroppingMode(false);
+      toast.success('All images cropped successfully');
+    }
+
+  } catch (error) {
+    console.error('Error saving cropped image:', error);
+    toast.error(`Error cropping image ${currentImageIndex + 1}: ${error.message}`);
+  }
+}, [croppedAreaPixels, imagePreviews, currentImageIndex, croppedImages]);
+
+
+
 
   const handleCategorySelect = (value) => {
     setFormData((prev) => {
@@ -248,9 +358,14 @@ const Page = () => {
         formDataToSend.append("categories", category);
       });
 
-      formData.imageFiles.forEach((file) => {
-        formDataToSend.append("images", file);
-      });
+      // Use cropped images if available, otherwise use original images
+      for (let i = 0; i < formData.imageFiles.length; i++) {
+      const fileToUpload = croppedImages[i] || formData.imageFiles[i];
+      const fileName = croppedImages[i] ? 
+        `cropped_${formData.imageFiles[i].name}` : 
+        formData.imageFiles[i].name;
+      formDataToSend.append("images", fileToUpload, fileName);
+    }
 
       if (Object.keys(specifications).length > 0) {
         formDataToSend.append(
@@ -280,6 +395,7 @@ const Page = () => {
         setSpecifications({});
         setTags([]);
         setImagePreviews([]);
+        setCroppedImages([]);
       } else {
         toast.error(`Failed to add product: ${response.data.message}`);
       }
@@ -290,14 +406,219 @@ const Page = () => {
     }
   };
 
+ useEffect(() => {
+  return () => {
+    // Clean up image preview URLs only when component unmounts or imagePreviews change
+    imagePreviews.forEach((url) => {
+      if (url.startsWith('blob:')) {
+        URL.revokeObjectURL(url);
+      }
+    });
+  };
+}, []);
+ useEffect(() => {
+  return () => {
+    // Final cleanup on unmount
+    imagePreviews.forEach((url) => {
+      if (url.startsWith('blob:')) {
+        URL.revokeObjectURL(url);
+      }
+    });
+  };
+}, []);
+  // Image cropping modal
+if (croppingMode && imagePreviews.length > 0) {
   return (
-   <DashboardWrapper>
+    <DashboardWrapper>
+      <div className="p-6">
+        <h1 className="text-2xl font-bold mb-4">Crop Images</h1>
+        
+        {!imagePreviews[currentImageIndex] ? (
+          <div className="text-red-500 p-4 bg-red-50 rounded-lg">
+            Error loading image {currentImageIndex + 1}. Please try again.
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {/* Main Cropper Container */}
+            <div 
+              className="relative bg-gray-100 rounded-lg overflow-hidden"
+              style={{ height: "400px", width: "100%" }}
+            >
+              <Cropper
+                image={imagePreviews[currentImageIndex]}
+                crop={crop}
+                zoom={zoom}
+                aspect={1}
+                onCropChange={setCrop}
+                onCropComplete={onCropComplete}
+                onZoomChange={setZoom}
+                cropShape="rect"
+                showGrid={true}
+                classes={{
+                  containerClassName: "rounded-lg",
+                  cropAreaClassName: "border-2 border-dashed border-blue-400",
+                  mediaClassName: "max-h-full max-w-full"
+                }}
+              />
+            </div>
+
+            {/* Zoom Controls */}
+            <div className="space-y-2">
+              <div className="flex justify-between items-center">
+                <label className="text-sm font-medium text-gray-700">
+                  Zoom: {zoom.toFixed(1)}x
+                </label>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setZoom(Math.max(1, zoom - 0.1))}
+                    className="px-3 py-1 bg-gray-200 rounded-md text-sm"
+                    disabled={zoom <= 1}
+                  >
+                    -
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setZoom(Math.min(3, zoom + 0.1))}
+                    className="px-3 py-1 bg-gray-200 rounded-md text-sm"
+                    disabled={zoom >= 3}
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+              <input
+                type="range"
+                min="1"
+                max="3"
+                step="0.1"
+                value={zoom}
+                onChange={(e) => setZoom(Number(e.target.value))}
+                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+              />
+            </div>
+
+            {/* Position Controls */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Horizontal Position
+                </label>
+                <input
+                  type="range"
+                  min="-100"
+                  max="100"
+                  step="1"
+                  value={crop.x * 100}
+                  onChange={(e) => setCrop(prev => ({ ...prev, x: Number(e.target.value) / 100 }))}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-gray-700">
+                  Vertical Position
+                </label>
+                <input
+                  type="range"
+                  min="-100"
+                  max="100"
+                  step="1"
+                  value={crop.y * 100}
+                  onChange={(e) => setCrop(prev => ({ ...prev, y: Number(e.target.value) / 100 }))}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                />
+              </div>
+            </div>
+
+            {/* Image Navigation */}
+            <div className="pt-4">
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium text-gray-700">
+                  Image {currentImageIndex + 1} of {imagePreviews.length}
+                </span>
+                
+                <div className="flex gap-3">
+                
+                  <Button
+                    onClick={saveCroppedImage}
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white"
+                  >
+                    {currentImageIndex < imagePreviews.length - 1 ? (
+                      <>
+                        <span>Save & Next</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+                        </svg>
+                      </>
+                    ) : (
+                      'Finish Cropping'
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {/* Thumbnail Strip */}
+            <div className="pt-4 border-t border-gray-200">
+              <div className="flex gap-2 overflow-x-auto pb-2">
+                {imagePreviews.map((preview, index) => (
+                  <div
+                    key={index}
+                    className={`flex-shrink-0 relative h-16 w-16 cursor-pointer rounded-md overflow-hidden border-2 transition-all ${
+                      currentImageIndex === index ? 'border-blue-500' : 'border-gray-300'
+                    }`}
+                    onClick={() => {
+                      setCurrentImageIndex(index);
+                      setCrop({ x: 0, y: 0 });
+                      setZoom(1);
+                    }}
+                  >
+                    <Image
+                      src={preview}
+                      alt={`Preview ${index}`}
+                      fill
+                      className="object-cover"
+                    />
+                    {croppedImages[index] && (
+                      <div className="absolute inset-0 bg-green-500 bg-opacity-30 flex items-center justify-center">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4 text-white"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Help Text */}
+            <div className="text-xs text-gray-500 mt-2">
+              Tip: Adjust the zoom and position to frame your image perfectly. All images will be cropped to a square aspect ratio.
+            </div>
+          </div>
+        )}
+      </div>
+    </DashboardWrapper>
+  );
+}
+
+  return (
+    <DashboardWrapper>
       <div className="p-6">
         <h1 className="text-2xl font-bold mb-4">Add Products</h1>
 
         {loading && (
           <div className="flex justify-center items-center my-4 absolute top-1/2 left-1/3 sm:top-1/2 sm:left-1/2">
-            <Loader className="animate-spin text-blue-500 w-24 h-24" />
+            <Loader className="animate-spin text-blue-500 w-24 h-24 z-[1000]" />
           </div>
         )}
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -721,27 +1042,32 @@ const Page = () => {
           </div>
 
           {/* Image Previews */}
-          {imagePreviews.length > 0 && (
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                Selected Images (Click to enlarge)
-              </label>
-              <div className="grid gap-3 justify-center grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-                {imagePreviews.map((preview, index) => (
-                  <div key={index} className="relative">
-                    <Image
-                      src={preview}
-                      alt={`Preview ${index}`}
-                      width={200}
-                      height={200}
-                      className="w-full h-auto object-cover cursor-pointer transition-transform duration-300 hover:scale-105"
-                      onClick={() => setSelectedImage(preview)}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
+      {imagePreviews.length > 0 && (
+  <div>
+    <label className="block text-sm font-medium mb-1">
+      Selected Images (Click to enlarge)
+    </label>
+    <div className="grid gap-3 justify-center grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+      {imagePreviews.map((preview, index) => (
+        <div key={index} className="relative">
+          <Image
+            src={preview}
+            alt={`Preview ${index}`}
+            width={200}
+            height={200}
+            className="w-full h-auto object-cover cursor-pointer transition-transform duration-300 hover:scale-105"
+            onClick={() => setSelectedImage(preview)}
+          />
+          {croppedImages[index] && (
+            <span className="absolute top-1 right-1 bg-green-500 text-white text-xs px-1 rounded">
+              Cropped
+            </span>
           )}
+        </div>
+      ))}
+    </div>
+  </div>
+)}
 
           {/* Enlarged Image Modal */}
           {selectedImage && (
@@ -778,3 +1104,7 @@ const Page = () => {
 };
 
 export default Page;
+
+
+
+

@@ -2,7 +2,7 @@
 
 
 import { NextResponse } from "next/server";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/lib/supabaseSetup";
 
 function parseNumericParam(value, paramName) {
   if (!value) return null;
