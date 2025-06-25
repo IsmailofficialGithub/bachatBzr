@@ -7,7 +7,7 @@ import { toast } from 'react-toastify'
 import axios from 'axios'
 import UserOrderDetailComponent from '@/components/user/UserOrderDetailsComponent'
 import OrderDetailsSkeleton from '@/components/skeleton/orderDetailSkeleton'
-import { supabase } from '@/lib/supabase'
+import { supabase } from "@/lib/supabaseSetup";
 
 const OrderDetail = () => {
     const { id } = useParams();

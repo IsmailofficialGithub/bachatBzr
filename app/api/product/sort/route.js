@@ -1,6 +1,6 @@
 // app/api/products/route.js
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase'; // Adjust path as necessary
+import { supabase } from "@/lib/supabaseSetup";; // Adjust path as necessary
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);

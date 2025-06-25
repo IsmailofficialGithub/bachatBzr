@@ -7,7 +7,7 @@ import { fetchAuthSession } from '@/features/auth/authSlice';
 import { toast } from 'react-toastify';
 import Link from 'next/link';
 import { applyDiscount } from '@/lib/discountHandler';
-import { supabase } from '@/lib/supabase';
+import { supabase } from "@/lib/supabaseSetup";;
 
 const OrderPage = () => {
   const { primary, secondary } = theme.color;

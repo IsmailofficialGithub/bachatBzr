@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import theme from '@/data';
-import { supabase } from '@/lib/supabase';
+import { supabase } from "@/lib/supabaseSetup";;
 import "@/public/assets/css/tailwind-cdn.css";
 
 
