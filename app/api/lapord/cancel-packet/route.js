@@ -9,7 +9,7 @@ export async function POST(req) {
 
     if (!cn_numbers) {
       return NextResponse.json(
-        { error: "Missing required field: cn_numbers" },
+        {success:false,message:"Missing Tracking number", error: "Missing required field: cn_numbers" },
         { status: 400 }
       );
     }
@@ -19,7 +19,7 @@ export async function POST(req) {
 
     if (!api_key || !api_password) {
       return NextResponse.json(
-        { error: "API credentials missing " },
+        { success:false,message:"Api keys Requried",error: "API credentials missing " },
         { status: 500 }
       );
     }
@@ -40,11 +40,12 @@ export async function POST(req) {
       }
     );
 
-    return NextResponse.json(response.data);
+    return NextResponse.json({ success: true, message: "Successfully order cancel", data: response.data });
   } catch (error) {
     console.error("Cancel Packet Error:", error?.response?.data || error.message);
     return NextResponse.json(
       {
+        success: false,
         error: "Failed to cancel booked packet",
         details: error?.response?.data || error.message,
       },

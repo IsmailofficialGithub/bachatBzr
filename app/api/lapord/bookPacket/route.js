@@ -4,20 +4,31 @@ import axios from "axios";
 export async function POST(req) {
   try {
     const body = await req.json();
-
+    console.log(body)
     // Check required fields
     if (
       !body.weight ||
       !body.pieces ||
-      !body.destinationCity ||
-      !body.customerName ||
-      !body.customerPhone ||
-      !body.customerAddress ||
-      !body.shipmentId
+      !body.destination_city ||
+      !body.receiver_name ||
+      !body.receiver_phone ||
+      !body.receiver_address ||
+      !body.shipment_id
     ) {
       return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
+        { 
+          error: "Missing required fields",
+          required: [
+            "weight",
+            "pieces", 
+            "destination_city",
+            "receiver_name",
+            "receiver_phone",
+            "receiver_address",
+            "shipment_id"
+          ]
+        },
+        { status: 400 },
       );
     }
 
@@ -27,62 +38,82 @@ export async function POST(req) {
     if (!api_key || !api_password) {
       return NextResponse.json(
         { error: "API credentials missing in .env" },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
+    // Map frontend fields to Leopards API fields
     const payload = {
       api_key,
       api_password,
-      booked_packet_weight: body.weight,
-      booked_packet_no_piece: body.pieces || 1,
-      booked_packet_collect_amount: body.collectAmount || 0,
-      booked_packet_order_id: body.orderId || "",
-      origin_city: "self",
-      destination_city: body.destinationCity,
-      shipment_id: body.shipmentId,
-
-      // Sender Info
+      
+      // Package Details
+      booked_packet_weight: parseInt(body.weight),
+      booked_packet_no_piece: parseInt(body.pieces) || 1,
+      booked_packet_collect_amount: parseInt(body.collection_amount) || 0,
+      booked_packet_order_id: body.order_id || "",
+      
+      // Volume Weight
+      booked_packet_vol_weight_w: body.vol_weight_w ? parseInt(body.vol_weight_w) : "",
+      booked_packet_vol_weight_h: body.vol_weight_h ? parseInt(body.vol_weight_h) : "",
+      booked_packet_vol_weight_l: body.vol_weight_l ? parseInt(body.vol_weight_l) : "",
+      
+      // Cities
+      origin_city: body.origin_city || "self",
+      destination_city: body.destination_city,
+      shipment_id: parseInt(body.shipment_id),
+      
+      // Sender Info (always self)
       shipment_name_eng: "self",
-      shipment_email: "self",
+      shipment_email: "self", 
       shipment_phone: "self",
       shipment_address: "self",
 
       // Receiver Info
-      consignment_name_eng: body.customerName,
-      consignment_email: body.customerEmail || "",
-      consignment_phone: body.customerPhone,
-      consignment_phone_two: body.customerPhone2 || "",
-      consignment_phone_three: body.customerPhone3 || "",
-      consignment_address: body.customerAddress,
+      consignment_name_eng: body.receiver_name,
+      consignment_phone: body.receiver_phone,
+      consignment_address: body.receiver_address,
+      consignment_email: body.receiver_email || "",
+      consignment_phone_two: body.receiver_phone2 || "",
+      consignment_phone_three: body.receiver_phone3 || "",
 
-      special_instructions: body.instructions || "",
-      shipment_type: body.shipmentType || "",
-      custom_data: body.customData || [],
-      return_address: "",
-      return_city: "",
-      is_vpc: 0,
+      // Additional Info
+      special_instructions: body.special_instructions || "Delivery Package safely",
+      shipment_type: body.shipment_type || "overnight",
+      custom_data: body.custom_data || [],
+      return_address: body.return_address || "",
+      return_city: body.return_city ? parseInt(body.return_city) : "",
+      is_vpc: body.is_vpc ? 1 : 0,
     };
 
-    const response = await axios.post(
-      "https://merchantapi.leopardscourier.com/api/bookPacket/format/json/",
-      payload,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
 
+    const leopardsUrl = "https://merchantapi.leopardscourier.com/api/bookPacket/format/json/"
+      
+    const response = await axios.post(leopardsUrl, payload, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      timeout: 30000,
+    });
+
+    console.log("Leopards API Response:", response.data);
     return NextResponse.json(response.data);
+
   } catch (error) {
-    console.error("Book Packet Error:", error?.response?.data || error.message);
+    console.error("Book Packet Error:", {
+      message: error.message,
+      response: error?.response?.data,
+      status: error?.response?.status
+    });
+
     return NextResponse.json(
       {
         error: "Failed to book packet",
-        details: error?.response?.data || error.message,
+        message: error.message,
+        details: error?.response?.data || null,
+        status: error?.response?.status || 500
       },
-      { status: 500 }
+      { status: error?.response?.status || 500 },
     );
   }
 }

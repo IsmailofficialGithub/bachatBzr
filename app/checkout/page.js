@@ -13,14 +13,100 @@ import { Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
 import EmptyCart from "@/app/components/EmptyCart";
 export default function Checkout() {
-  const router=useRouter()
+  //new
+  const [cityOptions, setCityOptions] = useState([]);
+const [cityLoading, setCityLoading] = useState(false);
+const [showCityDropdown, setShowCityDropdown] = useState(false);
+const [citySearchTerm, setCitySearchTerm] = useState("");
+
+// 2. Add this new function for searching cities:
+const searchCities = async (searchTerm) => {
+  if (searchTerm.length < 2) {
+    setCityOptions([]);
+    setShowCityDropdown(false);
+    return;
+  }
+
+  setCityLoading(true);
+  try {
+    const response = await fetch(`/api/lapord/findCity?name=${encodeURIComponent(searchTerm)}`);
+    const result = await response.json();
+    
+    if (result.success) {
+      setCityOptions(result.data);
+      setShowCityDropdown(true);
+    } else {
+      setCityOptions([]);
+      setShowCityDropdown(false);
+    }
+  } catch (error) {
+    console.error('Error searching cities:', error);
+    setCityOptions([]);
+    setShowCityDropdown(false);
+  } finally {
+    setCityLoading(false);
+  }
+};
+
+// 3. Add this new function for handling city input changes:
+const handleCityInputChange = (e) => {
+  const value = e.target.value;
+  setCitySearchTerm(value);
+  
+  // Clear the city object when user types manually
+  setAddress({
+    ...address,
+    city: null,
+  });
+  
+  // Debounce the API call
+  clearTimeout(window.citySearchTimeout);
+  window.citySearchTimeout = setTimeout(() => {
+    searchCities(value);
+  }, 300);
+};
+
+// 4. Add this new function for selecting a city:
+const handleCitySelect = (city) => {
+  setAddress({
+    ...address,
+    city: { city_name: city.name, city_id: city.id },
+  });
+  setCitySearchTerm(city.name);
+  setShowCityDropdown(false);
+  setCityOptions([]);
+};
+
+// 5. Add validation function for city:
+const isCityValid = () => {
+  return address.city && typeof address.city === 'object' && address.city.city_id;
+};
+
+useEffect(() => {
+  const handleClickOutside = (event) => {
+    const cityInput = event.target.closest('.checkout-form-list');
+    if (!cityInput) {
+      setShowCityDropdown(false);
+    }
+  };
+
+  document.addEventListener('mousedown', handleClickOutside);
+  return () => {
+    document.removeEventListener('mousedown', handleClickOutside);
+  };
+}, []);
+
+
+  //new
+
+  const router = useRouter();
   const [totalAmount, setTotalAmount] = useState();
   const [cashOnDelivery, setCashOnDelivery] = useState(false);
-  const [payment, setPayment] = useState('');
+  const [payment, setPayment] = useState("");
   const { cart } = useSelector((state) => state.shop) || {};
   const [session, setSession] = useState([]);
   const [message, setMessage] = useState("");
-  const [loading,setLoading]=useState(false)
+  const [loading, setLoading] = useState(false);
   const [orderDetails, setOrderDetails] = useState(null);
   const [address, setAddress] = useState({
     country: "pakistan",
@@ -29,7 +115,7 @@ export default function Checkout() {
     companyName: "",
     address: "",
     apartment: "",
-    city: "",
+    city: null,
     state: "",
     postcode: "",
     email: "",
@@ -40,6 +126,7 @@ export default function Checkout() {
     password: "",
   });
 
+  
   //calculate total amount
   const calculateTotals = (shippingfee = false) => {
     if (!cart || cart.length === 0) {
@@ -67,11 +154,11 @@ export default function Checkout() {
     return productTotal;
   };
 
-  useEffect(()=>{
-   if(cart.length<1 || cart===undefined){
-    router.push(`/shop`);
-   } 
-  },[cart])
+  useEffect(() => {
+    if (cart.length < 1 || cart === undefined) {
+      router.push(`/shop`);
+    }
+  }, [cart]);
   useEffect(() => {
     if (cashOnDelivery) {
       setTotalAmount(calculateTotals(true) + 50);
@@ -81,7 +168,7 @@ export default function Checkout() {
   }, [cashOnDelivery]);
 
   async function updateUserMetadata(e) {
-e.preventDefault()
+    e.preventDefault();
     if (session && address.email != "" && address.phone != "") {
       const {
         data: { user },
@@ -120,71 +207,68 @@ e.preventDefault()
       [name]: value,
     });
   };
- 
 
   //handle place order
   const handleAddOrder = async (e) => {
     e.preventDefault();
-    setLoading(true)
+    setLoading(true);
     try {
       const errors = [];
-    const requiredFields = [
-      "firstName",
-      "lastName",
-      "postcode",
-      "state",
-      "address",
-      "city",
-      "email",
-      "phone",
-    ];
-    if (!cashOnDelivery) {
-      return;
-    }
-    const missingFields = requiredFields.filter((field) => !address[field]);
+      const requiredFields = [
+        "firstName",
+        "lastName",
+        "postcode",
+        "state",
+        "address",
+        "city",
+        "email",
+        "phone",
+      ];
+      if (!cashOnDelivery) {
+        return;
+      }
+      const missingFields = requiredFields.filter((field) => !address[field]);
 
-    if (missingFields.length > 0) {
-      errors.push(
-        `Please fill in the following fields: ${missingFields.join(", ")}`,
-      );
-    }
+      if (missingFields.length > 0) {
+        errors.push(
+          `Please fill in the following fields: ${missingFields.join(", ")}`,
+        );
+      }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (address.email && !emailRegex.test(address.email)) {
-      errors.push("Please enter a valid email address");
-    }
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (address.email && !emailRegex.test(address.email)) {
+        errors.push("Please enter a valid email address");
+      }
 
-    const phoneRegex = /^\d{11}$/;
-    if (address.phone && !phoneRegex.test(address.phone)) {
-      errors.push("Phone number must contain exactly 11 digits");
-    }
+      const phoneRegex = /^\d{11}$/;
+      if (address.phone && !phoneRegex.test(address.phone)) {
+        errors.push("Phone number must contain exactly 11 digits");
+      }
 
-    if (!payment) {
-      errors.push("Please select a payment method");
-    }
+      if (!payment) {
+        errors.push("Please select a payment method");
+      }
 
-    if (errors.length > 0) {
-      toast.error(errors.join("\n"));
-      return;
-    }
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+      if (errors.length > 0) {
+        toast.error(errors.join("\n"));
+        return;
+      }
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
 
-    if (!session) {
-      toast.error("Please login to continue");
-      return;
-    }
-    
- await createOrder(orderDetails);
-   router.push(`/user/orders`) 
-      
+      if (!session) {
+        toast.error("Please login to continue");
+        return;
+      }
+
+      await createOrder(orderDetails);
+      router.push(`/user/orders`);
     } catch (error) {
-      toast.error("Internel server Error")
-    }finally{
- setLoading(false)
+      toast.error("Internel server Error");
+    } finally {
+      setLoading(false);
     }
-
   };
 
   // handleLoginSubmit
@@ -255,18 +339,16 @@ e.preventDefault()
     }
   };
 
-  
   useEffect(() => {
-    console.log(cart,"cart")
     setOrderDetails({
       user_id: session?.user?.id,
       Receiver: `${address.firstName} ${address.lastName}`,
       product_ids: cart.map((item) => item._id),
-      payment_method: cashOnDelivery?"cash_on_delivery":'card',
+      payment_method: cashOnDelivery ? "cash_on_delivery" : "card",
       delivery_address: address,
       phone: address.phone,
     });
-  }, [session, address, cart,cashOnDelivery]);
+  }, [session, address, cart, cashOnDelivery]);
 
   // getting session
   useEffect(() => {
@@ -283,13 +365,13 @@ e.preventDefault()
     };
     gettingSession();
   }, []);
- if (cart.length < 1 || cart === undefined) {
-  return (
-    <Layout headerStyle={3} footerStyle={1} breadcrumbTitle="Checkout">
-      <EmptyCart />
-    </Layout>
-  );
-}
+  if (cart.length < 1 || cart === undefined) {
+    return (
+      <Layout headerStyle={3} footerStyle={1} breadcrumbTitle="Checkout">
+        <EmptyCart />
+      </Layout>
+    );
+  }
 
   return (
     <>
@@ -436,12 +518,13 @@ e.preventDefault()
                                 companyName: "",
                                 address: "",
                                 apartment: "",
-                                city: "",
+                                city: null,
                                 state: "",
                                 postcode: "",
                                 email: "",
                                 phone: "",
                               });
+                               setCitySearchTerm("");
                             }}
                           >
                             Clear
@@ -491,58 +574,7 @@ e.preventDefault()
                             />
                           </div>
                         </div>
-                        <div className="col-md-12">
-                          <div className="checkout-form-list">
-                            <label>Company Name</label>
-                            <input
-                              type="text"
-                              name="companyName"
-                              value={address.companyName}
-                              onChange={handleAddressChange}
-                            />
-                          </div>
-                        </div>
-                        <div className="col-md-12">
-                          <div className="checkout-form-list">
-                            <label>
-                              Address <span className="required">*</span>
-                            </label>
-                            <input
-                              type="text"
-                              name="address"
-                              value={address.address}
-                              onChange={handleAddressChange}
-                              placeholder="Street address"
-                              required
-                            />
-                          </div>
-                        </div>
-                        <div className="col-md-12">
-                          <div className="checkout-form-list">
-                            <input
-                              type="text"
-                              name="apartment"
-                              value={address.apartment}
-                              onChange={handleAddressChange}
-                              placeholder="Apartment, suite, unit etc. (optional)"
-                            />
-                          </div>
-                        </div>
-                        <div className="col-md-12">
-                          <div className="checkout-form-list">
-                            <label>
-                              Town / City <span className="required">*</span>
-                            </label>
-                            <input
-                              type="text"
-                              name="city"
-                              value={address.city}
-                              onChange={handleAddressChange}
-                              placeholder="Town / City"
-                              required
-                            />
-                          </div>
-                        </div>
+                        {/* country */}
                         <div className="col-md-6">
                           <div className="checkout-form-list">
                             <label>
@@ -557,6 +589,99 @@ e.preventDefault()
                             />
                           </div>
                         </div>
+                        {/* city */}
+                        {/* <div className="col-md-12">
+                          <div className="checkout-form-list">
+                            <label>
+                              City <span className="required">*</span>
+                            </label>
+                            <input
+                              type="text"
+                              name="city"
+                              value={address.city}
+                              onChange={handleAddressChange}
+                              placeholder="Town / City"
+                              required
+                            />
+                          </div>
+                        </div> */}
+
+                    <div className="col-md-12">
+  <div className="checkout-form-list" style={{ position: 'relative' }}>
+    <label>
+      City <span className="required">*</span>
+    </label>
+    <input
+      type="text"
+      name="city"
+      value={citySearchTerm}
+      onChange={handleCityInputChange}
+      placeholder="Type city name (minimum 2 characters)"
+      required
+      autoComplete="off"
+      style={{
+        borderColor: !isCityValid() && citySearchTerm ? '#dc3545' : '#ddd'
+      }}
+    />
+    {!isCityValid() && citySearchTerm && (
+      <div style={{ color: '#dc3545', fontSize: '12px', marginTop: '5px' }}>
+        Please select a city from the dropdown
+      </div>
+    )}
+    {cityLoading && (
+      <div style={{ 
+        position: 'absolute', 
+        right: '10px', 
+        top: '35px', 
+        zIndex: 10 
+      }}>
+        <Loader size={16} className="animate-spin" />
+      </div>
+    )}
+    {showCityDropdown && (
+      <div style={{
+        position: 'absolute',
+        top: '100%',
+        left: 0,
+        right: 0,
+        backgroundColor: 'white',
+        border: '1px solid #ddd',
+        borderRadius: '4px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+        zIndex: 1000,
+        maxHeight: '200px',
+        overflowY: 'auto'
+      }}>
+        {cityOptions.length > 0 ? (
+          cityOptions.map((city) => (
+            <div
+              key={city.id}
+              onClick={() => handleCitySelect(city)}
+              style={{
+                padding: '10px 15px',
+                cursor: 'pointer',
+                borderBottom: '1px solid #eee'
+              }}
+              onMouseEnter={(e) => e.target.style.backgroundColor = '#f5f5f5'}
+              onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
+            >
+              {city.name}
+            </div>
+          ))
+        ) : (
+          <div style={{
+            padding: '10px 15px',
+            color: '#666',
+            fontStyle: 'italic'
+          }}>
+            No cities found for "{citySearchTerm}"
+          </div>
+        )}
+      </div>
+    )}
+  </div>
+</div>
+                        {/* post code */}
                         <div className="col-md-6">
                           <div className="checkout-form-list">
                             <label>
@@ -572,6 +697,47 @@ e.preventDefault()
                             />
                           </div>
                         </div>
+                        {/* address */}
+                        <div className="col-md-12">
+                          <div className="checkout-form-list">
+                            <label>
+                              Address <span className="required">*</span>
+                            </label>
+                            <input
+                              type="text"
+                              name="address"
+                              value={address.address}
+                              onChange={handleAddressChange}
+                              placeholder="Full Address"
+                              required
+                            />
+                          </div>
+                        </div>
+                        {/* Apartment suits units */}
+                        <div className="col-md-12">
+                          <div className="checkout-form-list">
+                            <input
+                              type="text"
+                              name="apartment"
+                              value={address.apartment}
+                              onChange={handleAddressChange}
+                              placeholder="Apartment, suite, unit etc. (Optional)"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="col-md-12">
+                          <div className="checkout-form-list">
+                            <label>Company Name (Optional)</label>
+                            <input
+                              type="text"
+                              name="companyName"
+                              value={address.companyName}
+                              onChange={handleAddressChange}
+                            />
+                          </div>
+                        </div>
+
                         <div className="col-md-6">
                           <div className="checkout-form-list">
                             <label>
@@ -648,11 +814,7 @@ e.preventDefault()
                         <table>
                           <thead>
                             <tr>
-                              <th
-                                className="product-name"
-                              >
-                                Product
-                              </th>
+                              <th className="product-name">Product</th>
                               <th className="product-total">Total</th>
                             </tr>
                           </thead>
@@ -753,8 +915,8 @@ e.preventDefault()
                             </div>
                           </div>
 
-                                                 {/* card payment */}
-                          <div className="accordion-item">
+                          {/* card payment */}
+                          {/* <div className="accordion-item">
                             <input
                               type="checkbox"
                               id="onlinePayment"
@@ -791,21 +953,25 @@ e.preventDefault()
                                 </div>
                               </div>
                             </div>
-                          </div>
+                          </div> */}
                         </div>
-
 
                         {/* </div> */}
                         {cashOnDelivery ? (
                           <div className="order-button-payment mt-20">
                             <button
-
-                            disabled={session?false:true}
+                              disabled={session ? false : true}
                               onClick={handleAddOrder}
                               className="tp-btn tp-color-btn w-100 banner-animation"
-                              style={{cursor:"pointer"}}
+                              style={{ cursor: "pointer" }}
                             >
-                              {loading?<Loader className="animate-spin"/>:session?"Place order":"Please login"}
+                              {loading ? (
+                                <Loader className="animate-spin" />
+                              ) : session ? (
+                                "Place order"
+                              ) : (
+                                "Please login"
+                              )}
                             </button>
                           </div>
                         ) : (

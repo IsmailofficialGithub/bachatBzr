@@ -5,7 +5,6 @@ export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url)
     const keyword = searchParams.get('q')
-    console.log(keyword)
 
     if (!keyword) {
       return NextResponse.json({
@@ -15,81 +14,69 @@ export async function GET(req) {
       }, { status: 400 })
     }
 
-    const searchTerm = keyword.toLowerCase()
+    const searchTerm = keyword.toLowerCase().trim()
+    
+    // Early return for very short search terms to reduce load
+    if (searchTerm.length < 2) {
+      return NextResponse.json({
+        success: true,
+        message: '0 suggestions found.',
+        data: []
+      }, { status: 200 })
+    }
 
-    // 1. Match product names
-    const { data: nameResults, error: nameError } = await supabase
+    // Single optimized query combining all search criteria
+    const { data: results, error } = await supabase
       .from('products')
-      .select('name')
-      .ilike('name', `%${searchTerm}%`)
+      .select('name, tags, categories')
+      .or(`name.ilike.%${searchTerm}%,tags.cs.{${searchTerm}},categories.cs.["${searchTerm}"]`)
+      .limit(50) // Limit database results to reduce data transfer
+      console.log(results)
 
-    if (nameError) {
+    if (error) {
+      console.error('Search error:', error)
       return NextResponse.json({
         success: false,
-        message: 'Name suggestion failed',
-        error: nameError.message
+        message: 'Search failed',
+        error: error.message
       }, { status: 500 })
     }
 
-    // 2. Match tags (text[]) - matches elements of array
-    const { data: tagResults, error: tagError } = await supabase
-      .from('products')
-      .select('tags')
-      .contains('tags', [searchTerm])
-
-    if (tagError) {
-      return NextResponse.json({
-        success: false,
-        message: 'Tag suggestion failed',
-        error: tagError.message
-      }, { status: 500 })
-    }
-
-    // 3. Match categories (jsonb[])
-    const { data: categoryResults, error: categoryError } = await supabase
-      .from('products')
-      .eq("sold", false)
-      .select('categories')
-        .filter('categories', 'cs', `["${searchTerm}"]`)
-
-    if (categoryError) {
-      return NextResponse.json({
-        success: false,
-        message: 'Category suggestion failed',
-        error: categoryError.message
-      }, { status: 500 })
-    }
-
-    // Collect all suggestions
+    // Process results efficiently using a Set for deduplication
     const suggestionsSet = new Set()
+    const maxSuggestions = 10
 
-    // Add product names
-    nameResults?.forEach(item => {
-      if (item?.name?.toLowerCase().includes(searchTerm)) {
+    for (const item of results) {
+      // Stop early if we have enough suggestions
+      if (suggestionsSet.size >= maxSuggestions) break
+
+      // Check name match
+      if (item.name?.toLowerCase().includes(searchTerm)) {
         suggestionsSet.add(item.name.toLowerCase())
       }
-    })
 
-    // Add matching tags
-    tagResults?.forEach(item => {
-      item.tags?.forEach(tag => {
-        if (tag.toLowerCase().includes(searchTerm)) {
-          suggestionsSet.add(tag.toLowerCase())
+      // Check tag matches
+      if (item.tags?.length) {
+        for (const tag of item.tags) {
+          if (suggestionsSet.size >= maxSuggestions) break
+          if (tag?.toLowerCase().includes(searchTerm)) {
+            suggestionsSet.add(tag.toLowerCase())
+          }
         }
-      })
-    })
+      }
 
-    // Add matching categories
-    categoryResults?.forEach(item => {
-      item.categories?.forEach(cat => {
-        if (cat.toLowerCase().includes(searchTerm)) {
-          suggestionsSet.add(cat.toLowerCase())
+      // Check category matches
+      if (item.categories?.length) {
+        for (const category of item.categories) {
+          if (suggestionsSet.size >= maxSuggestions) break
+          if (category?.toLowerCase().includes(searchTerm)) {
+            suggestionsSet.add(category.toLowerCase())
+          }
         }
-      })
-    })
+      }
+    }
 
-    // Convert to array and limit suggestions (e.g. top 10)
-    const suggestions = Array.from(suggestionsSet).slice(0, 10)
+    const suggestions = Array.from(suggestionsSet).slice(0, maxSuggestions)
 
     return NextResponse.json({
       success: true,
@@ -98,7 +85,63 @@ export async function GET(req) {
     }, { status: 200 })
 
   } catch (err) {
-    console.log(err)
+    console.error('Unexpected error:', err)
+    return NextResponse.json({
+      success: false,
+      message: 'Error generating suggestions.',
+      error: err.message
+    }, { status: 500 })
+  }
+}
+
+// Alternative version with even better performance using RPC
+export async function GET_ADVANCED(req) {
+  try {
+    const { searchParams } = new URL(req.url)
+    const keyword = searchParams.get('q')
+
+    if (!keyword) {
+      return NextResponse.json({
+        success: false,
+        message: 'Search keyword is required',
+        error: 'Missing query parameter: q'
+      }, { status: 400 })
+    }
+
+    const searchTerm = keyword.toLowerCase().trim()
+    
+    if (searchTerm.length < 2) {
+      return NextResponse.json({
+        success: true,
+        message: '0 suggestions found.',
+        data: []
+      }, { status: 200 })
+    }
+
+    // Use a stored procedure for maximum performance
+    const { data: suggestions, error } = await supabase
+      .rpc('get_search_suggestions', {
+        search_term: searchTerm,
+        max_results: 10
+      })
+
+    if (error) {
+      console.error('Search error:', error)
+      return NextResponse.json({
+        success: false,
+        message: 'Search failed',
+        error: error.message
+      }, { status: 500 })
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: `${suggestions?.length || 0} suggestions found.`,
+      data: suggestions || []
+    }, { status: 200 })
+
+  } catch (err) {
+    console.error('Unexpected error:', err)
     return NextResponse.json({
       success: false,
       message: 'Error generating suggestions.',

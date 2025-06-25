@@ -1,6 +1,7 @@
 import { supabase, supabaseAdmin } from "@/lib/supabase";
 import { sendEmail } from "@/app/utils/sendMail";
 import { NextResponse } from "next/server";
+import { createNotification } from "@/lib/notifications";
 
 export async function PATCH(req) {
   try {
@@ -63,7 +64,7 @@ export async function PATCH(req) {
       <body>
         <div class="container">
           <div class="logo">
-            <img src="https://www.yourwebsite.com/logo.png" alt="Company Logo">
+            <img src="https://res.cloudinary.com/dzkoeyx3s/image/upload/v1750419010/Bachat_2_tap7mv.png" alt="Company Logo">
           </div>
           <div class="content">
             <p>Dear Valued Customer,</p>
@@ -78,7 +79,7 @@ export async function PATCH(req) {
             </p>
             <p><strong>Best regards,</strong><br>The SmartSwap Team</p>
           </div>
-          <div class="footer">&copy; 2024 SmartSwap. All rights reserved.</div>
+          <div class="footer">&copy; 2025 to 2030 BachatBzr. All rights reserved.</div>
         </div>
       </body>
       </html>
@@ -93,6 +94,14 @@ export async function PATCH(req) {
         { status: 500 }
       );
     }
+    const notificationdata = {
+      user_id: userId,
+      order_id: orderId,
+      type: status,
+      title: "Important Update: Your Order Status Has Changed",
+      message: `Your order (#${orderId}) status has been updated to "${status}". Track your order for more details.`,
+    }
+    await createNotification(notificationdata)
 
     return NextResponse.json({
       success: true,

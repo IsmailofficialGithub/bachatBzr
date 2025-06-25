@@ -43,7 +43,7 @@ export default function HeaderSticky({
                           <Link href="/index-2">Fashion Home</Link>
                         </li>
                         <li>
-                          <Link href="/index-3">Furniture Home</Link>
+                          <Link href="/index-3">Furniture Home...</Link>
                         </li>
                         <li>
                           <Link href="/index-4">Cosmetics Home</Link>

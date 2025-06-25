@@ -1,7 +1,7 @@
 'use client'
 import Link from 'next/link'
 import { useState } from 'react'
-export default function MobileMenu() {
+export default function MobileMenu({isSuggestion}) {
     const [isActive, setIsActive] = useState({
         status: false,
         key: "",
@@ -22,7 +22,7 @@ export default function MobileMenu() {
     return (
         <>
             <div className="mobile-menu mean-container">
-                <div className="mean-bar">
+                <div className="mean-bar"  style={{display: `${isSuggestion ? "none" : "block"}`}}>
                     <Link href="#" className="meanmenu-reveal">
                         <span><span><span /></span></span>
                     </Link>
@@ -30,23 +30,26 @@ export default function MobileMenu() {
                         <ul>
                             <li className="has-dropdown">
                                 <Link href="/">Home</Link>
-                                <ul className="submenu" style={{ display: `${isActive.key == 1 ? "block" : "none"}` }}>
-                                    <li><Link href="/">Wooden  Home</Link></li>
-                                    <li><Link href="/index-2">Fashion Home</Link></li>
-                                    <li><Link href="/index-3">Furniture Home</Link></li>
-                                    <li><Link href="/index-4">Cosmetics Home</Link></li>
-                                    <li><Link href="/index-5">Food Grocery</Link></li>
-                                </ul>
+                                <ul className="submenu">
+                          <li>
+                            <Link href="/category/shoes">Shoes Home</Link>
+                          </li>
+                          <li>
+                            <Link href="/category/cloths">Cloths Home</Link>
+                          </li>
+                          <li>
+                            <Link href="/category/mens">Mens Home</Link>
+                          </li>
+                          <li>
+                            <Link href="/category/tshirts">T-shirts Home</Link>
+                          </li>
+                        </ul>
                                 <Link className="mean-expand" onClick={() => handleClick(1)} href="#" style={{ fontSize: 18 }}><i className="fal fa-plus" /></Link>
                             </li>
                             <li className="has-dropdown">
                                 <Link href="/shop">Shop</Link>
                                 <ul className="submenu" style={{ display: `${isActive.key == 2 ? "block" : "none"}` }}>
                                     <li><Link href="/shop">Shop</Link></li>
-                                    <li><Link href="/shop-2">Shop 2</Link></li>
-                                    <li><Link href="/shop-details">Shop Details </Link></li>
-                                    <li><Link href="/shop-details-2">Shop Details 2</Link></li>
-                                    <li><Link href="/shop-location">Shop Location</Link></li>
                                     <li><Link href="/cart">Cart</Link></li>
                                     <li><Link href="/authentication">Sign In</Link></li>
                                     <li><Link href="/checkout">Checkout</Link></li>
@@ -59,17 +62,16 @@ export default function MobileMenu() {
                                 <Link href="/about">Pages</Link>
                                 <ul className="submenu mega-menu" style={{ display: `${isActive.key == 3 ? "block" : "none"}` }}>
 
-                                    <li><Link href="/shop">Shop filters v1</Link></li>
-                                    <li><Link href="/shop-2">Shop filters v2</Link></li>
-                                    <li><Link href="/shop-details">Shop sidebar</Link></li>
-                                    <li><Link href="/shop-details-2">Shop Right sidebar</Link></li>
-                                    <li><Link href="/shop-location">Shop List view</Link></li>
+                                    <li><Link href="/shop">Shop 
+
+</Link></li>
+                                 
 
                                     <li><Link href="/about">About</Link></li>
                                     <li><Link href="/cart">Cart</Link></li>
                                     <li><Link href="/checkout">Checkout</Link></li>
-                                    <li><Link href="/authentication">Sign In</Link></li>
-                                    <li><Link href="/authentication">Log In</Link></li>
+                                    <li><Link href="/authentication?signup=true">Sign Up</Link></li>
+                                    <li><Link href="/authentication?signin=true">Log In</Link></li>
 
                                     <li><Link href="/track">Product Track</Link></li>
                                     <li><Link href="/wishlist">Wishlist</Link></li>

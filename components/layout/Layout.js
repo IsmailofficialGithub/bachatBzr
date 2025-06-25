@@ -16,6 +16,7 @@ export async function generateMetadata() {
   };
 }
 
+
 export default function Layout({
   headerStyle,
   footerStyle,
@@ -23,6 +24,7 @@ export default function Layout({
   children,
 }) {
   const [scroll, setScroll] = useState(0);
+  const [query,setQuery] = useState("");
   // Mobile Menu
   const [isMobileMenu, setMobileMenu] = useState(false);
   const handleMobileMenu = () => setMobileMenu(!isMobileMenu);
@@ -79,7 +81,9 @@ export default function Layout({
         isCartSidebar={isCartSidebar}
         handleCartSidebar={handleCartSidebar}
       />
-      <main style={{ marginLeft: "6%", marginRight: "6%" }}>
+      <main 
+      style={{ marginLeft: "6%", marginRight: "6%" }}
+      >
         {breadcrumbTitle && <Breadcrumb breadcrumbTitle={breadcrumbTitle} />}
 
         {children}

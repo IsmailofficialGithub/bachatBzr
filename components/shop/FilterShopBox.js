@@ -3,6 +3,7 @@ import "@/public/assets/css/tailwind-cdn.css";
 import { addCart } from "@/features/shopSlice";
 import { addWishlist } from "@/features/wishlistSlice";
 import { Fragment, useEffect, useRef, useState } from "react";
+import ProductGrid from "@/components/Product/ProductGrid"
 import { useDispatch } from "react-redux";
 import ShopCard from "./ShopCard";
 import ShopCardList from "./ShopCardList";
@@ -276,7 +277,10 @@ const FilterShopBox = () => {
         </div>
       </div>
 
-      <div className="row mb-50">
+      {products.length > 0 &&(
+        <ProductGrid Products={products}/>
+      )}
+      {/* <div className="row mb-50">
         <div className="col-lg-12">
           <div className="tab-content" id="nav-tabContent">
             <div
@@ -365,7 +369,7 @@ const FilterShopBox = () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       <PaginationComponent
         currentPage={page.current}

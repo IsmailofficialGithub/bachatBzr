@@ -1177,9 +1177,20 @@ only screen and (min-width: 768px) and (max-width: 991px) {
     font-weight: 600;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 500px ) {
     .header-welcome-text span {
-        font-size: 14px;
+        font-size: 10px;
+    }
+    .header-welcome-text a {
+        font-size: 10px;
+    }
+}
+@media (max-width: 350px ) {
+    .header-welcome-text span {
+        font-size: 8px;
+    }
+    .header-welcome-text a {
+        font-size: 9px;
     }
 }
 
@@ -1192,7 +1203,7 @@ only screen and (min-width: 768px) and (max-width: 991px) {
 
 @media (max-width: 767px) {
     .header-welcome-text a {
-        font-size: 14px;
+        font-size: 8px;
     }
 }
 
@@ -2154,7 +2165,7 @@ only screen and (min-width: 1200px) and (max-width: 1399px) {
 .tpsideinfo__search form {
     position: relative;
     padding-top: 13px;
-    padding-bottom: 20px;
+    padding-bottom: 11px;
 }
 
 .tpsideinfo__search form input {

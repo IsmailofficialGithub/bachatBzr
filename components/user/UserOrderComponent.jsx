@@ -262,7 +262,7 @@ const OrderPage = () => {
                             <div className="text-sm">
                               <p>{deliveryAddress.firstName} {deliveryAddress.lastName}</p>
                               <p>{deliveryAddress.address}</p>
-                              <p>{deliveryAddress.city}, {deliveryAddress.state}</p>
+                              <p>{deliveryAddress.city.city_name}, {deliveryAddress.state}</p>
                               <p>{deliveryAddress.country}, {deliveryAddress.postcode}</p>
                               <p className="mt-1">Phone: {deliveryAddress.phone}</p>
                               <p>Email: {deliveryAddress.email}</p>

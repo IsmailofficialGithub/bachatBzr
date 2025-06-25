@@ -49,13 +49,17 @@ const useAuth = () => {
   };
 };
 
+// Constants for pagination
+const NOTIFICATIONS_PER_PAGE = 10;
+const DEFAULT_PAGE = 1;
+
 // API service for notifications using axios
 const notificationService = {
   async fetchNotifications(userId, options = {}) {
     const params = new URLSearchParams();
     params.append("userId", userId);
-    if (options.page) params.append("page", options.page);
-    if (options.limit) params.append("limit", options.limit);
+    params.append("page", options.page || DEFAULT_PAGE);
+    params.append("limit", NOTIFICATIONS_PER_PAGE);
     
     try {
       const response = await axios.get(`/api/notification/get?${params}`);
@@ -96,12 +100,37 @@ const notificationService = {
       }
     }
   },
+
+  async deleteNotifications(notificationIds, userId) {
+    try {
+      const response = await axios.delete("/api/notification/delete", {
+        data: {
+          notificationIds,
+          userId,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      if (error.response) {
+        throw new Error(
+          `HTTP ${error.response.status}: ${
+            error.response.data?.error || error.response.statusText
+          }`,
+        );
+      } else if (error.request) {
+        throw new Error("Network error: Unable to reach server");
+      } else {
+        throw new Error(`Request error: ${error.message}`);
+      }
+    }
+  },
 };
 
 // Individual notification item component
 const NotificationItem = ({
   notification,
   onMarkAsRead,
+  onDelete,
   onSelect,
   isSelected,
 }) => {
@@ -175,14 +204,23 @@ const NotificationItem = ({
                 {formatDate(notification.created_at || notification.createdAt)}
               </span>
 
-              {!notification.is_read && (
+              <div className="flex items-center space-x-2">
+                {!notification.is_read && (
+                  <button
+                    onClick={() => onMarkAsRead([notification.id])}
+                    className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+                  >
+                    Mark as read
+                  </button>
+                )}
                 <button
-                  onClick={() => onMarkAsRead([notification.id])}
-                  className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+                  onClick={() => onDelete([notification.id])}
+                  className="text-xs text-red-600 hover:text-red-800 font-medium flex items-center"
                 >
-                  Mark as read
+                  <Trash2 className="h-3 w-3 mr-1" />
+                  Delete
                 </button>
-              )}
+              </div>
             </div>
           </div>
         </div>
@@ -196,12 +234,13 @@ const NotificationsCenter = () => {
   const { token, userId, isAuthenticated, loading: authLoading } = useAuth();
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState("all"); // 'all', 'unread', 'read'
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [pagination, setPagination] = useState({
-    page: 1,
-    limit: 10,
+    page: DEFAULT_PAGE,
+    limit: NOTIFICATIONS_PER_PAGE,
     total: 0,
     pages: 0,
   });
@@ -225,7 +264,6 @@ const NotificationsCenter = () => {
       try {
         const response = await notificationService.fetchNotifications(userId, {
           page,
-          limit: pagination.limit,
         });
 
         if (response.success) {
@@ -253,7 +291,7 @@ const NotificationsCenter = () => {
         setLoading(false);
       }
     },
-    [userId, isAuthenticated, pagination.limit],
+    [userId, isAuthenticated],
   );
 
   // Mark notifications as read
@@ -283,6 +321,52 @@ const NotificationsCenter = () => {
     } catch (err) {
       setError(err.message);
       console.error("Mark as read error:", err);
+    }
+  };
+
+  // Delete notifications
+  const handleDelete = async (notificationIds) => {
+    if (!userId) return;
+
+    // Show confirmation dialog
+    const confirmed = window.confirm(
+      `Are you sure you want to delete ${notificationIds.length} notification${notificationIds.length > 1 ? 's' : ''}? This action cannot be undone.`
+    );
+
+    if (!confirmed) return;
+
+    setDeleting(true);
+    setError(null);
+
+    try {
+      const response = await notificationService.deleteNotifications(
+        notificationIds,
+        userId,
+      );
+
+      if (response.success) {
+        // Remove deleted notifications from state
+        setNotifications((prev) =>
+          prev.filter((notification) => !notificationIds.includes(notification.id))
+        );
+
+        // Clear selection
+        setSelectedIds(new Set());
+
+        // Update pagination total
+        setPagination(prev => ({
+          ...prev,
+          total: prev.total - notificationIds.length
+        }));
+
+      } else {
+        throw new Error(response.error || "Failed to delete notifications");
+      }
+    } catch (err) {
+      setError(err.message);
+      console.error("Delete notifications error:", err);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -328,16 +412,24 @@ const NotificationsCenter = () => {
 
   // Supabase realtime subscription
   useEffect(() => {
-
     if (!isAuthenticated || !userId) return;
 
-    // Subscribe to notifications table changes for the current user
+    console.log('Setting up realtime subscription for user:', userId);
+
+    // Create a unique channel name
+    const channelName = `notifications-${userId}-${Date.now()}`;
+    
     const subscription = supabase
-      .channel('notifications-channel')
+      .channel(channelName, {
+        config: {
+          broadcast: { self: true },
+          presence: { key: userId }
+        }
+      })
       .on(
         'postgres_changes',
         {
-          event: '*', // Listen to all events (INSERT, UPDATE, DELETE)
+          event: '*',
           schema: 'public',
           table: 'notifications',
           filter: `user_id=eq.${userId}`,
@@ -347,12 +439,21 @@ const NotificationsCenter = () => {
           
           switch (payload.eventType) {
             case 'INSERT':
-              // Add new notification to the beginning of the list
-              setNotifications(prev => [payload.new, ...prev]);
+              console.log('New notification received:', payload.new);
+              setNotifications(prev => {
+                // Check if notification already exists to prevent duplicates
+                const exists = prev.some(n => n.id === payload.new.id);
+                if (exists) return prev;
+                return [payload.new, ...prev];
+              });
+              setPagination(prev => ({
+                ...prev,
+                total: prev.total + 1
+              }));
               break;
               
             case 'UPDATE':
-              // Update existing notification
+              console.log('Notification updated:', payload.new);
               setNotifications(prev =>
                 prev.map(notification =>
                   notification.id === payload.new.id
@@ -363,28 +464,49 @@ const NotificationsCenter = () => {
               break;
               
             case 'DELETE':
-              // Remove deleted notification
+              console.log('Notification deleted:', payload.old);
               setNotifications(prev =>
                 prev.filter(notification => notification.id !== payload.old.id)
               );
+              setPagination(prev => ({
+                ...prev,
+                total: Math.max(0, prev.total - 1)
+              }));
               break;
               
             default:
+              console.log('Unknown event type:', payload.eventType);
               break;
           }
         }
       )
-      .subscribe((status) => {
+      .subscribe(async (status, error) => {
         console.log('Subscription status:', status);
+        if (error) {
+          console.error('Subscription error:', error);
+        }
         if (status === 'SUBSCRIBED') {
           console.log('Successfully subscribed to notifications realtime updates');
+        } else if (status === 'CHANNEL_ERROR') {
+          console.error('Channel error - retrying in 5 seconds...');
+          setTimeout(() => {
+            subscription.unsubscribe();
+            // The effect will re-run and create a new subscription
+          }, 5000);
+        } else if (status === 'TIMED_OUT') {
+          console.error('Subscription timed out - retrying...');
+          subscription.unsubscribe();
+        } else if (status === 'CLOSED') {
+          console.log('Subscription closed');
         }
       });
 
-    // Cleanup subscription on unmount
+    // Cleanup subscription on unmount or dependency change
     return () => {
-      console.log('Unsubscribing from notifications realtime updates');
-      supabase.removeChannel(subscription);
+      console.log('Cleaning up realtime subscription');
+      if (subscription) {
+        subscription.unsubscribe();
+      }
     };
   }, [isAuthenticated, userId]);
 
@@ -430,14 +552,17 @@ const NotificationsCenter = () => {
           )}
         </div>
 
-        <button
-          onClick={() => fetchNotifications(1, true)}
-          disabled={loading}
-          className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-        >
-          Refresh {" "}
-          {loading ? <Loader2 className="h-4 w-4 animate-spin ml-2" /> : null}
-        </button>
+        <div className="flex space-x-2">
+          <button
+            onClick={() => fetchNotifications(1, true)}
+            disabled={loading}
+            className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+          >
+            Refresh {" "}
+            {loading ? <Loader2 className="h-4 w-4 animate-spin ml-2" /> : null}
+          </button>
+          
+        </div>
       </div>
       
 
@@ -473,10 +598,22 @@ const NotificationsCenter = () => {
             </span>
             <button
               onClick={() => handleMarkAsRead(Array.from(selectedIds))}
-              className="inline-flex items-center px-2 py-1 text-xs font-medium text-green-700 bg-green-100 rounded hover:bg-green-200"
+              className="inline-flex items-center px-2 py-1 text-xs font-medium text-green-700 bg-blue-100 rounded hover:bg-green-200"
             >
               <Check className="h-3 w-3 mr-1" />
               Mark Read
+            </button>
+            <button
+              onClick={() => handleDelete(Array.from(selectedIds))}
+              disabled={deleting}
+              className="inline-flex items-center px-2 py-1 text-xs font-medium text-red-700 bg-red-100 rounded hover:bg-red-200 disabled:opacity-50"
+            >
+              {deleting ? (
+                <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+              ) : (
+                <Trash2 className="h-3 w-3 mr-1" />
+              )}
+              Delete
             </button>
           </div>
         )}
@@ -538,6 +675,7 @@ const NotificationsCenter = () => {
                 key={notification.id}
                 notification={notification}
                 onMarkAsRead={handleMarkAsRead}
+                onDelete={handleDelete}
                 onSelect={handleSelect}
                 isSelected={selectedIds.has(notification.id)}
               />

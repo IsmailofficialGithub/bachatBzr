@@ -34,6 +34,8 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { supabase } from "@/lib/supabase";
+import { Button } from "@/components/ui/button";
+
 
 const statusColors = {
   pending: "bg-yellow-100 text-yellow-800",
@@ -93,7 +95,6 @@ const Orders = () => {
         },
         (payload) => {
           // Handle different types of changes
-          console.log('changes catched ', payload);
           if (payload.eventType === 'INSERT') {
             // Check if the new order should be included on the current page
             if (orders.length < limit) {
@@ -195,7 +196,8 @@ const Orders = () => {
   const formatAddress = (address) => {
     try {
       const parsed = JSON.parse(address);
-      return `${parsed.address}, ${parsed.city}, ${parsed.country}`;
+      console.log("address",parsed)
+      return `${parsed.address}, ${parsed.city.city_name}, ${parsed.country}`;
     } catch {
       return address;
     }
@@ -213,7 +215,7 @@ const Orders = () => {
           </div>
           <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
             <Select onValueChange={handleFilterChange}>
-              <SelectTrigger className="w-full md:w-48">
+              <SelectTrigger className=" md:w-48">
                 <div className="flex items-center gap-2">
                   <Filter className="h-4 w-4" />
                   <SelectValue placeholder="Filter status" />
@@ -309,13 +311,23 @@ const Orders = () => {
                            PKR {order.total_amount.final_total?.toFixed(2)}
                         </TableCell>
                         <TableCell>{order.phone}</TableCell>
-                        <TableCell className="text-right">
+                        <TableCell className="text-right flex flex-col">
                           <button
                             onClick={() => window.open(`/order/${order.id}`)}
-                            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline hover:decoration-red-500 decoration-2"
                           >
-                            View Details
+                            Details↗
                           </button>
+                        {
+                          !order.packet_tracking_id &&(
+                              <button
+                            onClick={() => window.open(`/admin/dashboard/blp/${order.id}`)}
+                            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline hover:decoration-red-500 decoration-2"
+                          >
+                            BLP↗
+                          </button>
+                          )
+                        }
                         </TableCell>
                       </TableRow>
                     ))}
@@ -326,7 +338,8 @@ const Orders = () => {
 
             {orders.length === 0 && !loading.mainLoading && (
               <div className="flex flex-col items-center justify-center py-12">
-                <p className="text-gray-500">No orders found</p>
+                <p className="text-gray-500 pb-3">No orders found</p>
+                <Button onClick={fetchOrders}>Refresh</Button>
               </div>
             )}
 

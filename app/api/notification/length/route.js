@@ -17,7 +17,7 @@ export const GET = async (req) => {
         { status: 404 },
       );
     }
-    console.log(data);
+    
 
     return NextResponse.json(
       {

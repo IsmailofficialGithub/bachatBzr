@@ -8,11 +8,10 @@ add head tags in all pages
 add right url while redirect from forget opt link to bachatbzr.com
 add login url correct
 change role also in user table from authentication tab and auto delete user from both authenction and user table
-stripe is not working fine
 increase time when product sold outs
 check product is not sold in api  .eq("sold", false)
-delete api is not working
-
+email update while change status , also notifications created 
+user/orders page mobile ui , new order in bottom 
 
 
 

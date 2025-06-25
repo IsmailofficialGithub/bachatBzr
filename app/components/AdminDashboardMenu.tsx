@@ -2,8 +2,8 @@
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { X } from "lucide-react";
-import '@/app/admin/dashboard/admin.css';
+import { Home, X } from "lucide-react";
+import "@/app/admin/dashboard/admin.css";
 
 export default function AdminDashboardMenu() {
   const [isOpen, setIsOpen] = useState(false);
@@ -11,10 +11,11 @@ export default function AdminDashboardMenu() {
 
   const navigation = [
     { name: "Dashboard", href: "/admin/dashboard" },
-    { name: "Users", href: "/admin/dashboard/users" },
     { name: "Products", href: "/admin/dashboard/products" },
     { name: "Orders", href: "/admin/dashboard/orders" },
-    { name: "Settings", href: "/admin/dashboard/settings" },
+    { name: "BLP", href: "/admin/dashboard/blp" },
+    { name: "Users", href: "/admin/dashboard/users" },
+    // { name: "Settings", href: "/admin/dashboard/settings" },
   ];
 
   return (
@@ -47,10 +48,8 @@ export default function AdminDashboardMenu() {
           <div className="admin-sidebar-content">
             <div className="admin-header">
               <h1 className="admin-title">Admin Panel</h1>
-              <X
-                className="admin-close-btn"
-                onClick={() => setIsOpen(false)}
-              />
+              <h1 className="admin-title cursor-pointer" onClick={()=>{window.location.href='/'}}><Home/></h1>
+              <X className="admin-close-btn" onClick={() => setIsOpen(false)} />
             </div>
             <nav>
               {navigation.map((item) => (

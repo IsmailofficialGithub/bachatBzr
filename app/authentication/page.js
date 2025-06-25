@@ -4,8 +4,9 @@ import Layout from "@/components/layout/Layout";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import { supabase } from "@/lib/supabase";
-import { useDispatch } from 'react-redux';
+import { useDispatch } from "react-redux";
 import { updateAuthState } from "@/features/auth/authSlice";
+import { useRouter } from "next/navigation";
 export default function SignIn() {
   const [isSignUp, setIsSignUp] = useState(true);
   const [email, setEmail] = useState("");
@@ -14,8 +15,7 @@ export default function SignIn() {
   const [message, setMessage] = useState({ text: "", status: "neutral" });
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
-  
-  
+  const router = useRouter();
 
   // Step 1: Initial signup with email and password
   const handleInitialSignUp = async (e) => {
@@ -50,7 +50,7 @@ export default function SignIn() {
             emailRedirectTo: `${process.env.NEXT_PUBLIC_API_URL}`,
             data: {
               email_confirmed: false,
-              role:'user' // Custom metadata to track verification status
+              role: "user", // Custom metadata to track verification status
             },
           },
         });
@@ -68,7 +68,7 @@ export default function SignIn() {
           text: `A verification Link has been sent to ${email}. `,
           status: "success",
         });
-        setShowOtpField(true)
+        setShowOtpField(true);
       }
     } catch (error) {
       toast.error("Something went wrong during authentication");
@@ -102,7 +102,7 @@ export default function SignIn() {
         password,
       });
 
-      console.log(error)
+      console.log(error);
       if (error) {
         toast.error(error.message);
         setMessage({ text: `Failed , ${error.message}`, status: "error" });
@@ -123,11 +123,11 @@ export default function SignIn() {
           setShowOtpField(true);
         } else {
           // Redirect user or update UI state
-          router.push('/') // Uncomment to redirect
+          router.push("/"); // Uncomment to redirect
         }
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
       toast.error("Something went wrong during authentication");
       setMessage({
         text: "An unexpected error occurred. Please try again later.",
@@ -151,8 +151,7 @@ export default function SignIn() {
       if (error) {
         console.error("Google sign-in error:", error);
         toast.error(error.message);
-      }else{
-
+      } else {
       }
       // The redirect will happen automatically, so no success handling needed here
     } catch (error) {
@@ -176,14 +175,14 @@ export default function SignIn() {
         console.error("Resend OTP error:", error);
         toast.error(error.message);
       } else {
-        setShowOtpField(false)
+        setShowOtpField(false);
         toast.success("Verification code resent!");
         setMessage({
           text: "A new verification code has been sent to your email.",
           status: "success",
         });
         setTimeout(() => {
-            setShowOtpField(true)
+          setShowOtpField(true);
         }, 10000);
       }
     } catch (error) {
@@ -212,8 +211,16 @@ export default function SignIn() {
         }, 1000);
       }
     };
-
     checkSession();
+    const searchParams = new window.URLSearchParams(window.location.search);
+    const signup = searchParams.get("signup");
+    const signin = searchParams.get("signin");
+    if (signup === null && signin === "true") {
+      setIsSignUp(false);
+    }
+    if (signin === null || signup === "true") {
+      setIsSignUp(true);
+    }
   }, []);
 
   return (
@@ -280,9 +287,7 @@ export default function SignIn() {
                       </div>
                       <div className="tptrack__item-content">
                         <h4 className="tptrack__item-title">
-                          {isSignUp
-                            ?  "Sign Up"
-                            : "Login Here"}
+                          {isSignUp ? "Sign Up" : "Login Here"}
                         </h4>
                         <p>
                           Your personal data will be used to support your
@@ -322,12 +327,20 @@ export default function SignIn() {
                               required
                             />
                           </form>
-                        </div>                       
-                          {message.text && (
-                                                        <div className={`alert ${message.status === 'error' ? 'alert-danger' : message.status === 'success' ? 'alert-success' : 'alert-info'} mb-15`}>
-                                                            {message.text}
-                                                        </div>
-                                                    )}
+                        </div>
+                        {message.text && (
+                          <div
+                            className={`alert ${
+                              message.status === "error"
+                                ? "alert-danger"
+                                : message.status === "success"
+                                ? "alert-success"
+                                : "alert-info"
+                            } mb-15`}
+                          >
+                            {message.text}
+                          </div>
+                        )}
 
                         <div className="tpsign__remember d-flex align-items-center justify-content-between mb-15">
                           <div className="form-check">
@@ -409,45 +422,50 @@ export default function SignIn() {
                     ) : (
                       // Sign Up Form
                       <>
-                        
-                          
-                          <>
-                            <div className="tptrack__id mb-10">
-                              <form action="#">
-                                <span>
-                                  <i className="fal fa-envelope" />
-                                </span>
-                                <input
-                                  type="email"
-                                  placeholder="Email address"
-                                  value={email}
-                                  onChange={(e) => setEmail(e.target.value)}
-                                  required
-                                />
-                              </form>
-                            </div>
-                            <div className="tptrack__email mb-10">
-                              <form action="#">
-                                <span>
-                                  <i className="fal fa-key" />
-                                </span>
-                                <input
-                                  type="password"
-                                  placeholder="Password"
-                                  value={password}
-                                  onChange={(e) => setPassword(e.target.value)}
-                                  required
-                                />
-                              </form>
-                            </div>
-                          </>
-                       
+                        <>
+                          <div className="tptrack__id mb-10">
+                            <form action="#">
+                              <span>
+                                <i className="fal fa-envelope" />
+                              </span>
+                              <input
+                                type="email"
+                                placeholder="Email address"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                required
+                              />
+                            </form>
+                          </div>
+                          <div className="tptrack__email mb-10">
+                            <form action="#">
+                              <span>
+                                <i className="fal fa-key" />
+                              </span>
+                              <input
+                                type="password"
+                                placeholder="Password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                              />
+                            </form>
+                          </div>
+                        </>
 
-{message.text && (
-                                                        <div className={`alert ${message.status === 'error' ? 'alert-danger' : message.status === 'success' ? 'alert-success' : 'alert-info'} mb-15`}>
-                                                            {message.text}
-                                                        </div>
-                                                    )}
+                        {message.text && (
+                          <div
+                            className={`alert ${
+                              message.status === "error"
+                                ? "alert-danger"
+                                : message.status === "success"
+                                ? "alert-success"
+                                : "alert-info"
+                            } mb-15`}
+                          >
+                            {message.text}
+                          </div>
+                        )}
 
                         {showOtpField && (
                           <div className="tpsign__account mb-15 text-center">
@@ -476,42 +494,42 @@ export default function SignIn() {
                         </div>
 
                         <div className="tptrack__btn">
-                            <button
-                              type="button"
-                              className="tptrack__submition tpsign__reg"
-                              onClick={handleInitialSignUp}
-                              disabled={isLoading}
-                            >
-                              {isLoading ? "Sending..." : "Register Now"}
-                              {!isLoading && (
-                                <i className="fal fa-long-arrow-right" />
-                              )}
-                            </button>
+                          <button
+                            type="button"
+                            className="tptrack__submition tpsign__reg"
+                            onClick={handleInitialSignUp}
+                            disabled={isLoading}
+                          >
+                            {isLoading ? "Sending..." : "Register Now"}
+                            {!isLoading && (
+                              <i className="fal fa-long-arrow-right" />
+                            )}
+                          </button>
                         </div>
 
-                          <div className="social-login mt-15">
-                            <p className="text-center mb-10">- OR -</p>
-                            <button
-                              type="button"
-                              onClick={handleGoogleSignIn}
-                              className="google-btn d-flex align-items-center justify-content-center w-100"
-                              disabled={isLoading}
-                              style={{
-                                padding: "10px",
-                                border: "1px solid #ddd",
-                                borderRadius: "4px",
-                                background: "#fff",
-                                cursor: "pointer",
-                              }}
-                            >
-                              <img
-                                src="/assets/img/icon/google.webp"
-                                alt="Google"
-                                style={{ width: "20px", marginRight: "10px" }}
-                              />
-                              Continue with Google
-                            </button>
-                          </div>
+                        <div className="social-login mt-15">
+                          <p className="text-center mb-10">- OR -</p>
+                          <button
+                            type="button"
+                            onClick={handleGoogleSignIn}
+                            className="google-btn d-flex align-items-center justify-content-center w-100"
+                            disabled={isLoading}
+                            style={{
+                              padding: "10px",
+                              border: "1px solid #ddd",
+                              borderRadius: "4px",
+                              background: "#fff",
+                              cursor: "pointer",
+                            }}
+                          >
+                            <img
+                              src="/assets/img/icon/google.webp"
+                              alt="Google"
+                              style={{ width: "20px", marginRight: "10px" }}
+                            />
+                            Continue with Google
+                          </button>
+                        </div>
                       </>
                     )}
                   </div>

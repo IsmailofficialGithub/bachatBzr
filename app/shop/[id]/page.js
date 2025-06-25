@@ -218,17 +218,17 @@ const ShopSingleDynamicV1 = () => {
                           <i className="fal fa-shopping-cart" /> Add To Cart
                         </button>
                       </div>
-                      <div className="tpproduct-details__wishlist ml-20">
+                      <div className="tpproduct-details__wishlist ml-3 " style={{background:"#ffa24d"}}>
                         <button>
                           <i className="fal fa-heart" onClick={addToWishlist} />
                         </button>
                       </div>
                     </div>
                   )}
-                  <div className="tpproduct-details__information tpproduct-details__code">
+                  {/* <div className="tpproduct-details__information tpproduct-details__code">
                     <p>SKU:</p>
                     <span>BO1D0MX8SJ</span>
-                  </div>
+                  </div> */}
                   <div className="tpproduct-details__information tpproduct-details__categories">
                     <p>Categories:</p>
                     {

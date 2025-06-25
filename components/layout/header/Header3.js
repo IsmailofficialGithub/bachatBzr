@@ -11,6 +11,7 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Bell } from "lucide-react";
+import { toast } from "react-toastify";
 
 export default function Header3({
   scroll,
@@ -25,7 +26,7 @@ export default function Header3({
   const handleToggle = () => setToggled(!isToggled);
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
-  const router=useRouter()
+  const router = useRouter();
 
   const debounce = (func, delay) => {
     const timer = useRef(null);
@@ -43,7 +44,9 @@ export default function Header3({
     if (!searchTerm) return setSuggestions([]);
 
     try {
-      const res = await axios.get(`api/product/searchSuggestion?q=${searchTerm}`);
+      const res = await axios.get(
+        `api/product/searchSuggestion?q=${searchTerm}`,
+      );
       const result = res.data;
 
       if (result.success) {
@@ -62,16 +65,14 @@ export default function Header3({
 
   const handleChange = (e) => {
     const value = e.target.value;
-    console.log(value)
     setQuery(value);
     debouncedFetch(value);
   };
-  const handleSearchClick=(e)=>{
-    e.preventDefault()
-    console.log("click 1")
+  const handleSearchClick = (e) => {
+    e.preventDefault();
     query && router.push(`/shop?q=${query}`);
-    setSuggestions([])
-  }
+    setSuggestions([]);
+  };
 
   return (
     <>
@@ -117,17 +118,11 @@ export default function Header3({
                     <Link href="#">
                       <i className="fab fa-facebook-f" />
                     </Link>
-                    <Link href="#">
-                      <i className="fab fa-twitter" />
+                    <Link href="https://www.instagram.com/bachatbzr">
+                      <i className="fab fa-instagram" />
                     </Link>
-                    <Link href="#">
-                      <i className="fab fa-behance" />
-                    </Link>
-                    <Link href="#">
-                      <i className="fab fa-youtube" />
-                    </Link>
-                    <Link href="#">
-                      <i className="fab fa-linkedin" />
+                    <Link href="https://www.tiktok.com/@bachatbzr">
+                      <i className="fab fa-tiktok" />
                     </Link>
                   </div>
                 </div>
@@ -159,8 +154,11 @@ export default function Header3({
                         value={query}
                         onChange={handleChange}
                       />
-                      <button className="header-search-icon" onClick={handleSearchClick}>
-                        <i className="fal fa-search" /> 
+                      <button
+                        className="header-search-icon"
+                        onClick={handleSearchClick}
+                      >
+                        <i className="fal fa-search" />
                       </button>
 
                       {/* Suggestions Dropdown */}
@@ -170,22 +168,19 @@ export default function Header3({
                             <li
                               key={idx}
                               className="py-1 px-2 hover:bg-gray-100 cursor-pointer"
-                              onClick={()=>{router.push(`/shop?q=${item}`)}}
+                              onClick={() => {
+                                router.push(`/shop?q=${item}`);
+                              }}
                             >
                               {item}
                             </li>
                           ))}
                         </ul>
-                        
                       )}
-                     
                     </div>
                   </div>
                   <div className="header-meta header-brand d-flex align-items-center">
                     <div className="header-meta__social d-flex align-items-center ml-25">
-
-                     
-
                       <button
                         className="header-cart p-relative tp-cart-toggle"
                         onClick={handleCartSidebar}
@@ -193,7 +188,7 @@ export default function Header3({
                         <i className="fal fa-shopping-cart" />
                         <CartShow />
                       </button>
-                     
+
                       <Link
                         href="/wishlist"
                         className="header-cart p-relative tp-cart-toggle"
@@ -201,15 +196,15 @@ export default function Header3({
                         <i className="fal fa-heart" />
                         <WishListShow />
                       </Link>
-                       <Link
+                      <Link
                         href="/notifications"
                         className="header-cart p-relative tp-cart-toggle"
                       >
-                       <Bell size={23} strokeWidth={1.3} />
+                        <Bell size={23} strokeWidth={1.3} />
 
                         <NotificationListShow />
                       </Link>
-                       <Link
+                      <Link
                         href={
                           user
                             ? `/${user?.user_metadata?.role}/dashboard`
@@ -218,8 +213,6 @@ export default function Header3({
                       >
                         <i className="fal fa-user" />
                       </Link>
-                      
-                      
                     </div>
                   </div>
                 </div>
@@ -273,16 +266,16 @@ export default function Header3({
                         <Link href="/">Home</Link>
                         <ul className="submenu">
                           <li>
-                            <Link href="/">Shoes Home</Link>
+                            <Link href="/category/shoes">Shoes Home</Link>
                           </li>
                           <li>
-                            <Link href="/index-2">Cloths Home</Link>
+                            <Link href="/category/cloths">Cloths Home</Link>
                           </li>
                           <li>
-                            <Link href="/index-3">Mens Home</Link>
+                            <Link href="/category/mens">Mens Home</Link>
                           </li>
                           <li>
-                            <Link href="/index-4">T-shirts Home</Link>
+                            <Link href="/category/tshirts">T-shirts Home</Link>
                           </li>
                         </ul>
                       </li>
@@ -323,9 +316,7 @@ export default function Header3({
                                 <Link href="/">Home</Link>
                               </li>
                               <li>
-                                <Link href="/shop-location">
-                                  Shop List view
-                                </Link>
+                                <Link href="/shop">Shop List view</Link>
                               </li>
                             </ul>
                           </li>
@@ -342,10 +333,14 @@ export default function Header3({
                                 <Link href="/checkout">Checkout</Link>
                               </li>
                               <li>
-                                <Link href="/authentication">Sign In</Link>
+                                <Link href="/authentication?signin=true">
+                                  Sign In
+                                </Link>
                               </li>
                               <li>
-                                <Link href="/authentication">Log In</Link>
+                                <Link href="/authentication?signup=true">
+                                  Sign Up
+                                </Link>
                               </li>
                             </ul>
                           </li>
@@ -392,11 +387,21 @@ export default function Header3({
                     <li>
                       <div className="menu-contact__item">
                         <div className="menu-contact__icon">
-                          <i className="fal fa-map-email-alt" />
+                          <i class="fa fa-envelope" aria-hidden="true" />
                         </div>
                         <div className="menu-contact__info">
-                          <Link href="/shop-location">
-                            lalagggg786@gmail.com
+                          <Link
+                            href="mailto:contact@bachatbzr.com"
+                            onClick={() => {
+                              navigator.clipboard.writeText(
+                                "contact@bachatbzr.com",
+                              );
+                              toast.success(
+                                "Email address copied to clipboard!",
+                              );
+                            }}
+                          >
+                            contact@bachatbzr.com
                           </Link>
                         </div>
                       </div>
@@ -427,7 +432,7 @@ export default function Header3({
           user ? `/${user?.user_metadata?.role}/dashboard` : "/authentication"
         }
         handleMobileMenu={handleMobileMenu}
-         InputChange={handleChange}
+        InputChange={handleChange}
         isCartSidebar={isCartSidebar}
         handleCartSidebar={handleCartSidebar}
       />
