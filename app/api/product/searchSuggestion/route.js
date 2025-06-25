@@ -33,7 +33,6 @@ export async function GET(req) {
       .or(`name.ilike.%${searchTerm}%,tags.cs.{${searchTerm}},categories.cs.["${searchTerm}"]`)
       .limit(50) // Limit database results to reduce data transfer
       
-    console.log(results)
 
     if (error) {
       console.error('Search error:', error)
