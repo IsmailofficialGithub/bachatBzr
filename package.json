@@ -11,6 +11,9 @@
         "sass": "sass --watch public/assets/scss/main.scss:public/assets/css/main.css"
     },
     "dependencies": {
+        "@emotion/react": "^11.14.0",
+        "@emotion/styled": "^11.14.0",
+        "@mui/material": "^7.1.2",
         "@radix-ui/react-alert-dialog": "^1.1.11",
         "@radix-ui/react-avatar": "^1.1.7",
         "@radix-ui/react-label": "^2.1.2",
@@ -36,6 +39,8 @@
         "nodemailer": "^6.10.0",
         "react": "18.2.0",
         "react-dom": "18.2.0",
+        "react-dropzone": "^14.3.8",
+        "react-easy-crop": "^5.4.2",
         "react-hook-form": "^7.58.1",
         "react-modal-video": "^2.0.1",
         "react-redux": "^9.0.4",

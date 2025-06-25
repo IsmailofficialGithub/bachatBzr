@@ -95,7 +95,7 @@ export async function GET(req) {
 }
 
 // Alternative version with even better performance using RPC
-export async function GET_ADVANCED(req) {
+export async function GET(req) {
   try {
     const { searchParams } = new URL(req.url)
     const keyword = searchParams.get('q')
