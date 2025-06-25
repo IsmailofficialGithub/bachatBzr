@@ -1,4 +1,4 @@
-import { supabase, supabaseAdmin } from "@/lib/supabase";
+import { supabase, supabaseAdmin } from "@/lib/supabaseSetup";
 import { sendEmail } from "@/app/utils/sendMail";
 import { NextResponse } from "next/server";
 import { createNotification } from "@/lib/notifications";
