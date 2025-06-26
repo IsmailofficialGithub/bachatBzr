@@ -3,10 +3,8 @@ import "@/public/assets/css/tailwind-cdn.css";
 import { addCart } from "@/features/shopSlice";
 import { addWishlist } from "@/features/wishlistSlice";
 import { Fragment, useEffect, useRef, useState } from "react";
-import ProductGrid from "@/components/Product/ProductGrid"
+import ProductGrid from "@/components/Product/ProductGrid";
 import { useDispatch } from "react-redux";
-import ShopCard from "./ShopCard";
-import ShopCardList from "./ShopCardList";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { supabase } from "@/lib/supabaseSetup";
@@ -15,6 +13,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import ProductSkeleton from "../skeleton/ShopSkeleton";
 import ProductSkeleton2 from "../skeleton/ShopSkeleton2";
 import { Button } from "../ui/button";
+import ShopCardList from '@/components/shop/ShopCardList'
 import { PriceFilterPopover } from "@/app/components/PriceFilterPopover";
 const FilterShopBox = () => {
   const searchParams = useSearchParams();
@@ -91,10 +90,10 @@ const FilterShopBox = () => {
           `/api/product/get?page=${page.current}&limit=${limit}`,
         );
       } else {
-        if(newFilter){
+        if (newFilter) {
           setPriceFilter(newFilter);
         }
-         response = await axios.get("/api/product/searchQuery", {
+        response = await axios.get("/api/product/searchQuery", {
           params: {
             q: searchQuery,
             page: page.current,
@@ -220,7 +219,9 @@ const FilterShopBox = () => {
               <div>
                 {" "}
                 <PriceFilterPopover
-                  onFilterChange={searchQuery? fetchProducts:handlePriceFilterChange}
+                  onFilterChange={
+                    searchQuery ? fetchProducts : handlePriceFilterChange
+                  }
                   onClearFilter={handleDeletePriceFilter}
                   initialMin={priceFilter.min || ""}
                   initialMax={priceFilter.max || ""}
@@ -277,7 +278,6 @@ const FilterShopBox = () => {
         </div>
       </div>
 
-     
       <div className="row mb-50">
         <div className="col-lg-12">
           <div className="tab-content" id="nav-tabContent">
@@ -331,10 +331,32 @@ const FilterShopBox = () => {
                 activeIndex == 2 ? "tab-pane fade show active" : "tab-pane fade"
               }
             >
-             {products.length > 0 &&(
-        <ProductGrid Products={products} addToCart={addToCart} addToWishlist={addToWishlist}/>
-      )}
-              
+              {loading ? (
+                        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 md:gap-6 auto-cols-fr">
+
+                <ProductSkeleton />
+                <ProductSkeleton />
+                <ProductSkeleton />
+                <ProductSkeleton />
+                <ProductSkeleton />
+                <ProductSkeleton />
+                <ProductSkeleton />
+                <ProductSkeleton />
+                <ProductSkeleton />
+                <ProductSkeleton />
+                <ProductSkeleton />
+                <ProductSkeleton />
+                </div>
+              ) : (
+                products.length > 0 && (
+                  <ProductGrid
+                    Products={products}
+                    addToCart={addToCart}
+                    addToWishlist={addToWishlist}
+                    soldProducts={soldProducts} 
+                  />
+                )
+              )}
             </div>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ShoppingCart, Eye, Heart } from "lucide-react";
 import { applyDiscount } from "@/lib/discountHandler";
 import Link from "next/link";
@@ -13,12 +13,17 @@ const ProductCard = ({
   _id,
   discounted_price,
   addToWishlist,
-  addToCart
+  addToCart,
+  soldProducts = [],
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [timeLeft, setTimeLeft] = useState(null);
   const [randomRating] = useState(() => Math.random() * (5 - 2.5) + 2.5);
+  const isSold = soldProducts.includes(_id);
+
+  // const isSold = soldProducts.includes(item._id);
+
   const [randomReviewCount] = useState(
     () => Math.floor(Math.random() * (800 - 20 + 1)) + 20,
   );
@@ -111,13 +116,69 @@ const ProductCard = ({
   };
 
   return (
+    
     <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
+      <style jsx>{`
+             .product-wrapper {
+               position: relative;
+               display: inline-block;
+             }
+     
+             .product-image {
+               height: 250px;
+               object-fit: cover;
+               display: block;
+             }
+     
+             .blocked {
+               cursor: not-allowed;
+             }
+     
+             .sold-overlay {
+               position: absolute;
+               top: 0;
+               left: 0;
+               width: 100%;
+               height: 100%;
+               background: rgba(0, 0, 0, 0.6);
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               animation: slideDown 0.5s ease-out forwards;
+               z-index: 10;
+             }
+     
+             .sold-overlay h2 {
+               color: #ff3b3b;
+               font-size: 3rem;
+               font-weight: bold;
+               margin: 0;
+             }
+               
+     
+             @keyframes slideDown {
+               0% {
+                 transform: translateY(-100%);
+                 opacity: 0;
+               }
+               100% {
+                 transform: translateY(0);
+                 opacity: 1;
+               }
+             }
+           `}</style>
       {/* Image Container */}
+
       <div
-        className="relative overflow-hidden bg-gray-100 aspect-square"
+        className={`relative overflow-hidden bg-gray-100 aspect-square  ${isSold ? "blocked" : ""}`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
+        {isSold && (
+        <div className="sold-overlay">
+          <h2>SOLD</h2>
+        </div>
+      )}
         <img
           loading="lazy"
           src={getImageToShow()}
@@ -133,25 +194,25 @@ const ProductCard = ({
           }`}
         >
           <div className="flex space-x-2">
-            <button 
+            <button
               onClick={() => addToCart(_id)}
-            className="bg-white p-2 rounded-full hover:bg-gray-50 transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:scale-110">
+              className="bg-white p-2 rounded-full hover:bg-gray-50 transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:scale-110"
+            >
               <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-700" />
             </button>
             <Link href={`/shop/${_id}`}>
-            <button className="bg-white p-2 rounded-full hover:bg-gray-50 transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:scale-110">
-              <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-700" />
-            </button>
+              <button className="bg-white p-2 rounded-full hover:bg-gray-50 transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:scale-110">
+                <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-700" />
+              </button>
             </Link>
             <button
-              onClick={() => {addToWishlist(_id)}}
+              onClick={() => {
+                addToWishlist(_id);
+              }}
               className="bg-white p-2 rounded-full hover:bg-gray-50 transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:scale-110"
             >
               <Heart
-              
-                className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${
-                  "text-gray-700"
-                }`}
+                className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${"text-gray-700"}`}
               />
             </button>
           </div>
@@ -163,19 +224,18 @@ const ProductCard = ({
             {discounted_price}% OFF
           </div>
         )}
-       
       </div>
 
       {/* Card Content */}
       <div className="p-2 sm:p-3 space-y-1.5 sm:space-y-2">
         {/* Product Name */}
         <Link href={`/shop/${_id}`}>
-        <h3
-          className="font-medium text-gray-800 text-xs sm:text-sm leading-tight hover:text-blue-600 transition-colors cursor-pointer truncate"
-          title={name}
-        >
-          {name}
-        </h3>
+          <h3
+            className="font-medium text-gray-800 text-xs sm:text-sm leading-tight hover:text-blue-600 transition-colors cursor-pointer truncate"
+            title={name}
+          >
+            {name}
+          </h3>
         </Link>
 
         {/* Price Section */}
@@ -218,14 +278,20 @@ const ProductCard = ({
 };
 
 // Demo Component with Multiple Cards
-const ProductGrid = ({ Products ,addToWishlist,addToCart}) => {
+const ProductGrid = ({ Products, addToWishlist, addToCart, soldProducts }) => {
   return (
     <div className="min-h-screen bg-gray-50 p-2 sm:p-4">
       <div className="max-w-7xl mx-auto">
         {/* Responsive Grid - Auto-fit based on screen size */}
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4 md:gap-6 auto-cols-fr">
           {Products.map((product, index) => (
-            <ProductCard key={index} {...product} addToWishlist={addToWishlist} addToCart={addToCart} />
+            <ProductCard
+              key={index}
+              {...product}
+              addToWishlist={addToWishlist}
+              addToCart={addToCart}
+              soldProducts={soldProducts}
+            />
           ))}
         </div>
       </div>

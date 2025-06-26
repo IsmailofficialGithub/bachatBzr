@@ -15,87 +15,90 @@ import EmptyCart from "@/app/components/EmptyCart";
 export default function Checkout() {
   //new
   const [cityOptions, setCityOptions] = useState([]);
-const [cityLoading, setCityLoading] = useState(false);
-const [showCityDropdown, setShowCityDropdown] = useState(false);
-const [citySearchTerm, setCitySearchTerm] = useState("");
+  const [cityLoading, setCityLoading] = useState(false);
+  const [showCityDropdown, setShowCityDropdown] = useState(false);
+  const [citySearchTerm, setCitySearchTerm] = useState("");
 
-// 2. Add this new function for searching cities:
-const searchCities = async (searchTerm) => {
-  if (searchTerm.length < 2) {
-    setCityOptions([]);
-    setShowCityDropdown(false);
-    return;
-  }
-
-  setCityLoading(true);
-  try {
-    const response = await fetch(`/api/lapord/findCity?name=${encodeURIComponent(searchTerm)}`);
-    const result = await response.json();
-    
-    if (result.success) {
-      setCityOptions(result.data);
-      setShowCityDropdown(true);
-    } else {
+  // 2. Add this new function for searching cities:
+  const searchCities = async (searchTerm) => {
+    if (searchTerm.length < 2) {
       setCityOptions([]);
       setShowCityDropdown(false);
+      return;
     }
-  } catch (error) {
-    console.error('Error searching cities:', error);
-    setCityOptions([]);
-    setShowCityDropdown(false);
-  } finally {
-    setCityLoading(false);
-  }
-};
 
-// 3. Add this new function for handling city input changes:
-const handleCityInputChange = (e) => {
-  const value = e.target.value;
-  setCitySearchTerm(value);
-  
-  // Clear the city object when user types manually
-  setAddress({
-    ...address,
-    city: null,
-  });
-  
-  // Debounce the API call
-  clearTimeout(window.citySearchTimeout);
-  window.citySearchTimeout = setTimeout(() => {
-    searchCities(value);
-  }, 300);
-};
+    setCityLoading(true);
+    try {
+      const response = await fetch(
+        `/api/lapord/findCity?name=${encodeURIComponent(searchTerm)}`,
+      );
+      const result = await response.json();
 
-// 4. Add this new function for selecting a city:
-const handleCitySelect = (city) => {
-  setAddress({
-    ...address,
-    city: { city_name: city.name, city_id: city.id },
-  });
-  setCitySearchTerm(city.name);
-  setShowCityDropdown(false);
-  setCityOptions([]);
-};
-
-// 5. Add validation function for city:
-const isCityValid = () => {
-  return address.city && typeof address.city === 'object' && address.city.city_id;
-};
-
-useEffect(() => {
-  const handleClickOutside = (event) => {
-    const cityInput = event.target.closest('.checkout-form-list');
-    if (!cityInput) {
+      if (result.success) {
+        setCityOptions(result.data);
+        setShowCityDropdown(true);
+      } else {
+        setCityOptions([]);
+        setShowCityDropdown(false);
+      }
+    } catch (error) {
+      console.error("Error searching cities:", error);
+      setCityOptions([]);
       setShowCityDropdown(false);
+    } finally {
+      setCityLoading(false);
     }
   };
 
-  document.addEventListener('mousedown', handleClickOutside);
-  return () => {
-    document.removeEventListener('mousedown', handleClickOutside);
-  };
-}, []);
+  // 3. Add this new function for handling city input changes:
+  const handleCityInputChange = (e) => {
+    const value = e.target.value;
+    setCitySearchTerm(value);
 
+    // Clear the city object when user types manually
+    setAddress({
+      ...address,
+      city: null,
+    });
+
+    // Debounce the API call
+    clearTimeout(window.citySearchTimeout);
+    window.citySearchTimeout = setTimeout(() => {
+      searchCities(value);
+    }, 300);
+  };
+
+  // 4. Add this new function for selecting a city:
+  const handleCitySelect = (city) => {
+    setAddress({
+      ...address,
+      city: { city_name: city.name, city_id: city.id },
+    });
+    setCitySearchTerm(city.name);
+    setShowCityDropdown(false);
+    setCityOptions([]);
+  };
+
+  // 5. Add validation function for city:
+  const isCityValid = () => {
+    return (
+      address.city && typeof address.city === "object" && address.city.city_id
+    );
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      const cityInput = event.target.closest(".checkout-form-list");
+      if (!cityInput) {
+        setShowCityDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   //new
 
@@ -126,7 +129,6 @@ useEffect(() => {
     password: "",
   });
 
-  
   //calculate total amount
   const calculateTotals = (shippingfee = false) => {
     if (!cart || cart.length === 0) {
@@ -524,7 +526,7 @@ useEffect(() => {
                                 email: "",
                                 phone: "",
                               });
-                               setCitySearchTerm("");
+                              setCitySearchTerm("");
                             }}
                           >
                             Clear
@@ -590,97 +592,107 @@ useEffect(() => {
                           </div>
                         </div>
                         {/* city */}
-                        {/* <div className="col-md-12">
-                          <div className="checkout-form-list">
+                       
+
+                        <div className="col-md-12">
+                          <div
+                            className="checkout-form-list"
+                            style={{ position: "relative" }}
+                          >
                             <label>
                               City <span className="required">*</span>
                             </label>
                             <input
                               type="text"
                               name="city"
-                              value={address.city}
-                              onChange={handleAddressChange}
-                              placeholder="Town / City"
+                              value={citySearchTerm}
+                              onChange={handleCityInputChange}
+                              placeholder="Type city name (minimum 2 characters)"
                               required
+                              autoComplete="off"
+                              style={{
+                                borderColor:
+                                  !isCityValid() && citySearchTerm
+                                    ? "#dc3545"
+                                    : "#ddd",
+                              }}
                             />
+                            {!isCityValid() && citySearchTerm && (
+                              <div
+                                style={{
+                                  color: "#dc3545",
+                                  fontSize: "12px",
+                                  marginTop: "5px",
+                                }}
+                              >
+                                Please select a city from the dropdown
+                              </div>
+                            )}
+                            {cityLoading && (
+                              <div
+                                style={{
+                                  position: "absolute",
+                                  right: "10px",
+                                  top: "35px",
+                                  zIndex: 10,
+                                }}
+                              >
+                                <Loader size={16} className="animate-spin" />
+                              </div>
+                            )}
+                            {showCityDropdown && (
+                              <div
+                                style={{
+                                  position: "absolute",
+                                  top: "100%",
+                                  left: 0,
+                                  right: 0,
+                                  backgroundColor: "white",
+                                  border: "1px solid #ddd",
+                                  borderRadius: "4px",
+                                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                                  zIndex: 1000,
+                                  maxHeight: "200px",
+                                  overflowY: "auto",
+                                }}
+                              >
+                                {cityOptions.length > 0 ? (
+                                  cityOptions.map((city) => (
+                                    <div
+                                      key={city.id}
+                                      onClick={() => handleCitySelect(city)}
+                                      style={{
+                                        padding: "10px 15px",
+                                        cursor: "pointer",
+                                        borderBottom: "1px solid #eee",
+                                      }}
+                                      onMouseEnter={(e) =>
+                                        (e.target.style.backgroundColor =
+                                          "#f5f5f5")
+                                      }
+                                      onMouseLeave={(e) =>
+                                        (e.target.style.backgroundColor =
+                                          "white")
+                                      }
+                                    >
+                                      {city.name}
+                                    </div>
+                                  ))
+                                ) : (
+                                  <div
+                                    style={{
+                                      padding: "10px 15px",
+                                      color: "#666",
+                                      fontStyle: "italic",
+                                    }}
+                                  >
+                                    No cities found for "{citySearchTerm}"
+                                  </div>
+                                )}
+                              </div>
+                            )}
                           </div>
-                        </div> */}
-
-                    <div className="col-md-12">
-  <div className="checkout-form-list" style={{ position: 'relative' }}>
-    <label>
-      City <span className="required">*</span>
-    </label>
-    <input
-      type="text"
-      name="city"
-      value={citySearchTerm}
-      onChange={handleCityInputChange}
-      placeholder="Type city name (minimum 2 characters)"
-      required
-      autoComplete="off"
-      style={{
-        borderColor: !isCityValid() && citySearchTerm ? '#dc3545' : '#ddd'
-      }}
-    />
-    {!isCityValid() && citySearchTerm && (
-      <div style={{ color: '#dc3545', fontSize: '12px', marginTop: '5px' }}>
-        Please select a city from the dropdown
-      </div>
-    )}
-    {cityLoading && (
-      <div style={{ 
-        position: 'absolute', 
-        right: '10px', 
-        top: '35px', 
-        zIndex: 10 
-      }}>
-        <Loader size={16} className="animate-spin" />
-      </div>
-    )}
-    {showCityDropdown && (
-      <div style={{
-        position: 'absolute',
-        top: '100%',
-        left: 0,
-        right: 0,
-        backgroundColor: 'white',
-        border: '1px solid #ddd',
-        borderRadius: '4px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-        zIndex: 1000,
-        maxHeight: '200px',
-        overflowY: 'auto'
-      }}>
-        {cityOptions.length > 0 ? (
-          cityOptions.map((city) => (
-            <div
-              key={city.id}
-              onClick={() => handleCitySelect(city)}
-              style={{
-                padding: '10px 15px',
-                cursor: 'pointer',
-                borderBottom: '1px solid #eee'
-              }}
-              onMouseEnter={(e) => e.target.style.backgroundColor = '#f5f5f5'}
-              onMouseLeave={(e) => e.target.style.backgroundColor = 'white'}
-            >
-              {city.name}
-            </div>
-          ))
-        ) : (
-          <div style={{
-            padding: '10px 15px',
-            color: '#666',
-            fontStyle: 'italic'
-          }}>
-            No cities found for "{citySearchTerm}"
-          </div>
-        )}
-      </div>
-    )}
-  </div>
-</div>
+                        </div>
                         {/* post code */}
                         <div className="col-md-6">
                           <div className="checkout-form-list">

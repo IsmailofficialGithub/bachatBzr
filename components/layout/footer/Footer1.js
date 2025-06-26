@@ -1,7 +1,7 @@
 import Image from "next/image"
 import Link from "next/link"
 
-export default function Footer1() {
+export default function Footer1(isMobileMenu) {
     return (
         <>
             <footer>
@@ -12,11 +12,14 @@ export default function Footer1() {
                                 <div className="col-lg-3 col-md-4 col-sm-6">
                                     <div className="footer-widget footer-col-1 mb-40">
                                         <div className="footer-logo mb-30">
-                                            <Link href="/"><Image src="/assets/img/logo/logo.png" alt="logo" width={220} height={150}/></Link>
+                                            <Link href="/"><Image src="/assets/img/logo/logo.png" alt="logo" width={isMobileMenu?150:250 } height={isMobileMenu?100:200}/></Link>
                                         </div>
                                         <div className="footer-content">
-                                            <p>Elegant pink origami design three <br /> dimensional view and decoration co-exist.
-                                                <br /> Great for adding a decorative touch to <br /> any room’s decor.</p>
+                                            <p>BachatBar is your go-to marketplace for <br />top-brand, second-hand products in great condition
+                                                <br />  from fashion and shoes to accessories <br /> all at unbeatable prices.</p>
+                                        </div>
+                                        <div className="footer-content">
+                                            <p>BachatBar – Branded Deals, Second-Hand Steals</p>
                                         </div>
                                     </div>
                                 </div>
@@ -39,11 +42,10 @@ export default function Footer1() {
                                         <h4 className="footer-widget__title mb-30">My Account</h4>
                                         <div className="footer-widget__links">
                                             <ul>
-                                                <li><Link href="#">Delivery Information</Link></li>
-                                                <li><Link href="#">Privacy Policy</Link></li>
-                                                <li><Link href="#">Discount</Link></li>
-                                                <li><Link href="#">Custom Service</Link></li>
-                                                <li><Link href="#">Terms  Condition</Link></li>
+                                                <li><Link href="/track">Delivery Information</Link></li>
+                                                <li><Link href="/about">Privacy Policy</Link></li>
+                                                <li><Link href="/contact">Custom Service</Link></li>
+                                                <li><Link href="/about">Terms  Condition</Link></li>
                                             </ul>
                                         </div>
                                     </div>
@@ -53,11 +55,10 @@ export default function Footer1() {
                                         <h4 className="footer-widget__title mb-30">Social Network</h4>
                                         <div className="footer-widget__links">
                                             <ul>
-                                                <li><Link href="#"><i className="fab fa-facebook-f" />Facebook</Link></li>
-                                                <li><Link href="#"><i className="fab fa-dribbble" />Dribbble</Link></li>
+                                                <li><Link href="/"><i className="fab fa-facebook-f" />Facebook</Link></li>
                                                 <li><Link href="#"><i className="fab fa-twitter" />Twitter</Link></li>
-                                                <li><Link href="#"><i className="fab fa-behance" />Behance</Link></li>
-                                                <li><Link href="#"><i className="fab fa-youtube" />Youtube</Link></li>
+                                                <li><Link href="#"><i className="fab fa-instagram" />Instagram</Link></li>
+                                                <li><Link href="#"><i className="fab fa-tiktok" />Tiktok</Link></li>
                                             </ul>
                                         </div>
                                     </div>
@@ -95,7 +96,7 @@ export default function Footer1() {
                                             <i className="far fa-phone" />
                                         </div>
                                         <div className="footer-cta__text">
-                                            <Link href="#">lalagggg786@gmail.com</Link>
+                                            <Link href="#">contact@bachatbzr.com</Link>
                                             <span>Working 8:00 PM - 8:00 AM</span>
                                         </div>
                                     </div>
