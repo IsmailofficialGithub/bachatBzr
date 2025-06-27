@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import theme from '@/data'
 export default function Category() {
   const categories = [
     {
@@ -37,18 +38,25 @@ export default function Category() {
       imgSrc: "/assets/img/svg/sneakers.svg",
       count: 1,
     },
+    {
+      title: "Sneakers",
+      subTitle: "Trendy & Comfortable",
+      link: "/shop",
+      imgSrc: "/assets/img/svg/sneakers.svg",
+      count: 1,
+    },
   ];
 
   return (
     <>
-      <section className="category-area pt-70 bg-green-500" style={{ backgroundColor: "#f9a253" }}>
+      <section className="category-area pt-70 bg-green-500" style={{ backgroundColor: theme.color.primary,borderRadius:"13px"}}>
         <div className="container">
           <div className="row">
             <div className="col-md-12">
               <div className="tpsection mb-40">
                 <h4 className="tpsection__title">
                   Top{" "}
-                  <span className="text-green-600" style={{ color: "white" }}>
+                  <span className="text-green-600" style={{ color: theme.color.secondary }}>
                     {" "}
                     Categories{" "}
                     <img src="/assets/img/icon/title-shape-01.jpg" alt="" />

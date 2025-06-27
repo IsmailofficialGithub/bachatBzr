@@ -20,7 +20,7 @@ export default function HeaderMobSticky({
         }`}
       >
         <div className="container">
-          <div className="row align-items-center">
+          <div className="row align-items-center" style={{height:"60px"}}>
             <div className="col-3 d-flex align-items-center">
               <div className="header-canvas flex-auto">
                 <button className="tp-menu-toggle" onClick={handleMobileMenu}>
@@ -31,7 +31,7 @@ export default function HeaderMobSticky({
             <div className="col-3">
               <div className="logo text-center">
                 <Link href="/">
-                  <img src="/assets/img/logo/logo.png" alt="logo" width={90} />
+                  <img src="/assets/img/logo/logo.png" alt="logo" width={80} />
                 </Link>
               </div>
             </div>

@@ -7,7 +7,7 @@ const swiperOptions = {
     slidesPerView: 1,
     spaceBetween: 30,
     autoplay: {
-        delay: 2500,
+        delay: 102500,
     },
 
     // Navigation
