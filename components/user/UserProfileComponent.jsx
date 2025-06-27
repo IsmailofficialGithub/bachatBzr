@@ -25,6 +25,7 @@ const ProfilePage = () => {
     phone: "+92 300 1234567",
     avatar: "https://avatar.iran.liara.run/public/31",
   });
+  
   useEffect(() => {
     const fetchSession = async () => {
       const session = await dispatch(fetchAuthSession());
@@ -38,7 +39,9 @@ const ProfilePage = () => {
           "BachatBzr user";
         const email = user?.email;
         const phone = user?.phone || user.user_metadata?.address?.phone || "";
-        const avatar = user?.user_metadata?.avatar || "https://avatar.iran.liara.run/public/31";
+        const avatar =
+          user?.user_metadata?.avatar ||
+          "https://avatar.iran.liara.run/public/31";
         setProfile((prev) => ({ ...prev, name, email, phone, avatar }));
       }
     };
@@ -120,7 +123,7 @@ const ProfilePage = () => {
       const { error } = await supabase.auth.resetPasswordForEmail(
         profile.email,
         {
-          redirectTo: `/user/update-password`, // 👈 Must match your frontend route
+          redirectTo: `${process.env.NEXT_PUBLIC_API_URL}/user/update-password`, // 👈 Must match your frontend route
         },
       );
       if (error) {
@@ -140,24 +143,23 @@ const ProfilePage = () => {
       // setShowPasswordForm(false)
     }
   };
+
   return (
     <div
-      className="min-h-screen w-full p-4 md:p-8"
+      className="min-h-screen w-full p-2 sm:p-4 md:p-6 lg:p-8"
       style={{ backgroundColor: colorScheme.lightBg }}
     >
       <div className="max-w-6xl mx-auto">
-        {" "}
-        {/* Wider container for large screens */}
-        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
-          {/* Left Column - Avatar Card (becomes sidebar on large screens) */}
+        <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 md:gap-6 lg:gap-8">
+          {/* Left Column - Avatar Card */}
           <div className="w-full lg:w-1/3">
             <div
-              className="rounded-xl shadow-md overflow-hidden"
+              className="rounded-lg sm:rounded-xl shadow-md overflow-hidden"
               style={{ backgroundColor: colorScheme.secondary }}
             >
-              <div className="p-6 text-center">
+              <div className="p-3 sm:p-4 md:p-6 text-center relative">
                 <div
-                  className="relative mx-auto h-40 w-40 md:h-48 md:w-48 rounded-full overflow-hidden border-4 mb-4 cursor-pointer"
+                  className="relative mx-auto h-24 w-24 sm:h-32 sm:w-32 md:h-40 md:w-40 lg:h-48 lg:w-48 rounded-full overflow-hidden border-2 sm:border-4 mb-2 sm:mb-4 cursor-pointer"
                   style={{ borderColor: colorScheme.primary }}
                   onClick={handleAvatarClick}
                 >
@@ -166,14 +168,14 @@ const ProfilePage = () => {
                     alt="Profile"
                     width={192}
                     height={192}
-                    className="object-cover"
+                    className="object-cover w-full h-full"
                     priority
                   />
                   {isEditing && (
                     <button className="absolute inset-0 flex items-center justify-center bg-black/40">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        className="h-8 w-8 text-white"
+                        className="h-4 w-4 sm:h-6 sm:w-6 md:h-8 md:w-8 text-white"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -196,12 +198,12 @@ const ProfilePage = () => {
                 </div>
 
                 {isEditing && showAvatarOptions && (
-                  <div className="absolute z-10 mt-2 w-64 bg-white rounded-lg shadow-lg p-4">
-                    <div className="grid grid-cols-5 gap-2">
+                  <div className="absolute z-10 left-1/2 transform -translate-x-1/2 mt-2 w-56 sm:w-64 bg-white rounded-lg shadow-lg p-3 sm:p-4">
+                    <div className="grid grid-cols-5 gap-1 sm:gap-2">
                       {avatarOptions.map((avatar, index) => (
                         <div
                           key={index}
-                          className="h-10 w-10 rounded-full overflow-hidden cursor-pointer hover:ring-2"
+                          className="h-8 w-8 sm:h-10 sm:w-10 rounded-full overflow-hidden cursor-pointer hover:ring-2"
                           style={{ borderColor: colorScheme.primary }}
                           onClick={() => selectAvatar(avatar)}
                         >
@@ -210,7 +212,7 @@ const ProfilePage = () => {
                             alt={`Avatar option ${index}`}
                             width={40}
                             height={40}
-                            className="object-cover"
+                            className="object-cover w-full h-full"
                           />
                         </div>
                       ))}
@@ -219,13 +221,14 @@ const ProfilePage = () => {
                 )}
 
                 <h2
-                  className="text-xl font-bold mb-1"
+                  className="text-sm sm:text-base md:text-lg lg:text-xl font-bold mb-1 truncate"
                   style={{ color: colorScheme.text }}
+                  title={profile.name}
                 >
                   {profile.name}
                 </h2>
                 <p
-                  className="text-sm mb-4"
+                  className="text-xs sm:text-sm mb-3 sm:mb-4"
                   style={{ color: colorScheme.accent }}
                 >
                   BachatBzr User
@@ -235,14 +238,11 @@ const ProfilePage = () => {
                   onClick={() =>
                     isEditing ? handleSave() : setIsEditing(true)
                   }
-                  className={`w-full py-2 px-4 rounded-lg font-medium transition-all ${
-                    isEditing
-                      ? "bg-green-600 hover:bg-green-700"
-                      : "bg-green-600 hover:bg-green-700"
-                  } text-black`}
+                  className="w-full py-2 px-3 sm:px-4 rounded-md sm:rounded-lg font-medium transition-all bg-green-600 hover:bg-green-700 text-white text-xs sm:text-sm"
+                  disabled={loading.updateProfile}
                 >
                   {isEditing
-                    ? loading.updateInfo
+                    ? loading.updateProfile
                       ? "Updating..."
                       : "Save Profile"
                     : "Edit Profile"}
@@ -253,16 +253,16 @@ const ProfilePage = () => {
 
           {/* Right Column - Profile Details */}
           <div className="w-full lg:w-2/3">
-            <div className="rounded-xl shadow-md overflow-hidden bg-white">
-              <div className="p-6 md:p-8">
+            <div className="rounded-lg sm:rounded-xl shadow-md overflow-hidden bg-white">
+              <div className="p-3 sm:p-4 md:p-6 lg:p-8">
                 <h2
-                  className="text-2xl font-bold mb-6"
+                  className="text-lg sm:text-xl md:text-2xl font-bold mb-4 sm:mb-6"
                   style={{ color: colorScheme.primary }}
                 >
                   Profile Information
                 </h2>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-4 sm:space-y-6">
                   <ProfileField
                     label="Full Name"
                     name="name"
@@ -276,10 +276,11 @@ const ProfilePage = () => {
                     label="Email Address"
                     name="email"
                     value={profile.email}
-                    isEditing={isEditing}
+                    isEditing={false}
                     type="email"
                     primaryColor={colorScheme.primary}
                   />
+                  
                   <ProfileField
                     label="Phone Number"
                     name="phone"
@@ -292,9 +293,9 @@ const ProfilePage = () => {
                 </div>
 
                 {/* Password Section */}
-                <div className="mt-8 pt-6 border-t border-gray-200">
+                <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200">
                   <h3
-                    className="text-lg font-semibold mb-4"
+                    className="text-base sm:text-lg font-semibold mb-3 sm:mb-4"
                     style={{ color: colorScheme.primary }}
                   >
                     Security
@@ -302,18 +303,19 @@ const ProfilePage = () => {
 
                   {showPasswordForm ? (
                     <div
-                      className="space-y-4 p-4 rounded-lg"
+                      className="space-y-4 p-3 sm:p-4 rounded-lg"
                       style={{ backgroundColor: colorScheme.secondary }}
                     >
-                      <p>{message.resetEmailMessage}</p>
+                      <p className="text-xs sm:text-sm break-words">{message.resetEmailMessage}</p>
                     </div>
                   ) : (
                     <button
                       onClick={resetpassword}
-                      className="py-2 px-4 rounded-lg font-medium border border-[#d59243] text-[#d59243] hover:bg-[#f3eee7] transition-colors"
+                      className="w-full sm:w-auto py-2 px-3 sm:px-4 rounded-md sm:rounded-lg font-medium border border-[#d59243] text-[#d59243] hover:bg-[#f3eee7] transition-colors text-xs sm:text-sm"
+                      disabled={loading.resetEmailLoading}
                     >
                       {loading.resetEmailLoading
-                        ? "Sending Otp..."
+                        ? "Sending OTP..."
                         : "Change Password"}
                     </button>
                   )}
@@ -336,12 +338,11 @@ const ProfileField = ({
   onChange,
   type = "text",
   primaryColor,
-  fullWidth = false,
 }) => {
   return (
-    <div className={fullWidth ? "md:col-span-2" : ""}>
+    <div className="w-full">
       <label
-        className="block text-sm font-medium mb-1"
+        className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2"
         style={{ color: primaryColor }}
       >
         {label}
@@ -352,11 +353,13 @@ const ProfileField = ({
           name={name}
           value={value}
           onChange={onChange}
-          className="w-full px-3 py-2 border-b focus:outline-none"
+          className="w-full px-2 sm:px-3 py-2 text-xs sm:text-sm border-b-2 focus:outline-none bg-transparent"
           style={{ borderBottomColor: primaryColor }}
         />
       ) : (
-        <p className="px-3 py-2 text-gray-800">{value || "-"}</p>
+        <p className="px-2 sm:px-3 py-2 text-xs sm:text-sm text-gray-800 break-words">
+          {value || "-"}
+        </p>
       )}
     </div>
   );

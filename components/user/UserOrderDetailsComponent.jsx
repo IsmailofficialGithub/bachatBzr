@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import theme from "@/data.js";
 import { applyDiscount } from "@/lib/discountHandler";
 import { useRouter } from "next/navigation";
@@ -16,37 +17,38 @@ const OrderDetailsPage = ({ order }) => {
     lightBg: "#f9f7f3",
   };
 
-  const [expandedProduct, setExpandedProduct] = useState(null);
+
   const router = useRouter();
+  
   const formatAddress = (addressString) => {
     try {
       const address = JSON.parse(addressString);
       return (
         <div className="space-y-1">
-          <p className="font-medium">
+          <p className="font-medium text-sm">
             {address.firstName} {address.lastName}
           </p>
-          <p>{address.address}</p>
-          <p>
+          <p className="text-sm">{address.address}</p>
+          <p className="text-sm">
             {address.apartment && `${address.apartment}, `}
             {address.city.city_name}
           </p>
-          <p>
+          <p className="text-sm">
             {address.state}, {address.postcode}
           </p>
-          <p>{address.country}</p>
-          <p className="mt-2">Phone: {address.phone}</p>
-          <p>Email: {address.email}</p>
+          <p className="text-sm">{address.country}</p>
+          <p className="mt-2 text-sm">Phone: {address.phone}</p>
+          <p className="text-sm">Email: {address.email}</p>
         </div>
       );
     } catch {
-      return <p>Address not available</p>;
+      return <p className="text-sm">Address not available</p>;
     }
   };
 
   const getStatusBadge = (status) => {
     const baseClasses =
-      "inline-flex items-center px-3 py-1 rounded-full text-sm font-medium";
+      "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium";
 
     switch (status.toLowerCase()) {
       case "delivered":
@@ -84,7 +86,7 @@ const OrderDetailsPage = ({ order }) => {
 
   const getPaymentBadge = (status, method) => {
     const baseClasses =
-      "inline-flex items-center px-3 py-1 rounded-full text-sm font-medium";
+      "inline-flex items-center px-2 py-1 rounded-full text-xs font-medium";
 
     switch (status.toLowerCase()) {
       case "paid":
@@ -114,23 +116,23 @@ const OrderDetailsPage = ({ order }) => {
 
   return (
     <div
-      className="min-h-screen w-full p-4 md:p-8 mt-3"
+      className="min-h-screen w-full p-2 sm:p-4 md:p-8 mt-3"
       style={{ backgroundColor: colorScheme.lightBg }}
     >
       <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
+        {/* Header - Optimized for small screens */}
+        <div className="mb-4 sm:mb-6 md:mb-8">
           <h1
-            className="text-2xl md:text-3xl font-bold mb-2 "
+            className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-2"
             style={{ color: colorScheme.primary }}
           >
-            <div> Order #{order.id.substring(0, 8)}</div>
-           
+            Order #{order.id.substring(0, 8)}
           </h1>
-          <p className="text-gray-600">
+          <p className="text-xs sm:text-sm text-gray-600">
             Placed on{" "}
             {new Date(order.created_at).toLocaleDateString("en-US", {
               year: "numeric",
-              month: "long",
+              month: "short",
               day: "numeric",
               hour: "2-digit",
               minute: "2-digit",
@@ -138,34 +140,33 @@ const OrderDetailsPage = ({ order }) => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Order Summary Card */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Order Status Card */}
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        {/* Mobile-first layout - Stack everything on small screens */}
+        <div className="space-y-4 sm:space-y-6 lg:grid lg:grid-cols-3 lg:gap-6 lg:space-y-0">
+          {/* Order Status Card - Full width on mobile */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-lg sm:rounded-xl shadow-sm p-3 sm:p-4 md:p-6 mb-4 sm:mb-6">
+              <div className="space-y-3 sm:space-y-4">
                 <div>
-                  <h2 className="text-lg font-semibold mb-2">Order Status</h2>
-                  <div className="flex items-center gap-3">
+                  <h2 className="text-sm sm:text-base md:text-lg font-semibold mb-2">Order Status</h2>
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
                     {getStatusBadge(order.order_status)}
-                    <span className="text-sm text-gray-500">
-                      Last updated:{" "}
-                      {new Date(order.updated_at).toLocaleDateString()}
+                    <span className="text-xs text-gray-500">
+                      Updated: {new Date(order.updated_at).toLocaleDateString()}
                     </span>
                   </div>
                 </div>
                 <div>
-                  <h2 className="text-lg font-semibold mb-2">Payment</h2>
+                  <h2 className="text-sm sm:text-base md:text-lg font-semibold mb-2">Payment</h2>
                   {getPaymentBadge(order.payment_status, order.payment_method)}
                 </div>
               </div>
             </div>
 
             {/* Products Card */}
-            <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-              <div className="p-6 border-b">
+            <div className="bg-white rounded-lg sm:rounded-xl shadow-sm overflow-hidden">
+              <div className="p-3 sm:p-4 md:p-6 border-b">
                 <h2
-                  className="text-lg font-semibold"
+                  className="text-sm sm:text-base md:text-lg font-semibold"
                   style={{ color: colorScheme.primary }}
                 >
                   Products ({order.products.length})
@@ -174,142 +175,61 @@ const OrderDetailsPage = ({ order }) => {
 
               <div className="divide-y">
                 {order.productsDetails?.map((product, index) => (
-                  <div key={product._id} className="p-6">
-                    <div className="flex flex-col md:flex-row gap-4">
-                      <div className="w-full md:w-32 h-32 relative rounded-lg overflow-hidden bg-gray-100">
-                        {product.images?.length > 0 ? (
-                          <Image
-                            src={cleanImageUrl(product.images[0])}
-                            alt={product.name}
-                            fill
-                            className="object-cover"
-                            sizes="(max-width: 768px) 100vw, 128px"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-400">
-                            No Image
-                          </div>
-                        )}
-                      </div>
+                  <div key={product._id} className="p-3 sm:p-4 md:p-6">
+                    <div className="flex gap-3 sm:gap-4">
+                      {/* Product Image - Smaller on mobile */}
+                      <Link href={`/shop/${product._id}`} className="block">
+                        <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 relative rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 hover:opacity-80 transition-opacity">
+                          {product.images?.length > 0 ? (
+                            <Image
+                              src={cleanImageUrl(product.images[0])}
+                              alt={product.name}
+                              fill
+                              className="object-cover"
+                              sizes="(max-width: 640px) 80px, (max-width: 768px) 96px, 128px"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
+                              No Image
+                            </div>
+                          )}
+                        </div>
+                      </Link>
 
-                      <div className="flex-1">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <h3 className="font-medium text-lg">
-                              {product.name}
-                            </h3>
-                            <p className="text-sm text-gray-600 mt-1">
+                      {/* Product Details */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
+                          <div className="min-w-0 flex-1">
+                            <Link href={`/shop/${product._id}`}>
+                              <h3 className="font-medium text-sm sm:text-base md:text-lg leading-tight hover:underline cursor-pointer" style={{ color: colorScheme.primary }}>
+                                {product.name}
+                              </h3>
+                            </Link>
+                            <p className="text-xs sm:text-sm text-gray-600 mt-1 line-clamp-2">
                               {product.short_description}
                             </p>
                           </div>
-                          <div className="text-right">
+                          <div className="text-right flex-shrink-0">
                             {product.discounted_price ? (
-                              <>
-                                <span className="font-medium">
+                              <div className="flex flex-col sm:flex-row sm:items-center gap-1">
+                                <span className="font-medium text-sm sm:text-base">
                                   PKR{" "}
                                   {applyDiscount(
                                     product.price,
                                     product.discounted_price,
                                   ).toLocaleString()}
                                 </span>
-                                <span className="ml-2 text-sm line-through text-gray-500">
+                                <span className="text-xs sm:text-sm line-through text-gray-500">
                                   PKR {product.price.toLocaleString()}
                                 </span>
-                              </>
+                              </div>
                             ) : (
-                              <span className="font-medium">
+                              <span className="font-medium text-sm sm:text-base">
                                 PKR {product.price.toLocaleString()}
                               </span>
                             )}
                           </div>
                         </div>
-
-                        <button
-                          onClick={() =>
-                            setExpandedProduct(
-                              expandedProduct === index ? null : index,
-                            )
-                          }
-                          className="mt-3 text-sm font-medium flex items-center"
-                          style={{ color: colorScheme.primary }}
-                        >
-                          {expandedProduct === index
-                            ? "Hide details"
-                            : "View details"}
-                          <svg
-                            className={`ml-1 h-4 w-4 transform transition-transform ${
-                              expandedProduct === index ? "rotate-180" : ""
-                            }`}
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M19 9l-7 7-7-7"
-                            />
-                          </svg>
-                        </button>
-
-                        {expandedProduct === index && (
-                          <div className="mt-3 p-3 bg-gray-50 rounded-lg">
-                            <h4 className="font-medium mb-2">
-                              Product Details
-                            </h4>
-                            <p className="text-sm text-gray-700 mb-2">
-                              {product.long_description}
-                            </p>
-
-                            <div className="grid grid-cols-2 gap-2 text-sm">
-                              <div>
-                                <span className="text-gray-500">
-                                  Condition:
-                                </span>{" "}
-                                {product.product_condition}
-                              </div>
-                              <div>
-                                <span className="text-gray-500">
-                                  Categories:
-                                </span>{" "}
-                                {product.categories?.join(", ")}
-                              </div>
-                              <div>
-                                <span className="text-gray-500">Tags:</span>{" "}
-                                {product.tags?.join(", ") || "None"}
-                              </div>
-                              <div>
-                                <span className="text-gray-500">Status:</span>{" "}
-                                {product.sold ? "Sold" : "Available"}
-                              </div>
-                            </div>
-
-                            {product.images?.length > 1 && (
-                              <div className="mt-3">
-                                <h4 className="font-medium mb-2">
-                                  More Images
-                                </h4>
-                                <div className="flex gap-2 overflow-x-auto py-2">
-                                  {product.images.slice(1).map((img, idx) => (
-                                    <div
-                                      key={idx}
-                                      className="flex-shrink-0 w-20 h-20 relative rounded overflow-hidden bg-gray-100"
-                                    >
-                                      <Image
-                                        src={cleanImageUrl(img)}
-                                        alt={`${product.name} ${idx + 2}`}
-                                        fill
-                                        className="object-cover"
-                                        sizes="80px"
-                                      />
-                                    </div>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        )}
                       </div>
                     </div>
                   </div>
@@ -318,31 +238,31 @@ const OrderDetailsPage = ({ order }) => {
             </div>
           </div>
 
-          {/* Order Information Sidebar */}
-          <div className="space-y-6">
+          {/* Sidebar - Stacked on mobile, sidebar on desktop */}
+          <div className="space-y-4 sm:space-y-6">
             {/* Delivery Address Card */}
-            <div className="bg-white rounded-xl shadow-sm p-6">
+            <div className="bg-white rounded-lg sm:rounded-xl shadow-sm p-3 sm:p-4 md:p-6">
               <h2
-                className="text-lg font-semibold mb-4"
+                className="text-sm sm:text-base md:text-lg font-semibold mb-3 sm:mb-4"
                 style={{ color: colorScheme.primary }}
               >
                 Delivery Address
               </h2>
-              <div className="text-sm">
+              <div className="text-xs sm:text-sm">
                 {formatAddress(order.delivery_address)}
               </div>
             </div>
 
             {/* Payment Summary Card */}
-            <div className="bg-white rounded-xl shadow-sm p-6">
+            <div className="bg-white rounded-lg sm:rounded-xl shadow-sm p-3 sm:p-4 md:p-6">
               <h2
-                className="text-lg font-semibold mb-4"
+                className="text-sm sm:text-base md:text-lg font-semibold mb-3 sm:mb-4"
                 style={{ color: colorScheme.primary }}
               >
                 Payment Summary
               </h2>
 
-              <div className="space-y-3 text-sm">
+              <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Subtotal:</span>
                   <span>
@@ -362,9 +282,7 @@ const OrderDetailsPage = ({ order }) => {
                 {order.payment_method === "cash_on_delivery" &&
                   order.total_amount?.cash_on_delivery_fee && (
                     <div className="flex justify-between">
-                      <span className="text-gray-600">
-                        Cash on Delivery Fee:
-                      </span>
+                      <span className="text-gray-600">COD Fee:</span>
                       <span>
                         PKR{" "}
                         {order.total_amount.cash_on_delivery_fee.toLocaleString()}
@@ -372,7 +290,7 @@ const OrderDetailsPage = ({ order }) => {
                     </div>
                   )}
 
-                <div className="border-t pt-3 mt-3 flex justify-between font-medium">
+                <div className="border-t pt-2 sm:pt-3 mt-2 sm:mt-3 flex justify-between font-medium">
                   <span>Total:</span>
                   <span style={{ color: colorScheme.primary }}>
                     PKR{" "}
@@ -381,9 +299,9 @@ const OrderDetailsPage = ({ order }) => {
                 </div>
 
                 {order.transaction_id && (
-                  <div className="mt-4 pt-3 border-t">
-                    <p className="text-gray-600">Transaction ID:</p>
-                    <p className="font-mono text-sm break-all">
+                  <div className="mt-3 sm:mt-4 pt-2 sm:pt-3 border-t">
+                    <p className="text-gray-600 text-xs sm:text-sm">Transaction ID:</p>
+                    <p className="font-mono text-xs break-all mt-1">
                       {order.transaction_id}
                     </p>
                   </div>
@@ -393,22 +311,21 @@ const OrderDetailsPage = ({ order }) => {
 
             {/* Help Card */}
             <div
-              className="bg-white rounded-xl shadow-sm p-6"
+              className="bg-white rounded-lg sm:rounded-xl shadow-sm p-3 sm:p-4 md:p-6"
               style={{ backgroundColor: colorScheme.secondary }}
             >
               <h2
-                className="text-lg font-semibold mb-3"
+                className="text-sm sm:text-base md:text-lg font-semibold mb-2 sm:mb-3"
                 style={{ color: colorScheme.primary }}
               >
                 Need Help?
               </h2>
-              <p className="text-sm text-gray-600 mb-4">
-                If you have any questions about your order, please contact our
-                customer support.
+              <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">
+                Questions about your order? Contact our support team.
               </p>
               <button
                 onClick={() => router.push("/contact")}
-                className="w-full py-2 px-4 rounded-lg font-medium text-white hover:opacity-90 transition-opacity"
+                className="w-full py-2 sm:py-3 px-3 sm:px-4 rounded-lg font-medium text-white hover:opacity-90 transition-opacity text-xs sm:text-sm"
                 style={{ backgroundColor: colorScheme.primary }}
               >
                 Contact Support

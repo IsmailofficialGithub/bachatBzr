@@ -7,7 +7,7 @@ import { fetchAuthSession } from '@/features/auth/authSlice';
 import { toast } from 'react-toastify';
 import Link from 'next/link';
 import { applyDiscount } from '@/lib/discountHandler';
-import { supabase } from "@/lib/supabaseSetup";;
+import { supabase } from "@/lib/supabaseSetup";
 
 const OrderPage = () => {
   const { primary, secondary } = theme.color;
@@ -55,9 +55,9 @@ const OrderPage = () => {
   const getPaymentMethodText = (method) => {
     switch (method) {
       case 'card':
-        return 'Credit/Debit Card';
+        return 'Card';
       case 'cash_on_delivery':
-        return 'Cash on Delivery';
+        return 'COD';
       default:
         return method;
     }
@@ -82,7 +82,6 @@ const OrderPage = () => {
   }, []);
 
   const setupRealtimeSubscription = (userid) => {
-    // Subscribe to changes in the orders table for this user
     const subscription = supabase
       .channel('orders_changes')
       .on(
@@ -94,7 +93,6 @@ const OrderPage = () => {
           filter: `user_id=eq.${userid}`
         },
         (payload) => {
-          // Handle different types of changes
           handleOrderChange(payload);
         }
       )
@@ -106,17 +104,14 @@ const OrderPage = () => {
   const handleOrderChange = (payload) => {
     switch (payload.eventType) {
       case 'INSERT':
-        // New order added
         setOrders(prev => [...prev, payload.new]);
         break;
       case 'UPDATE':
-        // Order updated
         setOrders(prev => prev.map(order => 
           order.id === payload.new.id ? payload.new : order
         ));
         break;
       case 'DELETE':
-        // Order deleted
         setOrders(prev => prev.filter(order => order.id !== payload.old.id));
         break;
       default:
@@ -143,28 +138,31 @@ const OrderPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen w-full p-4 md:p-8 flex items-center justify-center" 
+      <div className="min-h-screen w-full p-2 sm:p-4 flex items-center justify-center" 
            style={{ backgroundColor: colorScheme.lightBg }}>
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2" 
+        <div className="animate-spin rounded-full h-8 w-8 sm:h-12 sm:w-12 border-t-2 border-b-2" 
              style={{ borderColor: colorScheme.primary }}></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen w-full p-4 md:p-8" style={{ backgroundColor: colorScheme.lightBg }}>
+    <div className="min-h-screen w-full p-2 sm:p-4 md:p-8" style={{ backgroundColor: colorScheme.lightBg }}>
       <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold mb-2" style={{ color: colorScheme.primary }}>My Orders</h1>
-          <p className="text-gray-600">View your order history and track shipments</p>
+        <div className="mb-4 sm:mb-6 md:mb-8">
+          <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-1 sm:mb-2" 
+              style={{ color: colorScheme.primary }}>
+            My Orders
+          </h1>
+          <p className="text-xs sm:text-sm text-gray-600">Track your orders</p>
         </div>
 
         {orders.length === 0 ? (
-          <div className="bg-white rounded-xl shadow-md p-8 text-center">
-            <p className="text-gray-500 mb-4">You haven't placed any orders yet.</p>
+          <div className="bg-white rounded-lg sm:rounded-xl shadow-md p-4 sm:p-6 md:p-8 text-center">
+            <p className="text-gray-500 mb-3 sm:mb-4 text-sm sm:text-base">No orders yet.</p>
             <Link href="/shop">
               <button 
-                className="px-6 py-2 rounded-lg font-medium text-white hover:opacity-90 transition-opacity"
+                className="px-4 sm:px-6 py-2 rounded-md sm:rounded-lg font-medium text-white hover:opacity-90 transition-opacity text-sm sm:text-base"
                 style={{ backgroundColor: colorScheme.primary }}
               >
                 Start Shopping
@@ -172,160 +170,119 @@ const OrderPage = () => {
             </Link>
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-3 sm:space-y-4 md:space-y-6">
             {orders.map((order) => {
               const deliveryAddress = order.delivery_address ? JSON.parse(order.delivery_address) : null;
               
               return (
-                <div key={order.id} className="bg-white rounded-xl shadow-md overflow-hidden">
-                  {/* Order Header */}
-                  <div className="p-4 md:p-6 border-b flex flex-col md:flex-row justify-between items-start md:items-center" 
+                <div key={order.id} className="bg-white rounded-lg sm:rounded-xl shadow-md overflow-hidden">
+                  {/* Order Header - Simplified */}
+                  <div className="p-3 sm:p-4 md:p-6 border-b" 
                        style={{ backgroundColor: colorScheme.secondary }}>
-                    <div className="mb-3 md:mb-0">
-                      <h3 className="font-medium" style={{ color: colorScheme.primary }}>
-                        Order #{order.id.substring(0, 8)}...
-                      </h3>
-                      <p className="text-sm text-gray-600">
-                        Placed on {new Date(order.created_at).toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
-                      </p>
+                    <div className="flex justify-between items-start mb-2 sm:mb-3">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-medium text-sm sm:text-base truncate" 
+                            style={{ color: colorScheme.primary }}>
+                          #{order.id.substring(0, 6)}...
+                        </h3>
+                        <p className="text-xs sm:text-sm text-gray-600 mt-1">
+                          {new Date(order.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <div className="text-right ml-2">
+                        <p className="font-bold text-sm sm:text-base" style={{ color: colorScheme.primary }}>
+                          PKR {order.total_amount?.final_total?.toFixed(0) || '0'}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {getPaymentMethodText(order.payment_method)}
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex flex-wrap gap-2">
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(order.order_status)}`}>
+                    
+                    {/* Status Pills */}
+                    <div className="flex flex-wrap gap-1 sm:gap-2">
+                      <span className={`px-2 sm:px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(order.order_status)}`}>
                         {order.order_status}
                       </span>
-                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${getPaymentStatusColor(order.payment_status)}`}>
+                      <span className={`px-2 sm:px-3 py-1 rounded-full text-xs font-medium ${getPaymentStatusColor(order.payment_status)}`}>
                         {order.payment_status}
                       </span>
-                      {order.transaction_id && (
-                        <span className="px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
-                          {order.transaction_id.substring(0, 8)}...
-                        </span>
-                      )}
                     </div>
                   </div>
 
-                  {/* Order Content */}
-                  <div className="p-4 md:p-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {/* Products Section */}
-                      <div>
-                        <h4 className="font-medium mb-3" style={{ color: colorScheme.accent }}>Products</h4>
-                        <div className="space-y-4">
-                          {order.products.map((product, index) => (
-                            <div key={index} className="flex items-start">
-                              <div className="flex-1">
-                                <p className="font-medium">{product.name}</p>
-
-                                  {
-                                    product.discounted_price ?(
-                                      <div className="flex items-center mt-1">
-                                      <p className="text-sm text-gray-600 mr-2">
-                                    PKR {applyDiscount(product.price,product.discounted_price).toFixed(2)}
+                  {/* Order Content - Simplified */}
+                  <div className="p-3 sm:p-4 md:p-6">
+                    {/* Products Section - Compact */}
+                    <div className="mb-4">
+                      <h4 className="font-medium text-sm sm:text-base mb-2 sm:mb-3" 
+                          style={{ color: colorScheme.accent }}>
+                        Items ({order.products.length})
+                      </h4>
+                      <div className="space-y-2 sm:space-y-3">
+                        {order.products.slice(0, 2).map((product, index) => (
+                          <div key={index} className="flex justify-between items-start">
+                            <div className="flex-1 min-w-0 mr-2">
+                              <p className="font-medium text-xs sm:text-sm truncate">{product.name}</p>
+                              <p className="text-xs text-gray-500">Qty: 1</p>
+                            </div>
+                            <div className="text-right">
+                              {product.discounted_price ? (
+                                <div>
+                                  <p className="font-medium text-xs sm:text-sm">
+                                    PKR {applyDiscount(product.price, product.discounted_price).toFixed(0)}
                                   </p>
-                                   <span className="text-xs line-through text-gray-400">
-                                   PKR {product.price.toFixed(2)}
-                                 </span>
-                                    </div>
-                                    ):
-                                    <div className="flex items-center mt-1">
-                                    <p className="text-sm text-gray-600 mr-2">
-                                  PKR {applyDiscount(product.price,product.discounted_price).toFixed(2)}
-                                </p></div>
-                                  }
-                                  
-                              </div>
-                              <div className="text-right">
-                                <p className="font-medium">
-                                  PKR {product.discounted_price 
-                                    ? (applyDiscount(product.price,product.discounted_price))
-                                    : (product.price )}
+                                  <span className="text-xs line-through text-gray-400">
+                                    PKR {product.price.toFixed(0)}
+                                  </span>
+                                </div>
+                              ) : (
+                                <p className="font-medium text-xs sm:text-sm">
+                                  PKR {product.price.toFixed(0)}
                                 </p>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Order Details Section */}
-                      <div>
-                        <h4 className="font-medium mb-3" style={{ color: colorScheme.accent }}>Order Details</h4>
-                        
-                        <div className="mb-4">
-                          <h5 className="text-sm font-medium text-gray-500 mb-1">Delivery Address</h5>
-                          {deliveryAddress ? (
-                            <div className="text-sm">
-                              <p>{deliveryAddress.firstName} {deliveryAddress.lastName}</p>
-                              <p>{deliveryAddress.address}</p>
-                              <p>{deliveryAddress.city.city_name}, {deliveryAddress.state}</p>
-                              <p>{deliveryAddress.country}, {deliveryAddress.postcode}</p>
-                              <p className="mt-1">Phone: {deliveryAddress.phone}</p>
-                              <p>Email: {deliveryAddress.email}</p>
-                            </div>
-                          ) : (
-                            <p className="text-sm text-gray-500">No address provided</p>
-                          )}
-                        </div>
-
-                        <div className="mb-4">
-                          <h5 className="text-sm font-medium text-gray-500 mb-1">Payment Method</h5>
-                          <p className="text-sm">{getPaymentMethodText(order.payment_method)}</p>
-                        </div>
-
-                        <div>
-                          <h5 className="text-sm font-medium text-gray-500 mb-1">Order Summary</h5>
-                          <div className="space-y-1 text-sm">
-                            <div className="flex justify-between">
-                              <span>Subtotal:</span>
-                              <span>PKR {order.total_amount?.totalPrice?.toFixed(2) || '0.00'}</span>
-                            </div>
-                            {order.total_amount?.shipping_fee && (
-                              <div className="flex justify-between">
-                                <span>Shipping Fee:</span>
-                                <span>PKR {order.total_amount.shipping_fee.toFixed(2)}</span>
-                              </div>
-                            )}
-                            {order.total_amount?.cash_on_delivery_fee && (
-                              <div className="flex justify-between">
-                                <span>COD Fee:</span>
-                                <span>PKR {order.total_amount.cash_on_delivery_fee.toFixed(2)}</span>
-                              </div>
-                            )}
-                            <div className="flex justify-between font-medium pt-2 mt-2 border-t">
-                              <span>Total:</span>
-                              <span style={{ color: colorScheme.primary }}>
-                                PKR {order.total_amount?.final_total?.toFixed(2) || '0.00'}
-                              </span>
+                              )}
                             </div>
                           </div>
-                        </div>
+                        ))}
+                        {order.products.length > 2 && (
+                          <p className="text-xs sm:text-sm text-gray-500 italic">
+                            +{order.products.length - 2} more items
+                          </p>
+                        )}
                       </div>
                     </div>
+
+                    {/* Delivery Info - Minimal */}
+                    {deliveryAddress && (
+                      <div className="mb-4">
+                        <h5 className="text-xs sm:text-sm font-medium text-gray-500 mb-1">Delivery To:</h5>
+                        <p className="text-xs sm:text-sm">
+                          {deliveryAddress.firstName} - {deliveryAddress.city?.city_name || deliveryAddress.city}
+                        </p>
+                        <p className="text-xs text-gray-500">{deliveryAddress.phone}</p>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Order Footer */}
-                  <div className="p-4 md:p-6 border-t flex justify-end">
-                    <Link href={`/order/${order.id}`}>
-                      <button 
-                        className="px-6 py-2 rounded-lg font-medium text-white hover:opacity-90 transition-opacity"
-                        style={{ backgroundColor: colorScheme.primary }}
-                      >
-                       Details
-                      </button>
+                  {/* Order Footer - Compact */}
+                  <div className="px-3 py-2 sm:p-4 md:p-6 border-t bg-gray-50">
+                    <div className="flex gap-2">
+                      <Link href={`/order/${order.id}`} className="flex-1">
+                        <button 
+                          className="w-full px-3 sm:px-4 py-2 rounded-md sm:rounded-lg font-medium text-white hover:opacity-90 transition-opacity text-xs sm:text-sm"
+                          style={{ backgroundColor: colorScheme.primary }}
+                        >
+                          Details
+                        </button>
                       </Link>
-                      <Link href={`/track#${order.id}`}>
-                      <button 
-                        className="px-6 py-2 mx-1 rounded-lg font-medium text-white hover:opacity-90 transition-opacity"
-                        style={{ backgroundColor: colorScheme.webtheme }}
-                      >
-                       Track
-                      </button>
+                      <Link href={`/track#${order.id}`} className="flex-1">
+                        <button 
+                          className="w-full px-3 sm:px-4 py-2 rounded-md sm:rounded-lg font-medium text-white hover:opacity-90 transition-opacity text-xs sm:text-sm"
+                          style={{ backgroundColor: colorScheme.webtheme }}
+                        >
+                          Track
+                        </button>
                       </Link>
+                    </div>
                   </div>
                 </div>
               );

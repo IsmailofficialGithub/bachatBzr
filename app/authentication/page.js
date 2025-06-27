@@ -102,7 +102,6 @@ export default function SignIn() {
         password,
       });
 
-      console.log(error);
       if (error) {
         toast.error(error.message);
         setMessage({ text: `Failed , ${error.message}`, status: "error" });

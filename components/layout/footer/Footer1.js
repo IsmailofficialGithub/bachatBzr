@@ -32,7 +32,6 @@ export default function Footer1(isMobileMenu) {
                                                 <li><Link href="/faqs">FAQs</Link></li>
                                                 <li><Link href="/track">Ordering Tracking</Link></li>
                                                 <li><Link href="/contact">Contacts</Link></li>
-                                                <li><Link href="#">Events</Link></li>
                                             </ul>
                                         </div>
                                     </div>

@@ -5,12 +5,12 @@ import ProfileSkeleton from '@/components/skeleton/UserProfileSkeleton'
 const page = () => {
   
   return (
-    <Layout headerStyle={3} footerStyle={1}>
-      <UserLayout title="User Profile Page">
+    <Layout>
+      <UserLayout title="Profile">
         <ProfilePage/>
         {/* <ProfileSkeleton/> */}
       </UserLayout>
-    </Layout>
+      </Layout>
   )
 }
 

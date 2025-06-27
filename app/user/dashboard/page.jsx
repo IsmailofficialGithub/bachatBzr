@@ -67,6 +67,6 @@ export default function Dashboard() {
         <UserStats stats={stats} />
         <UserQuickLinks links={quickLinks} />
       </UserLayout>
-    </Layout>
+     </Layout>
   );
 }
