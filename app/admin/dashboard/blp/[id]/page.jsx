@@ -23,6 +23,7 @@ import { applyDiscount } from "@/lib/discountHandler";
 // new
 import OrderNotFound from '@/components/admin/OrderNotFound';
 import PacketAlreadyBooked from '@/components/admin/PacketAlreadyBooked';
+import { getAccessToken } from "@/util/getAccessToken";
 // new
 
 const LeopardsCourierForm = () => {
@@ -192,9 +193,15 @@ const handleRetry = () => {
       toast.error("Track number and Order ID are required to update tracking.");
       return;
     }
+    const token=await getAccessToken()
     const response=await axios.patch("/api/orders/update-book-packet", {
       track_number: trackNumber,
       orderId: orderId,
+    },{
+      headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
     });
     if(!response.data.success) {
       return toast.error("Failed to update tracking ID.");
@@ -250,10 +257,16 @@ const handleRetry = () => {
         }
       });
       processedData.destination_city = destinitionCityID;
-
+      const token=await getAccessToken()
       const response = await axios.post(
         "/api/lapord/bookPacket",
         JSON.stringify(processedData),
+        {
+            headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+        }
       );
       if (response.data.error === 0) {
         updateTrackingId(response.data.track_number,orderId);

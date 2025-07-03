@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { applyDiscount } from "@/lib/discountHandler";
+import { getAccessToken } from "@/util/getAccessToken";
 
 export const ProductList = () => {
   const router = useRouter();
@@ -65,9 +66,16 @@ export const ProductList = () => {
     if (!shouldDelete) return;
 
     const originalProducts = [...products];
+      const accessToken = await getAccessToken();
+     
     try {
       setProducts(products.filter((p) => p._id !== id));
-      const response = await axios.delete(`/api/product/delete/${id}`);
+      const response = await axios.delete(`/api/product/delete/${id}`,{
+         headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
       if (response.data.success) {
         toast.success("Product deleted", {
           description: `"${name}" has been removed`,

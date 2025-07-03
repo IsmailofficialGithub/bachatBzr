@@ -1,16 +1,18 @@
+import { CheckRouteRole } from "@/lib/auth-token";
 import { supabaseAdmin } from "@/lib/supabaseSetup";
 import { NextResponse } from "next/server";
 
 export const POST = async (req) => {
+   const {  success, error } = await CheckRouteRole(req,["admin"]);
+   if (error || !success) {
+      return NextResponse.json({ error }, { status: 401 })
+    }
   try {
     const { userId, role } = await req.json();
-    const { data, error } = await supabaseAdmin.auth.admin.updateUserById(
-      userId,
-      {
-        app_metadata: { role },
-        user_metadata: { role }, // Correct syntax
-      },
-    );
+    const { data, error } = await supabaseAdmin
+      .from("users")
+      .update({ role: role })
+      .eq("id", userId);
 
     if (error) {
       return NextResponse.json({

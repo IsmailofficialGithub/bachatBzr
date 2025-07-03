@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabaseSetup';
+import { CheckRouteRole } from '@/lib/auth-token';
 
 // GET: Fetch a specific category
 export async function GET(req, context) {
@@ -27,6 +28,12 @@ export async function GET(req, context) {
 // PUT: Update a specific category
 export async function PUT(req, context) {
   const { id } = context.params;
+  
+
+const {  success, error } = await CheckRouteRole(req,["admin"]);
+ if (error || !success) {
+    return NextResponse.json({ error }, { status: 401 })
+  }
 
   try {
     const body = await req.json();
@@ -51,6 +58,10 @@ export async function PUT(req, context) {
 
 // DELETE: Delete a specific category
 export async function DELETE(req, context) {
+  const {  success, error } = await CheckRouteRole(req,["admin"]);
+ if (error || !success) {
+    return NextResponse.json({ error }, { status: 401 })
+  }
   const { id } = context.params;
 
   try {

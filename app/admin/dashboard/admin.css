@@ -23,9 +23,7 @@
     }
   }
   
-  .sidebar {
-    /* Sidebar styling */
-  }
+  
   
   .main-content {
     background-color: #16404D;
@@ -67,7 +65,7 @@
   z-index: 40;
   width: 15rem;
   height: 100vh;
-  background-color: #fb923c; /* orange */
+  background-color: #8fa4db; /* orange */
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease-in-out;
 }
@@ -122,6 +120,18 @@
   color: white;
 }
 
+.admin-nav-logout{
+  display: block;
+  padding: 0.5rem 1rem;
+  margin-top: auto;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  cursor: pointer;
+}
+.admin-nav-logout:hover{
+  background-color: rgb(221, 88, 88);
+}
+
 /* Desktop styles */
 @media (min-width: 768px) {
   .admin-sidebar {
@@ -136,6 +146,148 @@
 }
 
 
-/*  admin user  */
+/* Admin Authentication Check Styles */
+
+.adminAuthCheck-wrapper {
+  width: 100%;
+  height: 100vh;
+  background-color: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.adminAuthCheck-loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 40px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e5e7eb;
+  min-width: 320px;
+  text-align: center;
+}
+
+.adminAuthCheck-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #e5e7eb;
+  border-top: 4px solid #3b82f6;
+  border-radius: 50%;
+  animation: adminAuthCheck-spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+.adminAuthCheck-loading-text {
+  font-size: 18px;
+  font-weight: 500;
+  color: #374151;
+  margin: 0;
+  letter-spacing: 0.025em;
+}
+
+/* Spinner Animation */
+@keyframes adminAuthCheck-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .adminAuthCheck-loading-container {
+    margin: 20px;
+    padding: 32px 24px;
+    min-width: auto;
+    width: calc(100% - 40px);
+    max-width: 400px;
+  }
+  
+  .adminAuthCheck-spinner {
+    width: 40px;
+    height: 40px;
+    border-width: 3px;
+  }
+  
+  .adminAuthCheck-loading-text {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .adminAuthCheck-loading-container {
+    padding: 24px 20px;
+    gap: 20px;
+  }
+  
+  .adminAuthCheck-spinner {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .adminAuthCheck-loading-text {
+    font-size: 15px;
+  }
+}
+
+/* Dark mode support (optional) */
+@media (prefers-color-scheme: dark) {
+  .adminAuthCheck-wrapper {
+    background-color: #0f172a;
+  }
+  
+  .adminAuthCheck-loading-container {
+    background: #3b82f6;
+    border-color: #334155;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  }
+  
+  .adminAuthCheck-spinner {
+    border-color: #475569;
+    border-top-color: #3b82f6;
+  }
+  
+  .adminAuthCheck-loading-text {
+    color: #e2e8f0;
+  }
+}
+
+/* Loading state animations */
+.adminAuthCheck-loading-container {
+  animation: adminAuthCheck-fadeIn 0.3s ease-in-out;
+}
+
+@keyframes adminAuthCheck-fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Pulse effect for loading text */
+.adminAuthCheck-loading-text {
+  animation: adminAuthCheck-pulse 2s ease-in-out infinite;
+}
+
+@keyframes adminAuthCheck-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
 
 

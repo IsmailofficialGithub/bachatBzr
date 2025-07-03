@@ -13,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { getAccessToken } from "@/util/getAccessToken";
 
 const UserDetails = () => {
   const params = useParams();
@@ -33,7 +34,13 @@ const UserDetails = () => {
       setLoading((prev) => ({ ...prev, mainLoading: true }));
 
       try {
-        const response = await axios.get(`/api/user/singleUser/${params.id}`);
+        const session = await getAccessToken();
+        const response = await axios.get(`/api/user/singleUser/${params.id}`,{
+          headers: {
+            Authorization: `Bearer ${session}`,
+            "Content-Type": "application/json",
+          },
+        });
         if (response.data.success) {
           setUser(response.data.user);
           setMessage(response.data.message);
@@ -67,12 +74,18 @@ const UserDetails = () => {
     if (confirmation !== value) return;
 
     setLoading((prev) => ({ ...prev, roleLoading: true }));
-
+  const session=await getAccessToken()
     try {
       const response = await axios.post("/api/user/setRole", {
         userId: params.id,
         role: value,
-      });
+      },{
+          headers: {
+            Authorization: `Bearer ${session}`,
+            "Content-Type": "application/json",
+          },
+      }
+    );
 
       if (response.data.success) {
         setRole(value);

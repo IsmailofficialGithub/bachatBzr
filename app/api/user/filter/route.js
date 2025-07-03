@@ -1,7 +1,12 @@
+import { CheckRouteRole } from "@/lib/auth-token";
 import { supabaseAdmin } from "@/lib/supabaseSetup";
 import { NextResponse } from "next/server";
 
 export async function GET(req) {
+  const { success, error } = await CheckRouteRole(req, ["admin"]);
+  if (error || !success) {
+    return NextResponse.json({success:false,message:"Unauthorized access", error }, { status: 401 });
+  }
   try {
     const { searchParams } = new URL(req.url);
     const role = searchParams.get("role");
@@ -19,7 +24,7 @@ export async function GET(req) {
           message: "Failed to get data from database",
           error: error.message,
         },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -49,7 +54,7 @@ export async function GET(req) {
         message: "Internal Server Error",
         error,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

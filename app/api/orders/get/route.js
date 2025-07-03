@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabaseSetup";
+import { CheckRouteRole } from "@/lib/auth-token";
 
 export async function GET(req) {
+  const {  success, error } = await CheckRouteRole(req,["admin"]);
+ if (error || !success) {
+    return NextResponse.json({ error }, { status: 401 })
+  }
   try {
     // ✅ Parse query parameters for pagination
     const { searchParams } = new URL(req.url);

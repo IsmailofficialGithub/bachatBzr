@@ -1,7 +1,12 @@
+import { CheckRouteRole } from "@/lib/auth-token";
 import { supabaseAdmin } from "@/lib/supabaseSetup";
 import { NextResponse } from "next/server";
 
 export async function GET(req) {
+  const {  success, error } = await CheckRouteRole(req,["admin"]);
+ if (error || !success) {
+    return NextResponse.json({ error }, { status: 401 })
+  }
   try {
     const searchParams = req.nextUrl.searchParams;
     const query = searchParams.get("query") || "";

@@ -144,6 +144,9 @@ export default function SignIn() {
         provider: "google",
         options: {
           redirectTo: `/`,
+           data: {
+              role: "user", // Custom metadata to track verification status
+            },
         },
       });
 
@@ -229,7 +232,7 @@ export default function SignIn() {
         footerStyle={1}
         breadcrumbTitle={isSignUp ? "Sign Up" : "Sign In"}
       >
-        <section className="track-area pt-80 pb-40">
+        <section className="track-area ">
           <div className="container">
             <div className="row justify-content-center">
               <div className="col-12 mb-4">

@@ -54,10 +54,10 @@ export default function Footer1(isMobileMenu) {
                                         <h4 className="footer-widget__title mb-30">Social Network</h4>
                                         <div className="footer-widget__links">
                                             <ul>
-                                                <li><Link href="/"><i className="fab fa-facebook-f" />Facebook</Link></li>
-                                                <li><Link href="#"><i className="fab fa-twitter" />Twitter</Link></li>
-                                                <li><Link href="#"><i className="fab fa-instagram" />Instagram</Link></li>
-                                                <li><Link href="#"><i className="fab fa-tiktok" />Tiktok</Link></li>
+                                                <li><Link href="https://www.facebook.com/bachatbzr"><i className="fab fa-facebook-f" />Facebook</Link></li>
+                                                <li><Link href="https://twitter.com/bachatbzr"><i className="fab fa-twitter" />Twitter</Link></li>
+                                                <li><Link href="https://www.instagram.com/bachatbzr"><i className="fab fa-instagram" />Instagram</Link></li>
+                                                <li><Link href="https://www.tiktok.com/@bachatbzr"><i className="fab fa-tiktok" />Tiktok</Link></li>
                                             </ul>
                                         </div>
                                     </div>

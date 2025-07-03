@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabaseSetup';
+import { CheckRouteRole } from '@/lib/auth-token';
 
 // GET: Fetch all categories
 export async function GET() {
@@ -29,6 +30,10 @@ export async function GET() {
 
 // POST: Create a new category
 export async function POST(req) {
+  const {  success, error } = await CheckRouteRole(req,["admin"]);
+ if (error || !success) {
+    return NextResponse.json({ error }, { status: 401 })
+  }
   try {
     const body = await req.json();
     const { name, description, parent_id } = body;

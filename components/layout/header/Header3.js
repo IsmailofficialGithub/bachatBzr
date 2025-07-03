@@ -206,9 +206,10 @@ export default function Header3({
                       </Link>
                       <Link
                         href={
-                          user
-                            ? `/${user?.user_metadata?.role}/dashboard`
-                            : "/authentication"
+                         user 
+  ? `/${user.user_metadata?.role || 'user'}/dashboard`
+  : "/authentication"
+
                         }
                       >
                         <i className="fal fa-user" />
@@ -421,7 +422,9 @@ export default function Header3({
         searchClick={handleSearchClick}
         InputChange={handleChange}
         AccountredirectUrl={
-          user ? `/${user?.user_metadata?.role}/dashboard` : "/authentication"
+          user
+            ? `/${user.user_metadata?.role || "user"}/dashboard`
+            : "/authentication"
         }
       />
       <HeaderTabSticky
@@ -429,7 +432,10 @@ export default function Header3({
         searchClick={handleSearchClick}
         isMobileMenu={isMobileMenu}
         AccountredirectUrl={
-          user ? `/${user?.user_metadata?.role}/dashboard` : "/authentication"
+         user 
+  ? `/${user.user_metadata?.role || 'user'}/dashboard`
+  : "/authentication"
+
         }
         handleMobileMenu={handleMobileMenu}
         InputChange={handleChange}
@@ -439,7 +445,10 @@ export default function Header3({
       <HeaderMobSticky
         scroll={scroll}
         AccountredirectUrl={
-          user ? `/${user?.user_metadata?.role}/dashboard` : "/authentication"
+         user 
+  ? `/${user.user_metadata?.role || 'user'}/dashboard`
+  : "/authentication"
+
         }
         isMobileMenu={isMobileMenu}
         handleMobileMenu={handleMobileMenu}

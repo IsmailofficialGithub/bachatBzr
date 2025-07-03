@@ -48,7 +48,6 @@ export const deleteImagesFromCloudinary = async (urls) => {
       const parts = url.split("/");
       return `${parts.slice(-2).join("/")}`.split(".")[0];
     });
-
     const deletionResults = await Promise.all(
       publicIds.map(async (publicId) => {
         try {

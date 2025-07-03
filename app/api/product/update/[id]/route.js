@@ -4,8 +4,13 @@ import {
   deleteImagesFromCloudinary,
   uploadImageToCloudinary,
 } from "@/lib/helper";
+import { CheckRouteRole } from "@/lib/auth-token";
 
 export async function PUT(request, { params }) {
+  const {  success, error } = await CheckRouteRole(request,["admin"]);
+ if (error || !success) {
+    return NextResponse.json({ error }, { status: 401 })
+  }
   try {
     const { id } = await params;
     const formData = await request.formData();

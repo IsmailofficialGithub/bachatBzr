@@ -12,6 +12,7 @@ import "@/public/assets/css/tailwind-cdn.css";
 import DashboardWrapper from "@/app/components/DashboardWrapper";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { getAccessToken } from "@/util/getAccessToken";
 
 const BookedPacketsPage = () => {
   const [packets, setPackets] = useState([]);
@@ -48,8 +49,14 @@ const BookedPacketsPage = () => {
   // Handle cancel packet (mock function)
   const handlecancel = async (trackingNumber) => {
     try {
+      const token=await getAccessToken();
       const response = await axios.post("/api/lapord/cancel-packet", {
         cn_numbers: trackingNumber,
+      },{
+          headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
 
       if (response.data.success) {
@@ -80,8 +87,14 @@ const BookedPacketsPage = () => {
     setError(null);
 
     try {
+      const token=await getAccessToken();
       const response = await fetch(
-        `/api/lapord/getBookedPackets?from_date=${fromDate}&to_date=${toDate}`,
+        `/api/lapord/getBookedPackets?from_date=${fromDate}&to_date=${toDate}`,{
+            headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+        }
       );
 
       if (!response.ok) {

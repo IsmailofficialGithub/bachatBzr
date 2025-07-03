@@ -1,6 +1,3 @@
-
-
-
 "use client";
 import DashboardWrapper from "@/app/components/DashboardWrapper";
 import {
@@ -35,7 +32,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { supabase } from "@/lib/supabaseSetup";
 import { Button } from "@/components/ui/button";
-
+import { getAccessToken } from "@/util/getAccessToken";
 
 const statusColors = {
   pending: "bg-yellow-100 text-yellow-800",
@@ -64,9 +61,16 @@ const Orders = () => {
 
   const fetchOrders = async () => {
     try {
-      setLoading(prev => ({ ...prev, mainLoading: true }));
+      setLoading((prev) => ({ ...prev, mainLoading: true }));
+      const token = await getAccessToken();
       const response = await axios.get(
         `/api/orders/get?page=${page}&limit=${limit}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        },
       );
       if (response.data.success) {
         setOrders(response.data.orders);
@@ -78,24 +82,24 @@ const Orders = () => {
     } catch (error) {
       toast("Failed to fetch orders");
     } finally {
-      setLoading(prev => ({ ...prev, mainLoading: false }));
+      setLoading((prev) => ({ ...prev, mainLoading: false }));
     }
   };
 
   useEffect(() => {
     // Subscribe to changes on the 'orders' table
     const subscription = supabase
-      .channel('table-changes')
+      .channel("table-changes")
       .on(
-        'postgres_changes',
+        "postgres_changes",
         {
-          event: '*', // Listen for all events (INSERT, UPDATE, DELETE)
-          schema: 'public', // Use your schema name if different
-          table: 'orders', // Your orders table name
+          event: "*", // Listen for all events (INSERT, UPDATE, DELETE)
+          schema: "public", // Use your schema name if different
+          table: "orders", // Your orders table name
         },
         (payload) => {
           // Handle different types of changes
-          if (payload.eventType === 'INSERT') {
+          if (payload.eventType === "INSERT") {
             // Check if the new order should be included on the current page
             if (orders.length < limit) {
               // If we have space on the current page, add the new order
@@ -105,29 +109,31 @@ const Orders = () => {
               // Update the total counts but don't add the order to the current page
               setTotalOrders((prev) => prev + 1);
               setTotalPages(Math.ceil((totalOrders + 1) / limit));
-              toast("New order received. Navigate to the latest page to view it.");
+              toast(
+                "New order received. Navigate to the latest page to view it.",
+              );
             }
-          } else if (payload.eventType === 'UPDATE') {
+          } else if (payload.eventType === "UPDATE") {
             // Update the order in the current list if it exists
             setOrders((currentOrders) =>
               currentOrders.map((order) =>
-                order.id === payload.new.id ? payload.new : order
-              )
+                order.id === payload.new.id ? payload.new : order,
+              ),
             );
-          } else if (payload.eventType === 'DELETE') {
+          } else if (payload.eventType === "DELETE") {
             // Remove the order from the current list if it exists
             setOrders((currentOrders) =>
-              currentOrders.filter((order) => order.id !== payload.old?.id)
+              currentOrders.filter((order) => order.id !== payload.old?.id),
             );
             setTotalOrders((prev) => prev - 1);
             setTotalPages(Math.ceil((totalOrders - 1) / limit));
-            
+
             // If the current page becomes empty but it's not the first page, go back one page
             if (orders.length === 1 && page > 1) {
               setPage((prevPage) => prevPage - 1);
             }
           }
-        }
+        },
       )
       .subscribe();
 
@@ -136,19 +142,26 @@ const Orders = () => {
       supabase.removeChannel(subscription);
     };
   }, [orders, limit, page, totalOrders]);
-  
+
   useEffect(() => {
     fetchOrders();
   }, [page, limit]);
 
   const handleFilterChange = async (value) => {
     try {
-      setLoading(prev => ({ ...prev, filterLoading: true }));
+      setLoading((prev) => ({ ...prev, filterLoading: true }));
       if (value === "all") {
         fetchOrders();
       } else {
+        const token = await getAccessToken();
         const response = await axios.get(
           `/api/orders/filter?status=${value}&page=${page}&limit=${limit}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          },
         );
         if (response.data.success) {
           setOrders(response.data.orders);
@@ -161,20 +174,23 @@ const Orders = () => {
       console.log(error);
       toast("Failed to fetch orders", { description: error.message });
     } finally {
-      setLoading(prev => ({ ...prev, filterLoading: false }));
+      setLoading((prev) => ({ ...prev, filterLoading: false }));
     }
   };
 
   const changeOrderStatus = async (value, orderId, userId) => {
     try {
-      const response = await axios.patch(
-        `/api/orders/updateStatus`,
-        {
-          orderId: orderId,
-          status: value,
-          userId,
-        },
-      );
+      const token = await getAccessToken();
+      const response = await axios.patch(`/api/orders/updateStatus`, {
+        orderId: orderId,
+        status: value,
+        userId,
+      },{
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
       if (response.data.success) {
         toast("Status updated successfully", {
           description: "Order status updated and notification sent to user",
@@ -196,7 +212,7 @@ const Orders = () => {
   const formatAddress = (address) => {
     try {
       const parsed = JSON.parse(address);
-      console.log("address",parsed)
+      console.log("address", parsed);
       return `${parsed.address}, ${parsed.city.city_name}, ${parsed.country}`;
     } catch {
       return address;
@@ -208,7 +224,9 @@ const Orders = () => {
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Orders</h1>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              Orders
+            </h1>
             <p className="text-gray-500 dark:text-gray-400">
               Manage and track all customer orders
             </p>
@@ -225,7 +243,6 @@ const Orders = () => {
                 <SelectItem value="all">All Orders</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
                 <SelectItem value="processing">Processing</SelectItem>
-                <SelectItem value="shipped">Shipped</SelectItem>
                 <SelectItem value="delivered">Delivered</SelectItem>
                 <SelectItem value="cancelled">Cancelled</SelectItem>
               </SelectContent>
@@ -264,8 +281,13 @@ const Orders = () => {
                   </TableHeader>
                   <TableBody>
                     {orders.map((order) => (
-                      <TableRow key={order.id} className="hover:bg-gray-600 hover:cursor-pointer dark:hover:bg-gray-800">
-                        <TableCell className="font-medium">#{order.id.slice(0, 8)}</TableCell>
+                      <TableRow
+                        key={order.id}
+                        className="hover:bg-gray-600 hover:cursor-pointer dark:hover:bg-gray-800"
+                      >
+                        <TableCell className="font-medium">
+                          #{order.id.slice(0, 8)}
+                        </TableCell>
                         <TableCell>
                           <div className="font-medium">{order.Receiver}</div>
                           <div className="text-sm text-gray-500 dark:text-gray-400">
@@ -282,7 +304,8 @@ const Orders = () => {
                             <SelectTrigger className="w-32">
                               <Badge
                                 className={`w-full justify-center ${
-                                  statusColors[order.order_status] || "bg-gray-100 text-gray-800"
+                                  statusColors[order.order_status] ||
+                                  "bg-gray-100 text-gray-800"
                                 }`}
                               >
                                 {order.order_status}
@@ -290,10 +313,16 @@ const Orders = () => {
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem value="pending">Pending</SelectItem>
-                              <SelectItem value="processing">Processing</SelectItem>
+                              <SelectItem value="processing">
+                                Processing
+                              </SelectItem>
                               <SelectItem value="shipped">Shipped</SelectItem>
-                              <SelectItem value="delivered">Delivered</SelectItem>
-                              <SelectItem value="cancelled">Cancelled</SelectItem>
+                              <SelectItem value="delivered">
+                                Delivered
+                              </SelectItem>
+                              <SelectItem value="cancelled">
+                                Cancelled
+                              </SelectItem>
                             </SelectContent>
                           </Select>
                         </TableCell>
@@ -301,14 +330,15 @@ const Orders = () => {
                           <Badge
                             variant="outline"
                             className={
-                              paymentStatusColors[order.payment_status] || "bg-gray-100 text-gray-800"
+                              paymentStatusColors[order.payment_status] ||
+                              "bg-gray-100 text-gray-800"
                             }
                           >
                             {order.payment_status}
                           </Badge>
                         </TableCell>
                         <TableCell className="font-medium">
-                           PKR {order.total_amount.final_total?.toFixed(2)}
+                          PKR {order.total_amount.final_total?.toFixed(2)}
                         </TableCell>
                         <TableCell>{order.phone}</TableCell>
                         <TableCell className="text-right flex flex-col">
@@ -318,16 +348,16 @@ const Orders = () => {
                           >
                             Details↗
                           </button>
-                        {
-                          !order.packet_tracking_id &&(
-                              <button
-                            onClick={() => window.open(`/admin/dashboard/blp/${order.id}`)}
-                            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline hover:decoration-red-500 decoration-2"
-                          >
-                            BLP↗
-                          </button>
-                          )
-                        }
+                          {!order.packet_tracking_id && (
+                            <button
+                              onClick={() =>
+                                window.open(`/admin/dashboard/blp/${order.id}`)
+                              }
+                              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline hover:decoration-red-500 decoration-2"
+                            >
+                              BLP↗
+                            </button>
+                          )}
                         </TableCell>
                       </TableRow>
                     ))}
@@ -351,7 +381,9 @@ const Orders = () => {
                       <PaginationPrevious
                         onClick={() => setPage((prev) => Math.max(1, prev - 1))}
                         disabled={page === 1}
-                        className={page === 1 ? "opacity-50 cursor-not-allowed" : ""}
+                        className={
+                          page === 1 ? "opacity-50 cursor-not-allowed" : ""
+                        }
                       />
                     </PaginationItem>
                     {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
@@ -378,9 +410,15 @@ const Orders = () => {
                     })}
                     <PaginationItem>
                       <PaginationNext
-                        onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+                        onClick={() =>
+                          setPage((prev) => Math.min(totalPages, prev + 1))
+                        }
                         disabled={page >= totalPages}
-                        className={page >= totalPages ? "opacity-50 cursor-not-allowed" : ""}
+                        className={
+                          page >= totalPages
+                            ? "opacity-50 cursor-not-allowed"
+                            : ""
+                        }
                       />
                     </PaginationItem>
                   </PaginationContent>

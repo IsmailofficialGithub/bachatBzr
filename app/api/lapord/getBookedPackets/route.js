@@ -1,8 +1,14 @@
 // app/api/get-packets/route.ts
 import { NextResponse } from "next/server";
 import axios from "axios";
+import { CheckRouteRole } from "@/lib/auth-token";
 
 export async function GET(req) {
+    
+const {  success, error } = await CheckRouteRole(req,["admin"]);
+ if (error || !success) {
+    return NextResponse.json({ error }, { status: 401 })
+  }
   const { searchParams } = new URL(req.url);
   const fromDate = searchParams.get("from_date");
   const toDate = searchParams.get("to_date");

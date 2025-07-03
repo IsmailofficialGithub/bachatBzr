@@ -19,6 +19,7 @@ export async function GET(req, { params }) {
     const { data, error } = await supabase
       .from("orders")
       .select("*")
+      .order("created_at", { ascending: false })
       .eq("user_id", userId);
 
     if (error) {

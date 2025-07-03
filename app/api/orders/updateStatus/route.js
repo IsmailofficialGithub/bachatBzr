@@ -2,8 +2,13 @@ import { supabase, supabaseAdmin } from "@/lib/supabaseSetup";
 import { sendEmail } from "@/app/utils/sendMail";
 import { NextResponse } from "next/server";
 import { createNotification } from "@/lib/notifications";
+import { CheckRouteRole } from "@/lib/auth-token";
 
 export async function PATCH(req) {
+  const {  success, error } = await CheckRouteRole(req,["admin"]);
+ if (error || !success) {
+    return NextResponse.json({ error }, { status: 401 })
+  }
   try {
     const { orderId, status, userId } = await req.json();
 

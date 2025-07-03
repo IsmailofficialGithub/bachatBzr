@@ -2,7 +2,6 @@
 import DashboardWrapper from "@/app/components/DashboardWrapper";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
-import { createBrowserClient } from '@supabase/ssr'
 import {
   Table,
   TableBody,
@@ -41,9 +40,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { supabase } from "@/lib/supabaseSetup";
+import { getAccessToken } from "@/util/getAccessToken";
 
 const Users = () => {
- 
   const [page, setPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [totalPages, setTotalPages] = useState(1);
@@ -54,13 +53,24 @@ const Users = () => {
 
   const handleChange = async (value) => {
     setRole(value);
+    const accessToken = await getAccessToken();
     try {
       const response = await axios.get(
-        `/api/user/filter?role=${value === "all" ? "" : value}&page=${page}&limit=10`,
+        `/api/user/filter`, // Your backend API route
         {
-          withCredentials: true,
-        }
+          params: {
+            role: value === "all" ? "" : value, // Leave empty if "all"
+            page: page, // Page number
+            limit: 10, // Items per page
+          },
+          withCredentials: true, // Include cookies if needed
+          headers: {
+            Authorization: `Bearer ${accessToken}`, // Auth token
+            "Content-Type": "application/json",
+          },
+        },
       );
+
       if (response.data.success) {
         if (response.data.users.length > 0) {
           toast.success(`Successfully filtered ${value}s`);
@@ -72,26 +82,29 @@ const Users = () => {
       }
     } catch (error) {
       console.log(error);
-      toast.error("Failed to filter users");
+      toast.error("Failed to filter users" + error.message);
     }
   };
 
   const fetchUsers = async () => {
     setLoading(true);
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) {
-        toast.error('Please login first')
-        router.push('/authentication')
-        return
-      }
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session) {
+      toast.error("Please login first");
+      router.push("/authentication");
+      return;
+    }
     try {
       const response = await axios.get(
-        `/api/user/get?page=${page}&pageSize=25`,{
-           headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json'
-        }
-        }
+        `/api/user/get?page=${page}&pageSize=25`,
+        {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+            "Content-Type": "application/json",
+          },
+        },
       );
       if (response.data.success) {
         setTotalPages(response.data.pagination.totalPages);
@@ -114,8 +127,15 @@ const Users = () => {
       if (searchQuery === "") {
         return toast.info("Please provide search criteria");
       }
+      const token = await getAccessToken();
       const response = await axios.get(
-        `/api/user/search?query=${searchQuery}&page=${page}&pageSize=10`
+        `/api/user/search?query=${searchQuery}&page=${page}&pageSize=10`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        },
       );
       if (response.data.success) {
         if (response.data.users.length > 0) {
@@ -163,7 +183,9 @@ const Users = () => {
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">User Management</h1>
+            <h1 className="text-3xl font-bold tracking-tight">
+              User Management
+            </h1>
             <p className="text-muted-foreground">
               Manage your platform users and their permissions
             </p>
@@ -266,7 +288,7 @@ const Users = () => {
                                   {getInitials(
                                     user.user_metadata?.name ||
                                       user.user_metadata?.full_name ||
-                                      user.email
+                                      user.email,
                                   )}
                                 </AvatarFallback>
                               </Avatar>
@@ -284,7 +306,8 @@ const Users = () => {
                           </TableCell>
                           <TableCell>
                             {getRoleBadge(
-                              user.user_metadata?.role || user.app_metadata?.role
+                              user.user_metadata?.role ||
+                                user.app_metadata?.role,
                             )}
                           </TableCell>
                           <TableCell>
@@ -302,12 +325,12 @@ const Users = () => {
                               <div className="flex flex-col">
                                 <span>
                                   {new Date(
-                                    user.last_sign_in_at
+                                    user.last_sign_in_at,
                                   ).toLocaleDateString()}
                                 </span>
                                 <span className="text-xs text-muted-foreground">
                                   {new Date(
-                                    user.last_sign_in_at
+                                    user.last_sign_in_at,
                                   ).toLocaleTimeString()}
                                 </span>
                               </div>
@@ -329,7 +352,9 @@ const Users = () => {
                       <PaginationContent>
                         <PaginationItem>
                           <PaginationPrevious
-                            onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+                            onClick={() =>
+                              setPage((prev) => Math.max(1, prev - 1))
+                            }
                             disabled={page === 1}
                           />
                         </PaginationItem>

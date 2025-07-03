@@ -1,8 +1,13 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabaseSetup";
 import { deleteImagesFromCloudinary } from "@/lib/helper";
+import { CheckRouteRole } from "@/lib/auth-token";
 
 export const DELETE = async (request, { params }) => {
+  const {  success, error } = await CheckRouteRole(request,["admin"]);
+ if (error || !success) {
+    return NextResponse.json({ error }, { status: 401 })
+  }
   try {
     const { id } = params;
 

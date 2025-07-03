@@ -6,6 +6,10 @@ import {
 } from "@/lib/helper";
 
 export const POST = async (request) => {
+  const {  success, error } = await CheckRouteRole(request,["admin"]);
+ if (error || !success) {
+    return NextResponse.json({ error }, { status: 401 })
+  }
   try {
     const formData = await request.formData();
 

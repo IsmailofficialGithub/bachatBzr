@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
+import { CheckRouteRole } from "@/lib/auth-token";
 
 export async function POST(req) {
+  
+const {  success, error } = await CheckRouteRole(req,["admin"]);
+ if (error || !success) {
+    return NextResponse.json({ error }, { status: 401 })
+  }
   try {
     const body = await req.json();
 

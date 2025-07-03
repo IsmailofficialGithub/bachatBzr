@@ -4,10 +4,14 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { Home, X } from "lucide-react";
 import "@/app/admin/dashboard/admin.css";
+import { signOut } from "@/features/auth/authSlice";
+import { useDispatch } from "react-redux";
 
 export default function AdminDashboardMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
+  const dispatch = useDispatch();
+
 
   const navigation = [
     { name: "Dashboard", href: "/admin/dashboard" },
@@ -17,7 +21,14 @@ export default function AdminDashboardMenu() {
     { name: "Users", href: "/admin/dashboard/users" },
     // { name: "Settings", href: "/admin/dashboard/settings" },
   ];
-
+ const handleLogout = async () => {
+  try {
+    await dispatch(signOut() as any);
+  } catch (error) {
+    console.error('Logout failed:', error);
+  }
+};
+ 
   return (
     <>
       <div className="admin-container">
@@ -64,6 +75,10 @@ export default function AdminDashboardMenu() {
                   {item.name}
                 </Link>
               ))}
+
+              <div className="admin-nav-link admin-nav-logout" onClick={handleLogout}>
+                Logout
+              </div>
             </nav>
           </div>
         </div>

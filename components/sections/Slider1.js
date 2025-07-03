@@ -69,14 +69,8 @@ export default function Slider1() {
                                         </SwiperSlide>
                                         <SwiperSlide>
                                             <div className="tp-slide-item">
-                                                <div className="tp-slide-item__content">
-                                                    <h4 className="tp-slide-item__sub-title">Womens</h4>
-                                                    <h3 className="tp-slide-item__title mb-25">Up To <i>45% Off <img src="/assets/img/icon/title-shape-02.jpg" alt="" /></i> latest
-                                                        Creations</h3>
-                                                    <Link className="tp-slide-item__slide-btn tp-btn" href="/shop">Shop Now <i className="fal fa-long-arrow-right" /></Link>
-                                                </div>
                                                 <div className="tp-slide-item__img">
-                                                    <img src="/assets/img/slider/banner-3.jpg" alt="" />
+                                                    <img src="/assets/img/slider/banner-3.png" alt="" />
                                                 </div>
                                             </div>
                                         </SwiperSlide>

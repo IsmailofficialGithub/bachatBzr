@@ -49,7 +49,7 @@ const OrderDetails = () => {
               <span
                 className={`px-4 py-1 ${
                   OrderDetails?.payment_status === "pending"
-                    ? " px-4 py-1 bg-[#fb923c]/20 text-[#fb923c] rounded-full"
+                    ? " px-4 py-1 bg-[#8fa4db]/20 text-[#8fa4db] rounded-full"
                     : "px-4 py-1 bg-[#16404d] text-white rounded-full"
                 } rounded-full text-sm font-medium`}
               >
@@ -210,7 +210,7 @@ const OrderDetails = () => {
                                   product.discounted_price,
                                 )}{" "}
                                 PKR
-                                <span className="ml-2 text-[#fb923c] line-through">
+                                <span className="ml-2 text-[#8fa4db] line-through">
                                   {product.price} PKR
                                 </span>
                               </>

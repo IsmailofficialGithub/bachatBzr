@@ -1127,6 +1127,7 @@ only screen and (min-width: 576px) and (max-width: 767px) {
     margin-bottom: 0;
 }
 
+
 .tpsectionarea__title {
     font-size: 40px;
     font-weight: 600;
@@ -1225,6 +1226,7 @@ only screen and (min-width: 768px) and (max-width: 991px) {
         font-size: 8px;
     }
 }
+
 
 .header-welcome-text a {
     color: var(--tp-text-primary);

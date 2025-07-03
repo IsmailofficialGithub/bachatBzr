@@ -1,37 +1,14 @@
  
 next js middleware not set[creatingClientmiddleware[createMiddlewareClient]]
 
-protect api (server,client) side [admin,user,manager]
 slider is not working fine [Slider1.js]
 .env supabase key are dublicate and also remove keys from supabase.ts key
 add head tags in all pages
 add right url while redirect from forget opt link to bachatbzr.com
 add login url correct
-change role also in user table from authentication tab and auto delete user from both authenction and user table
 increase time when product sold outs
 check product is not sold in api  .eq("sold", false)
-user/orders page mobile ui , new order in bottom 
 later (admin/dashboard/product/add) add button for again crop ,button for new image
 
 
 import "@/public/assets/css/tailwind-cdn.css"
-//
-/// role check logic in client side while sending api
-
- const response = await axios.get(
-        `/your-api-url`,{
-           headers: {
-          'Authorization': `Bearer ${session.access_token}`,
-          'Content-Type': 'application/json'
-        }
-        }
-      );
-
-/// role check logic in server side 
-
-import { CheckRouteRole } from "@/lib/auth-token";
-
-const {  success, error } = await CheckRouteRole(req,["admin"]);
- if (error || !success) {
-    return NextResponse.json({ error }, { status: 401 })
-  }

@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { CheckRouteRole } from "@/lib/auth-token";
 
 export async function GET(req) {
-const {  success, error } = await CheckRouteRole(req,["admin"]);
+const {  success, error } = await CheckRouteRole(req,["admin", "super-admin"]);
  if (error || !success) {
     return NextResponse.json({ error }, { status: 401 })
   }

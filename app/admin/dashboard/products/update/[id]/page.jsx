@@ -19,6 +19,7 @@ import { toast } from "react-toastify";
 import { Loader, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { getAccessToken } from "@/util/getAccessToken";
 
 const Page = () => {
   const router = useRouter();
@@ -237,23 +238,26 @@ const Page = () => {
           formDataToSend.append("newImages", file);
         });
       }
-
+ const token=await getAccessToken()
       const response = await axios.put(
         `/api/product/update/${params.id}`,
         formDataToSend,
         {
-          headers: { "Content-Type": "multipart/form-data" },
+          headers: { 
+            'Authorization': `Bearer ${token}`,
+           },
         }
       );
 
       if (response.data.success) {
-        router.push("/admin/dashboard/products");
+        // router.push("/admin/dashboard/products");
         toast.success("Product updated successfully");
       } else {
         toast.error(`Failed to update product: ${response.data.message}`);
       }
     } catch (error) {
       toast.error("Something went wrong");
+      console.log(error)
     } finally {
       setLoading(false);
     }
