@@ -9,6 +9,7 @@ add login url correct
 increase time when product sold outs
 check product is not sold in api  .eq("sold", false)
 later (admin/dashboard/product/add) add button for again crop ,button for new image
-
+this is slider , i have problem in it in mobile or 767px or less devices every thing is working fine but in large screens it can only show 2 image and white black space in place of third image , also animation when page swip every thing is working fine in mobile but in large screen its not wokring and only work first time ,and next time it cannot work
+wishlistItems.js image[0] is not found
 
 import "@/public/assets/css/tailwind-cdn.css"

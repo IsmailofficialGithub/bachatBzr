@@ -99,11 +99,16 @@ const Page = () => {
         toast.error("Category name is required");
         return;
       }
-
+      const accessToken=await getAccessToken()
       const response = await axios.post("/api/categories", {
         name: newCategory.name,
         description: newCategory.description,
         parent_id: newCategory.parent_id,
+      },{
+       headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${accessToken}`,
+        },
       });
 
       if (response.data.success) {

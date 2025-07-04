@@ -15,11 +15,11 @@ export default function Footer1(isMobileMenu) {
                                             <Link href="/"><Image src="/assets/img/logo/logo.png" alt="logo" width={isMobileMenu?150:250 } height={isMobileMenu?100:200}/></Link>
                                         </div>
                                         <div className="footer-content">
-                                            <p>BachatBar is your go-to marketplace for <br />top-brand, second-hand products in great condition
+                                            <p>BachatBzr is your go-to marketplace for <br />top-brand, second-hand products in great condition
                                                 <br />  from fashion and shoes to accessories <br /> all at unbeatable prices.</p>
                                         </div>
                                         <div className="footer-content">
-                                            <p>BachatBar – Branded Deals, Second-Hand Steals</p>
+                                            <p>BachatBzr – Branded Deals, Second-Hand Steals</p>
                                         </div>
                                     </div>
                                 </div>
@@ -54,7 +54,7 @@ export default function Footer1(isMobileMenu) {
                                         <h4 className="footer-widget__title mb-30">Social Network</h4>
                                         <div className="footer-widget__links">
                                             <ul>
-                                                <li><Link href="https://www.facebook.com/bachatbzr"><i className="fab fa-facebook-f" />Facebook</Link></li>
+                                                <li><Link href="https://www.facebook.com/share/15jd1gX7CA/"><i className="fab fa-facebook-f" />Facebook</Link></li>
                                                 <li><Link href="https://twitter.com/bachatbzr"><i className="fab fa-twitter" />Twitter</Link></li>
                                                 <li><Link href="https://www.instagram.com/bachatbzr"><i className="fab fa-instagram" />Instagram</Link></li>
                                                 <li><Link href="https://www.tiktok.com/@bachatbzr"><i className="fab fa-tiktok" />Tiktok</Link></li>

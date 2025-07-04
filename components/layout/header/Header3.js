@@ -115,7 +115,7 @@ export default function Header3({
                     </ul>
                   </div>
                   <div className="menu-top-social">
-                    <Link href="#">
+                    <Link href="https://www.facebook.com/share/15jd1gX7CA/">
                       <i className="fab fa-facebook-f" />
                     </Link>
                     <Link href="https://www.instagram.com/bachatbzr">
@@ -267,16 +267,16 @@ export default function Header3({
                         <Link href="/">Home</Link>
                         <ul className="submenu">
                           <li>
-                            <Link href="/category/shoes">Shoes Home</Link>
+                            <Link href="/category/shoes">Shoes </Link>
                           </li>
                           <li>
-                            <Link href="/category/cloths">Cloths Home</Link>
+                            <Link href="/category/cloths">Cloths </Link>
                           </li>
                           <li>
-                            <Link href="/category/mens">Mens Home</Link>
+                            <Link href="/category/mens">Mens </Link>
                           </li>
                           <li>
-                            <Link href="/category/tshirts">T-shirts Home</Link>
+                            <Link href="/category/tshirts">T-shirts </Link>
                           </li>
                         </ul>
                       </li>
