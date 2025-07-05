@@ -2819,6 +2819,12 @@ only screen and (min-width: 768px) and (max-width: 991px),
     font-size: 50px;
     font-weight: 600;
     line-height: 1.2;
+  background-color: rgba(0, 0, 0, 0.6); /* semi-transparent black */
+  color: white;
+  padding: 10px 15px;
+  border-radius: 6px;
+  display: inline-block;
+
 }
 
 @media (max-width: 767px) {
