@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 import { Button } from "@/components/ui/button";
 import { useSelector } from "react-redux";
 import { applyDiscount } from "@/lib/discountHandler";
-import StripePayment from "@/app/components/stripPayment";
+// import StripePayment from "@/app/components/stripPayment";
 import { createOrder } from "@/lib/createorderApiCall";
 import { Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -18,6 +18,7 @@ export default function Checkout() {
   const [cityLoading, setCityLoading] = useState(false);
   const [showCityDropdown, setShowCityDropdown] = useState(false);
   const [citySearchTerm, setCitySearchTerm] = useState("");
+  const [couponMessage,setCouponMessage]=useState("");
 
   // 2. Add this new function for searching cities:
   const searchCities = async (searchTerm) => {
@@ -156,14 +157,14 @@ export default function Checkout() {
     return productTotal;
   };
 
-  useEffect(() => {
-    if (cart.length < 1 || cart === undefined) {
-      router.push(`/shop`);
-    }
-  }, [cart]);
+  // useEffect(() => {
+  //   if (cart.length < 1 || cart === undefined) {
+  //     router.push(`/shop`);
+  //   }
+  // }, [cart]);
   useEffect(() => {
     if (cashOnDelivery) {
-      setTotalAmount(calculateTotals(true) + 50);
+      setTotalAmount(calculateTotals(true) + 0);
     } else {
       setTotalAmount(calculateTotals(true));
     }
@@ -272,6 +273,14 @@ export default function Checkout() {
       setLoading(false);
     }
   };
+  // handle Coupon Submit
+  const handleCouponSubmit=async()=>{
+    setCouponMessage("Invalid Coupon Code ...")
+
+    setTimeout(() => {
+      setCouponMessage("")
+    }, 3000);
+  }
 
   // handleLoginSubmit
   const handleLoginSubmit = async (e) => {
@@ -466,17 +475,17 @@ export default function Checkout() {
                       style={{ display: `${isCuponToggle ? "block" : "none"}` }}
                     >
                       <div className="coupon-info">
-                        <form action="#">
                           <p className="checkout-coupon">
+                        <p style={{color:"red"}}>{couponMessage} </p>
                             <input type="text" placeholder="Coupon Code" />
                             <button
+                            onClick={handleCouponSubmit}
                               className="tp-btn tp-color-btn"
-                              type="submit"
                             >
                               Apply Coupon
                             </button>
+                           
                           </p>
-                        </form>
                       </div>
                     </div>
                     {/* ACCORDION END */}
@@ -912,7 +921,7 @@ export default function Checkout() {
                                   if (e.target.checked) {
                                     setCashOnDelivery(true);
                                     setPayment(e.target.value);
-                                    setTotalAmount(calculateTotals(true) + 50);
+                                    setTotalAmount(calculateTotals(true) + 0);
                                   } else {
                                     setCashOnDelivery(false);
                                     setTotalAmount(calculateTotals(true));
@@ -922,7 +931,7 @@ export default function Checkout() {
                               />{" "}
                               <label htmlFor="cashOnDelivery">
                                 {" "}
-                                Cash on Delivery [50 PKR Service Fee]
+                                Cash on Delivery [0 PKR Service Fee]
                               </label>
                             </div>
                           </div>
@@ -970,7 +979,7 @@ export default function Checkout() {
 
                         {/* </div> */}
                         {cashOnDelivery ? (
-                          <div className="order-button-payment mt-20">
+                          <div className="order-button-payment ">
                             <button
                               disabled={session ? false : true}
                               onClick={handleAddOrder}

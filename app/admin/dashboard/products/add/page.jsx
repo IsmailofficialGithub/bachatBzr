@@ -1,6 +1,6 @@
 "use client";
 import DashboardWrapper from "@/app/components/DashboardWrapper";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -16,13 +16,22 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { Loader, Trash2 } from "lucide-react";
 import Image from "next/image";
-import Cropper from "react-easy-crop";
-import { readFile, createImage } from "@/lib/imageUtils";
+// import Cropper from "react-easy-crop";
+// import { readFile, createImage } from "@/lib/imageUtils";
 import { getAccessToken } from "@/util/getAccessToken";
 
 const Page = () => {
+  // State for categories
   const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [categoriesLoading, setCategoriesLoading] = useState(false);
+  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
+  const [newCategory, setNewCategory] = useState({
+    name: "",
+    description: "",
+    parent_id: null,
+  });
+
+  // State for form data
   const [formData, setFormData] = useState({
     name: "",
     price: "",
@@ -36,33 +45,7 @@ const Page = () => {
     imageFiles: [],
   });
 
-  // Image cropping state
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [croppingMode, setCroppingMode] = useState(false);
-  const [croppedImages, setCroppedImages] = useState([]);
-
-  const [specifications, setSpecifications] = useState({});
-  const [categoriesLoading, setCategoriesLoading] = useState(false);
-  const [currentSpec, setCurrentSpec] = useState({
-    key: "",
-    value: "",
-  });
-  const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
-  const [newCategory, setNewCategory] = useState({
-    name: "",
-    description: "",
-    parent_id: null,
-  });
-
-  const [tags, setTags] = useState([]);
-  const [currentTag, setCurrentTag] = useState("");
-
-  const [imagePreviews, setImagePreviews] = useState([]);
-  const [selectedImage, setSelectedImage] = useState(null);
-
+  // State for form errors
   const [formErrors, setFormErrors] = useState({
     name: "",
     price: "",
@@ -76,6 +59,33 @@ const Page = () => {
     tags: "",
   });
 
+  // State for specifications
+  const [specifications, setSpecifications] = useState({});
+  const [currentSpec, setCurrentSpec] = useState({
+    key: "",
+    value: "",
+  });
+
+  // State for tags
+  const [tags, setTags] = useState([]);
+  const [currentTag, setCurrentTag] = useState("");
+
+  // State for images
+  const [imagePreviews, setImagePreviews] = useState([]);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  // Commented out cropping state
+  /*
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [croppingMode, setCroppingMode] = useState(false);
+  const [croppedImages, setCroppedImages] = useState([]);
+  */
+
+  // Fetch categories on mount
   useEffect(() => {
     const fetchingCategories = async () => {
       try {
@@ -92,6 +102,7 @@ const Page = () => {
     fetchingCategories();
   }, []);
 
+  // Handle category creation
   const handleCreateCategory = async () => {
     setCategoriesLoading(true);
     try {
@@ -99,17 +110,21 @@ const Page = () => {
         toast.error("Category name is required");
         return;
       }
-      const accessToken=await getAccessToken()
-      const response = await axios.post("/api/categories", {
-        name: newCategory.name,
-        description: newCategory.description,
-        parent_id: newCategory.parent_id,
-      },{
-       headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${accessToken}`,
+      const accessToken = await getAccessToken();
+      const response = await axios.post(
+        "/api/categories",
+        {
+          name: newCategory.name,
+          description: newCategory.description,
+          parent_id: newCategory.parent_id,
         },
-      });
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        },
+      );
 
       if (response.data.success) {
         toast.success("Category created successfully");
@@ -126,10 +141,10 @@ const Page = () => {
     }
   };
 
+  // Handle form input changes
   const handleChange = (e) => {
     const { name, value, files, type } = e.target;
 
-    console.log("file change");
     if (type === "file" && files) {
       // Clean up previous URLs before creating new ones
       imagePreviews.forEach((url) => URL.revokeObjectURL(url));
@@ -139,14 +154,16 @@ const Page = () => {
 
       const previewUrls = fileList.map((file) => URL.createObjectURL(file));
       setImagePreviews(previewUrls);
-      setCroppedImages(new Array(fileList.length)); // Initialize with proper length
-      setCroppingMode(true);
-      setCurrentImageIndex(0);
+      // setCroppedImages(new Array(fileList.length)); // Initialize with proper length
+      // setCroppingMode(true);
+      // setCurrentImageIndex(0);
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
+  // Commented out cropping functions
+  /*
   const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
     setCroppedAreaPixels(croppedAreaPixels);
   }, []);
@@ -239,7 +256,9 @@ const Page = () => {
       );
     }
   }, [croppedAreaPixels, imagePreviews, currentImageIndex, croppedImages]);
+  */
 
+  // Handle category selection
   const handleCategorySelect = (value) => {
     setFormData((prev) => {
       const isSelected = prev.categories.includes(value);
@@ -252,6 +271,7 @@ const Page = () => {
     });
   };
 
+  // Handle specifications
   const addSpecification = () => {
     if (currentSpec.key.trim() && currentSpec.value.trim()) {
       setSpecifications((prev) => ({
@@ -276,6 +296,7 @@ const Page = () => {
     }));
   };
 
+  // Handle tags
   const handleAddTag = () => {
     if (currentTag.trim() && !tags.includes(currentTag.trim())) {
       setTags([...tags, currentTag.trim()]);
@@ -295,6 +316,7 @@ const Page = () => {
     }
   };
 
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -358,13 +380,9 @@ const Page = () => {
         formDataToSend.append("categories", category);
       });
 
-      // Use cropped images if available, otherwise use original images
+      // Use original images (cropping logic commented out)
       for (let i = 0; i < formData.imageFiles.length; i++) {
-        const fileToUpload = croppedImages[i] || formData.imageFiles[i];
-        const fileName = croppedImages[i]
-          ? `cropped_${formData.imageFiles[i].name}`
-          : formData.imageFiles[i].name;
-        formDataToSend.append("images", fileToUpload, fileName);
+        formDataToSend.append("images", formData.imageFiles[i]);
       }
 
       if (Object.keys(specifications).length > 0) {
@@ -398,7 +416,7 @@ const Page = () => {
         setSpecifications({});
         setTags([]);
         setImagePreviews([]);
-        setCroppedImages([]);
+        // setCroppedImages([]);
       } else {
         toast.error(`Failed to add product: ${response.data.message}`);
       }
@@ -409,27 +427,19 @@ const Page = () => {
     }
   };
 
+  // Clean up image previews on unmount
   useEffect(() => {
     return () => {
-      // Clean up image preview URLs only when component unmounts or imagePreviews change
       imagePreviews.forEach((url) => {
         if (url.startsWith("blob:")) {
           URL.revokeObjectURL(url);
         }
       });
     };
-  }, []);
-  useEffect(() => {
-    return () => {
-      // Final cleanup on unmount
-      imagePreviews.forEach((url) => {
-        if (url.startsWith("blob:")) {
-          URL.revokeObjectURL(url);
-        }
-      });
-    };
-  }, []);
-  // Image cropping modal
+  }, [imagePreviews]);
+
+  // Commented out cropping mode UI
+  /*
   if (croppingMode && imagePreviews.length > 0) {
     return (
       <DashboardWrapper>
@@ -442,7 +452,6 @@ const Page = () => {
             </div>
           ) : (
             <div className="space-y-4">
-              {/* Main Cropper Container */}
               <div
                 className="relative bg-gray-100 rounded-lg overflow-hidden"
                 style={{ height: "400px", width: "100%" }}
@@ -465,7 +474,6 @@ const Page = () => {
                 />
               </div>
 
-              {/* Zoom Controls */}
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <label className="text-sm font-medium text-gray-700">
@@ -501,7 +509,6 @@ const Page = () => {
                 />
               </div>
 
-              {/* Position Controls */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium text-gray-700">
@@ -543,7 +550,6 @@ const Page = () => {
                 </div>
               </div>
 
-              {/* Image Navigation */}
               <div className="pt-4">
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium text-gray-700">
@@ -579,7 +585,6 @@ const Page = () => {
                 </div>
               </div>
 
-              {/* Thumbnail Strip */}
               <div className="pt-4 border-t border-gray-200">
                 <div className="flex gap-2 overflow-x-auto pb-2">
                   {imagePreviews.map((preview, index) => (
@@ -623,7 +628,6 @@ const Page = () => {
                 </div>
               </div>
 
-              {/* Help Text */}
               <div className="text-xs text-gray-500 mt-2">
                 Tip: Adjust the zoom and position to frame your image perfectly.
                 All images will be cropped to a square aspect ratio.
@@ -634,6 +638,7 @@ const Page = () => {
       </DashboardWrapper>
     );
   }
+  */
 
   return (
     <DashboardWrapper>
@@ -1082,11 +1087,13 @@ const Page = () => {
                       className="w-full h-auto object-cover cursor-pointer transition-transform duration-300 hover:scale-105"
                       onClick={() => setSelectedImage(preview)}
                     />
+                    {/* Commented out cropped indicator
                     {croppedImages[index] && (
                       <span className="absolute top-1 right-1 bg-green-500 text-white text-xs px-1 rounded">
                         Cropped
                       </span>
                     )}
+                    */}
                   </div>
                 ))}
               </div>

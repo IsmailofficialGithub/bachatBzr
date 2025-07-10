@@ -1,7 +1,14 @@
 import Image from "next/image"
 import Link from "next/link"
+import { toast } from "react-toastify"
 
 export default function Footer1(isMobileMenu) {
+    const handleSubscribe=async()=>{
+        const input=document.getElementsByClassName("SubscribeInput");
+        console.log(input.value)
+        input.value=""
+        toast.success("Request send Successfully")
+    }
     return (
         <>
             <footer>
@@ -67,10 +74,10 @@ export default function Footer1(isMobileMenu) {
                                         <h4 className="footer-widget__title mb-30">Get Newsletter</h4>
                                         <p>Get on the list and get 10% off your first order!</p>
                                         <div className="footer-widget__newsletter">
-                                            <form action="#">
-                                                <input type="email" placeholder="Enter email address" />
-                                                <button className="footer-widget__fw-news-btn tpsecondary-btn">Subscribe Now<i className="fal fa-long-arrow-right" /></button>
-                                            </form>
+                                            {/* <form action="#"> */}
+                                                <input type="email" placeholder="Enter email address" className="SubscribeInput" />
+                                                <button className="footer-widget__fw-news-btn tpsecondary-btn" onClick={handleSubscribe}>Subscribe Now<i className="fal fa-long-arrow-right" /></button>
+                                            {/* </form> */}
                                         </div>
                                     </div>
                                 </div>
