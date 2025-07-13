@@ -6,42 +6,42 @@ export default function Category() {
     {
       title: "Shoes",
       subTitle: "Men Sport",
-      link: "/shop",
+      link: "/category/shoes",
       imgSrc: "/assets/img/svg/shoes.svg",
       count: 2,
     },
     {
       title: "T-Shirts",
       subTitle: "Casual Wear",
-      link: "/shop",
+      link: "/category/tshirt",
       imgSrc: "/assets/img/svg/tshirt.svg",
       count: 5,
     },
     {
       title: "Hoodies",
       subTitle: "Winter Collection",
-      link: "/shop",
+      link: "/category/hoodie",
       imgSrc: "/assets/img/svg/hoodie.svg",
       count: 3,
     },
     {
       title: "Tracksuits",
       subTitle: "Athletic Fit",
-      link: "/shop",
+      link: "/category/tracksuit",
       imgSrc: "/assets/img/svg/tracksuit.svg",
       count: 10,
     },
     {
       title: "Sneakers",
       subTitle: "Trendy & Comfortable",
-      link: "/shop",
+      link: "/category/sneakers",
       imgSrc: "/assets/img/svg/sneakers.svg",
       count: 1,
     },
     {
-      title: "Sneakers",
+      title: "Kids Sneakers",
       subTitle: "Trendy & Comfortable",
-      link: "/shop",
+      link: "/category/kids Shoes",
       imgSrc: "/assets/img/svg/sneakers.svg",
       count: 1,
     },
@@ -68,10 +68,13 @@ export default function Category() {
           <div className="custom-row category-border pb-45 justify-content-xl-between">
             {categories.map((category, index) => (
               <div key={index} className="tpcategory mb-40">
+                    <Link href={category.link}>
+
                 <div className="tpcategory__icon p-relative">
                   <Image src={category.imgSrc} alt="" className="fn__svg" width={60} height={60}/>
                   <span>{category.count}</span>
                 </div>
+                </Link>
                 <div className="tpcategory__content">
                   <h5 className="tpcategory__title">
                     <Link href={category.link}>

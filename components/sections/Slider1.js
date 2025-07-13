@@ -55,6 +55,27 @@ export default function Slider1() {
             <div className="tp-slider-area p-relative">
               <div ref={sliderRef} className="keen-slider">
                 {/* sliders */}
+                 <div className="keen-slider__slide">
+                  <div className="tp-slide-item">
+                    <div className="tp-slide-item__content">
+                      <h4 className="tp-slide-item__sub-title">T-Shirts</h4>
+                      <h3 className="tp-slide-item__title mb-25">
+                        Up To {''}
+                        <i>
+                          35% Off {''}
+                          <img src="/assets/img/icon/title-shape-02.jpg" alt="" />
+                        </i>
+                        Latest Creations
+                      </h3>
+                      <Link className="tp-slide-item__slide-btn tp-btn" href="/shop">
+                        Shop Now <i className="fal fa-long-arrow-right" />
+                      </Link>
+                    </div>
+                    <div className="tp-slide-item__img">
+                      <img src="/assets/img/slider/banner-1.png" alt="" />
+                    </div>
+                  </div>
+                </div>
                 <div className="keen-slider__slide">
                   <div className="tp-slide-item">
                     <div className="tp-slide-item__content">
@@ -97,27 +118,7 @@ export default function Slider1() {
                     </div>
                   </div>
                 </div>
-                <div className="keen-slider__slide">
-                  <div className="tp-slide-item">
-                    <div className="tp-slide-item__content">
-                      <h4 className="tp-slide-item__sub-title">T-Shirts</h4>
-                      <h3 className="tp-slide-item__title mb-25">
-                        Up To {''}
-                        <i>
-                          35% Off {''}
-                          <img src="/assets/img/icon/title-shape-02.jpg" alt="" />
-                        </i>
-                        Latest Creations
-                      </h3>
-                      <Link className="tp-slide-item__slide-btn tp-btn" href="/shop">
-                        Shop Now <i className="fal fa-long-arrow-right" />
-                      </Link>
-                    </div>
-                    <div className="tp-slide-item__img">
-                      <img src="/assets/img/slider/banner-1.png" alt="" />
-                    </div>
-                  </div>
-                </div>
+               
               </div>
 
             </div>
@@ -129,7 +130,7 @@ export default function Slider1() {
                 <div className="tpslider-banner tp-slider-sm-banner mb-30">
                   <Link href="/shop">
                     <div className="tpslider-banner__img">
-                      <img src="/assets/img/slider/banner-slider-01.jpeg" alt="" />
+                      <img src="/assets/img/slider/banner-slider-01.png" alt="" />
                       <div className="tpslider-banner__content">
                         <span className="tpslider-banner__sub-title">Hand made</span>
                         <h4 className="tpslider-banner__title">
@@ -144,10 +145,10 @@ export default function Slider1() {
                 <div className="tpslider-banner">
                   <Link href="/shop">
                     <div className="tpslider-banner__img">
-                      <img src="/assets/img/slider/banner-slider-03.jpeg" alt="" />
+                      <img src="/assets/img/slider/banner-slider-02.png" alt="banner-slider" />
                       <div className="tpslider-banner__content">
                         <span className="tpslider-banner__sub-title">Popular</span>
-                        <h4 className="tpslider-banner__title">
+                        <h4 className="tpslider-banner__title" style={{color:'orange'}}>
                           Energy with our <br /> newest collection
                         </h4>
                       </div>

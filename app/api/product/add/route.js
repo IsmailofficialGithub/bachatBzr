@@ -6,10 +6,10 @@ import {
 } from "@/lib/helper";
 import { CheckRouteRole } from "@/lib/auth-token";
 export const POST = async (request) => {
-  const {  success, error } = await CheckRouteRole(request,["admin"]);
- if (error || !success) {
-    return NextResponse.json({ error }, { status: 401 })
-  }
+    const {  success, error } = await CheckRouteRole(request,["admin"]);
+   if (error || !success) {
+      return NextResponse.json({ error }, { status: 401 })
+    }
   try {
     const formData = await request.formData();
 
@@ -33,14 +33,15 @@ export const POST = async (request) => {
       !short_description ||
       !long_description ||
       !categories ||
-      !imageFiles.length
+      !imageFiles.length ||
+      !tags
     ) {
       return NextResponse.json(
         {
           error:
-            "Name, price, short_description, long_description, category, and at least one image are required.",
+            "Name, price, short_description, long_description, tags , category, and at least one image are required.",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -63,7 +64,7 @@ export const POST = async (request) => {
       short_description,
       long_description,
       product_condition,
-      categories: Array.isArray(categories) ? categories : [categories],
+      categories: JSON.parse(categories),
       price,
       problems: problem ?? null,
       discounted_price:
@@ -92,14 +93,15 @@ export const POST = async (request) => {
         success: true,
         message: "Product added successfully!",
         data,
+        product,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error(error);
     return NextResponse.json(
       { error: "Something went wrong while adding the product." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 };

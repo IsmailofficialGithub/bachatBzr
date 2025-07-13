@@ -13,9 +13,9 @@ export default function DealProduct1() {
                             <div className="col-lg-6 col-md-12">
                                 <div className="tpdealproduct">
                                     <div className="tpdealproduct__thumb p-relative text-center">
-                                        <img src="/assets/img/floded/floded-01.png" alt="dealproduct-thumb" />
+                                        <img src="/assets/img/floded/floded-01.jpeg" alt="dealproduct-thumb" />
                                         <div className="tpdealproductd__offer">
-                                            <h5 className="tpdealproduct__offer-price"><span>From</span>PKR 299</h5>
+                                            <h5 className="tpdealproduct__offer-price"><span>From</span>PKR 399</h5>
                                         </div>
                                     </div>
                                 </div>
@@ -23,15 +23,13 @@ export default function DealProduct1() {
                             <div className="col-lg-6 col-md-12">
                                 <div className="tpdealcontact pt-30">
                                     <div className="tpdealcontact__price mb-5">
-                                        <span>PRK 299.00</span>
+                                        <span>PRK 399.00</span>{" "}
                                         <del>PKR 3000</del>
                                     </div>
                                     <div className="tpdealcontact__text mb-30">
-                                        <h4 className="tpdealcontact__title mb-10"><Link href="/shop-details">Pro2 Abstract
-                                            Folded Pots</Link></h4>
-                                        <p>Elegant pink origami design three-dimensional view and decoration co-exist. Great
-                                            for adding a decorative touch to any room’s decor. Wonderful accent piece for
-                                            coffee tables or side tables.</p>
+                                        <h4 className="tpdealcontact__title mb-10"><Link href="/shop">Luxury Sports 
+                                           Footwear Gift </Link></h4>
+                                        <p>These premium sports shoes combine performance with style, packaged in a nature-inspired gift box. Perfect for those who value comfort, durability, and a refined look — both on and off the track.</p>
                                     </div>
                                     <div className="tpdealcontact__progress mb-30">
                                         <div className="progress">
