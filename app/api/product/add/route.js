@@ -6,10 +6,10 @@ import {
 } from "@/lib/helper";
 import { CheckRouteRole } from "@/lib/auth-token";
 export const POST = async (request) => {
-    const {  success, error } = await CheckRouteRole(request,["admin"]);
-   if (error || !success) {
-      return NextResponse.json({ error }, { status: 401 })
-    }
+  const { success, error } = await CheckRouteRole(request, ["admin"]);
+  if (error || !success) {
+    return NextResponse.json({ error }, { status: 401 });
+  }
   try {
     const formData = await request.formData();
 
@@ -54,7 +54,7 @@ export const POST = async (request) => {
     if (uploadedUrls.length === 0) {
       return NextResponse.json(
         { error: "Image upload failed. Please try again." },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -64,7 +64,7 @@ export const POST = async (request) => {
       short_description,
       long_description,
       product_condition,
-      categories: JSON.parse(categories),
+      categories: Array.isArray(categories) ? categories : [categories], // Ensure categories is an array
       price,
       problems: problem ?? null,
       discounted_price:
@@ -84,7 +84,7 @@ export const POST = async (request) => {
       await deleteImagesFromCloudinary(uploadedUrls);
       return NextResponse.json(
         { success: false, message: error.message },
-        { status: 400 }
+        { status: 400 },
       );
     }
 

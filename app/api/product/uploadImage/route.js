@@ -1,10 +1,11 @@
-import { uploadImageToCloudinary } from "@/lib/helper";
+import { uploadImageToCloudinary2 } from "@/lib/helper";
 import { NextResponse } from "next/server";
 
 export const POST = async (req) => {
   try {
     const formData = await req.formData();
     const imageFile = formData.get("image");
+    
     if (!imageFile || imageFile.length < 1) {
       return NextResponse.json(
         {
@@ -14,13 +15,26 @@ export const POST = async (req) => {
         { status: 400 },
       );
     }
-    const uploadImage = await uploadImageToCloudinary();
+
+    // Upload as temporary with auto-delete after 2 hours
+    const uploadImage = await uploadImageToCloudinary2(imageFile, {
+      folder: "temp-uploads",
+      tags: ["temporary", `expires_${Date.now() + (2 * 60 * 60 * 1000)}`],
+      context: {
+        status: "temporary",
+        uploaded_at: Date.now().toString()
+      },
+      // Auto-delete after 2 hours if not confirmed
+      eager: [{ fetch_format: "auto", quality: "auto" }],
+    });
+
     if (uploadImage.success) {
       return NextResponse.json(
         {
           success: true,
-          message: "Image uploaded successFully",
+          message: "Image uploaded successfully (temporary)",
           imageUrl: uploadImage.secure_url,
+          publicId: uploadImage.public_id, // Include public_id for confirmation
         },
         { status: 200 },
       );
@@ -28,10 +42,10 @@ export const POST = async (req) => {
       return NextResponse.json(
         {
           success: false,
-          message: "Failed to Upload image . Please Retry",
-          error: "Internel Error",
+          message: "Failed to Upload image. Please Retry",
+          error: "Internal Error",
         },
-        { status: 300 },
+        { status: 500 },
       );
     }
   } catch (error) {
@@ -39,8 +53,8 @@ export const POST = async (req) => {
     return NextResponse.json(
       {
         success: false,
-        message: "Failed to upload data ",
-        error,
+        message: "Failed to upload data",
+        error: error.message,
       },
       { status: 500 },
     );
