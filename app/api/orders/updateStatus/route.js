@@ -75,14 +75,14 @@ export async function PATCH(req) {
             <p>Dear Valued Customer,</p>
             <p>Your order <strong>(#${orderId})</strong> status has been updated to <strong>"${status}"</strong>.</p>
             <p>Please log in to view your order and track its progress.</p>
-            <p>Thank you for choosing SmartSwap!</p>
+            <p>Thank you for choosing BachatBzr!</p>
             <p>
               🌐 <strong>Website:</strong> <a href="https://www.bachatbzr.com">www.bachatbzr.com</a><br>
-              📘 <strong>Facebook:</strong> <a href="https://www.facebook.com/bachatbzr">Facebook</a><br>
+              📘 <strong>Facebook:</strong> <a href="https://www.facebook.com/share/15jd1gX7CA/">Facebook</a><br>
               🐦 <strong>Tiktok:</strong> <a href="https://twitter.com/bachatbzr">Tiktok</a><br>
               📸 <strong>Instagram:</strong> <a href="https://www.instagram.com/bachatbzr">Instagram</a>
             </p>
-            <p><strong>Best regards,</strong><br>The SmartSwap Team</p>
+            <p><strong>Best regards,</strong><br>The BachatBzr Team</p>
           </div>
           <div class="footer">&copy; 2025 to 2030 BachatBzr. All rights reserved.</div>
         </div>

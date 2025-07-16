@@ -81,7 +81,9 @@ export const ProductList = () => {
           description: `"${name}" has been removed`,
         });
       } else {
-        throw new Error(response.data.message || "Deletion failed");
+        toast.error("Deletion failed", {
+        description: response.data.message || "Failed to delete Products"
+      });
       }
     } catch (error) {
       setProducts(originalProducts);

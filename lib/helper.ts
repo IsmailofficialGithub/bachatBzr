@@ -90,4 +90,58 @@ export const deleteImageFromCloudinary = async (url) => {
   }
 };
 
+interface UploadOptions {
+  folder?: string;
+  tags?: string[];
+  context?: Record<string, any>;
+  [key: string]: any; // Allow additional Cloudinary options
+}
 
+export const uploadImageToCloudinaryTemp = async (image, options: UploadOptions = {}) => {
+  try {
+    if (image instanceof File) {
+      const buffer = await fileToBuffer(image);
+      image = `data:${image.type};base64,${buffer.toString("base64")}`;
+    }
+
+    const uploadOptions = {
+      folder: options.folder || "uploads",
+      tags: options.tags || [],
+      context: options.context || {},
+      ...options
+    };
+
+    const result = await cloudinary.uploader.upload(image, uploadOptions);
+
+    if (!result.secure_url) {
+      throw new Error("Failed to get secure URL from Cloudinary");
+    }
+
+    return { 
+      success: true, 
+      secure_url: result.secure_url,
+      public_id: result.public_id
+    };
+  } catch (error) {
+    console.error("Error uploading image to Cloudinary:", error);
+    return { success: false, message: error.message || "Unknown error" };
+  }
+};
+
+export const confirmImageUpload = async (publicId) => {
+  try {
+    
+    // Remove temporary tag and add permanent tag
+    await cloudinary.uploader.remove_tag("temporary", publicId);
+    await cloudinary.uploader.add_tag("permanent", publicId);
+    
+    // Move to permanent folder
+    const newPublicId = publicId.replace('temp-uploads/', 'products/');
+    await cloudinary.uploader.rename(publicId, newPublicId, { overwrite: true });
+    
+    return { success: true, newPublicId };
+  } catch (error) {
+    console.error('Failed to confirm image:', error);
+    return { success: false, error: error.message };
+  }
+};

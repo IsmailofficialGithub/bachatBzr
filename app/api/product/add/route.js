@@ -1,15 +1,15 @@
 import { supabase } from "@/lib/supabaseSetup";
 import { NextResponse } from "next/server";
 import {
-  uploadImagesToCloudinary,
   deleteImagesFromCloudinary,
+  confirmImageUpload,
 } from "@/lib/helper";
 import { CheckRouteRole } from "@/lib/auth-token";
 export const POST = async (request) => {
-  const { success, error } = await CheckRouteRole(request, ["admin"]);
-  if (error || !success) {
-    return NextResponse.json({ error }, { status: 401 });
-  }
+    const {  success, error } = await CheckRouteRole(request,["admin"]);
+   if (error || !success) {
+      return NextResponse.json({ error }, { status: 401 })
+    }
   try {
     const formData = await request.formData();
 
@@ -24,7 +24,8 @@ export const POST = async (request) => {
     const problem = formData.get("problem");
     const additional_information = formData.get("additional_information");
     const tags = formData.get("tags");
-    const imageFiles = formData.getAll("images");
+    const imageData = JSON.parse(formData.get("imageData") || "[]");
+
 
     // Validate required fields
     if (
@@ -33,7 +34,7 @@ export const POST = async (request) => {
       !short_description ||
       !long_description ||
       !categories ||
-      !imageFiles.length ||
+      !imageData.length ||
       !tags
     ) {
       return NextResponse.json(
@@ -45,26 +46,23 @@ export const POST = async (request) => {
       );
     }
 
-    // Upload images to Cloudinary
-    const uploadResults = await uploadImagesToCloudinary(imageFiles);
-    const uploadedUrls = uploadResults
-      .filter((result) => result.success && result.secure_url)
-      .map((result) => result.secure_url);
-
-    if (uploadedUrls.length === 0) {
-      return NextResponse.json(
-        { error: "Image upload failed. Please try again." },
-        { status: 500 },
-      );
-    }
-
+   
+    const confirmedImages = [];
+for (const img of imageData) {
+  const confirmResult = await confirmImageUpload(img.publicId);
+  if (confirmResult.success) {
+    confirmedImages.push(img.url.replace('temp-uploads/', 'products/'));
+  } else {
+    confirmedImages.push(img.url); // Keep original if confirmation fails
+  }
+}
     // Prepare product object
     const product = {
       name,
       short_description,
       long_description,
       product_condition,
-      categories: Array.isArray(categories) ? categories : [categories], // Ensure categories is an array
+      categories: JSON.parse(categories),
       price,
       problems: problem ?? null,
       discounted_price:
@@ -73,7 +71,7 @@ export const POST = async (request) => {
       additional_information: additional_information
         ? JSON.parse(additional_information)
         : null,
-      images: uploadedUrls,
+      images:confirmedImages ,
       tags: tags ? JSON.parse(tags) : [],
     };
 
@@ -84,7 +82,7 @@ export const POST = async (request) => {
       await deleteImagesFromCloudinary(uploadedUrls);
       return NextResponse.json(
         { success: false, message: error.message },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -105,3 +103,5 @@ export const POST = async (request) => {
     );
   }
 };
+
+

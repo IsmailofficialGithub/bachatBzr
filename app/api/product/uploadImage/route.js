@@ -1,4 +1,4 @@
-import { uploadImageToCloudinary2 } from "@/lib/helper";
+import { uploadImageToCloudinaryTemp } from "@/lib/helper";
 import { NextResponse } from "next/server";
 
 export const POST = async (req) => {
@@ -17,7 +17,7 @@ export const POST = async (req) => {
     }
 
     // Upload as temporary with auto-delete after 2 hours
-    const uploadImage = await uploadImageToCloudinary2(imageFile, {
+    const uploadImage = await uploadImageToCloudinaryTemp(imageFile, {
       folder: "temp-uploads",
       tags: ["temporary", `expires_${Date.now() + (2 * 60 * 60 * 1000)}`],
       context: {

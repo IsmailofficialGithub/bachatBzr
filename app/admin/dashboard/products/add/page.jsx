@@ -21,6 +21,10 @@ import Image from "next/image";
 import { getAccessToken } from "@/util/getAccessToken";
 
 const Page = () => {
+  const [uploadedImages, setUploadedImages] = useState([]); // Store uploaded image data
+  const [imageUploadLoading, setImageUploadLoading] = useState({}); // Track loading for each image
+  const [uploadQueue, setUploadQueue] = useState([]); // Queue for sequential uploads
+  const [isUploading, setIsUploading] = useState(false); // Global upload state
   // State for categories
   const [categories, setCategories] = useState([]);
   const [categoriesLoading, setCategoriesLoading] = useState(false);
@@ -141,27 +145,114 @@ const Page = () => {
     }
   };
 
+  // Function to process upload queue sequentially
+  const processUploadQueue = async (files) => {
+    setIsUploading(true);
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const imageId = `image-${Date.now()}-${i}`;
+
+      // Set loading state for this image
+      setImageUploadLoading((prev) => ({ ...prev, [imageId]: true }));
+
+      try {
+        const formData = new FormData();
+        formData.append("image", file);
+
+        const response = await axios.post(
+          "/api/product/uploadImage",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          },
+        );
+
+        if (response.data.success) {
+          const newImage = {
+            id: imageId,
+            url: response.data.imageUrl,
+            publicId: response.data.publicId,
+            originalFile: file,
+            preview: URL.createObjectURL(file),
+          };
+
+          setUploadedImages((prev) => [...prev, newImage]);
+          toast.success(`Image ${i + 1} uploaded successfully`);
+        } else {
+          toast.error(`Failed to upload image: ${file.name}`);
+        }
+      } catch (error) {
+        toast.error(`Error uploading image: ${file.name}`);
+        console.error("Upload error:", error);
+      } finally {
+        // Remove loading state for this image
+        setImageUploadLoading((prev) => {
+          const newState = { ...prev };
+          delete newState[imageId];
+          return newState;
+        });
+      }
+    }
+
+    setIsUploading(false);
+  };
   // Handle form input changes
-  const handleChange = (e) => {
+  const handleChange = async (e) => {
     const { name, value, files, type } = e.target;
 
     if (type === "file" && files) {
-      // Clean up previous URLs before creating new ones
-      imagePreviews.forEach((url) => URL.revokeObjectURL(url));
-
       const fileList = Array.from(files);
-      setFormData((prev) => ({ ...prev, [name]: fileList }));
 
-      const previewUrls = fileList.map((file) => URL.createObjectURL(file));
-      setImagePreviews(previewUrls);
-      // setCroppedImages(new Array(fileList.length)); // Initialize with proper length
-      // setCroppingMode(true);
-      // setCurrentImageIndex(0);
+      // Add to existing form data instead of replacing
+      setFormData((prev) => ({
+        ...prev,
+        [name]: [...(prev[name] || []), ...fileList],
+      }));
+
+      // Process uploads sequentially
+      await processUploadQueue(fileList);
+
+      // Clear the input so user can select same files again if needed
+      e.target.value = "";
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
+  // Function to delete uploaded image
+  const deleteImage = async (imageId) => {
+    try {
+      const imageToDelete = uploadedImages.find((img) => img.id === imageId);
+      if (!imageToDelete) return;
+
+      // Optional: Call API to delete from Cloudinary
+      // await axios.delete(`/api/delete-image/${imageToDelete.publicId}`);
+
+      // Remove from uploaded images
+      setUploadedImages((prev) => prev.filter((img) => img.id !== imageId));
+
+      // Clean up preview URL
+      if (imageToDelete.preview) {
+        URL.revokeObjectURL(imageToDelete.preview);
+      }
+
+      // Update form data
+      setFormData((prev) => ({
+        ...prev,
+        imageFiles: prev.imageFiles.filter(
+          (file) => file !== imageToDelete.originalFile,
+        ),
+      }));
+
+      toast.success("Image deleted successfully");
+    } catch (error) {
+      toast.error("Failed to delete image");
+      console.error("Delete error:", error);
+    }
+  };
   // Commented out cropping functions
   /*
   const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
@@ -354,8 +445,16 @@ const Page = () => {
       errors.product_condition = "Condition must be a number between 1 and 10";
     }
 
-    if (formData.imageFiles.length < 2)
-      errors.imageFiles = "At least 2 images are required";
+    // Update image validation in handleSubmit
+    if (uploadedImages.length < 2) {
+      errors.imageFiles = "At least 2 images are required and must be uploaded";
+    }
+
+    // Add check for any ongoing uploads
+    if (isUploading) {
+      toast.warning("Please wait for all images to finish uploading");
+      return;
+    }
 
     setFormErrors(errors);
 
@@ -365,6 +464,8 @@ const Page = () => {
 
     try {
       setLoading(true);
+
+      // Prepare form data - remove the image file handling
       const formDataToSend = new FormData();
       formDataToSend.append("name", formData.name);
       formDataToSend.append("price", formData.price);
@@ -376,14 +477,14 @@ const Page = () => {
       formDataToSend.append("problem", formData.problems);
       formDataToSend.append("tags", JSON.stringify(tags));
 
-      formData.categories.forEach((category) => {
-        formDataToSend.append("categories", category);
-      });
+      formDataToSend.append("categories", JSON.stringify(formData.categories));
 
-      // Use original images (cropping logic commented out)
-      for (let i = 0; i < formData.imageFiles.length; i++) {
-        formDataToSend.append("images", formData.imageFiles[i]);
-      }
+      // Send uploaded image URLs and public IDs instead of files
+      const imageData = uploadedImages.map((img) => ({
+        url: img.url,
+        publicId: img.publicId,
+      }));
+      formDataToSend.append("imageData", JSON.stringify(imageData));
 
       if (Object.keys(specifications).length > 0) {
         formDataToSend.append(
@@ -391,6 +492,7 @@ const Page = () => {
           JSON.stringify(specifications),
         );
       }
+
       const accessToken = await getAccessToken();
       const response = await axios.post("/api/product/add", formDataToSend, {
         headers: {
@@ -400,7 +502,8 @@ const Page = () => {
       });
 
       if (response.data.success) {
-        toast.success("Success , Product added successfully");
+        toast.success("Product added Successfully");
+        // Reset form
         setFormData({
           name: "",
           price: "",
@@ -416,27 +519,30 @@ const Page = () => {
         setSpecifications({});
         setTags([]);
         setImagePreviews([]);
-        // setCroppedImages([]);
+        setUploadedImages([]);
+        setImageUploadLoading({});
+        setIsUploading(false);
       } else {
         toast.error(`Failed to add product: ${response.data.message}`);
       }
     } catch (error) {
-      toast.error(error.response.data.error || "Something went wrong");
+      toast.error(error.response?.data?.error || "Something went wrong");
     } finally {
       setLoading(false);
     }
   };
 
-  // Clean up image previews on unmount
+  // Update cleanup useEffect
   useEffect(() => {
     return () => {
-      imagePreviews.forEach((url) => {
-        if (url.startsWith("blob:")) {
-          URL.revokeObjectURL(url);
+      // Clean up uploaded image previews
+      uploadedImages.forEach((image) => {
+        if (image.preview && image.preview.startsWith("blob:")) {
+          URL.revokeObjectURL(image.preview);
         }
       });
     };
-  }, [imagePreviews]);
+  }, [uploadedImages]);
 
   // Commented out cropping mode UI
   /*
@@ -821,6 +927,39 @@ const Page = () => {
               </label>
             )}
           </div>
+          {/* Selected Categories Display - Removable Tags */}
+          {formData.categories.length > 0 && (
+            <div className="mt-2 p-2 bg-gray-600 rounded border">
+              <p className="text-sm font-medium text-white mb-2">
+                Selected Categories:
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {formData.categories.map((category) => (
+                  <span
+                    key={category}
+                    className="inline-flex items-center bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded"
+                  >
+                    {category}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          categories: prev.categories.filter(
+                            (cat) => cat !== category,
+                          ),
+                        }));
+                      }}
+                      className="ml-1 text-red-600 hover:text-red-800"
+                      disabled={loading}
+                    >
+                      <Trash2 width={15}/>
+                    </button>
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Short Description */}
           <div>
@@ -1054,15 +1193,41 @@ const Page = () => {
             <label className="block text-sm font-medium mb-1">
               Upload Images <span className="text-red-600">*</span>
             </label>
-            <Input
-              disabled={loading}
-              className="cursor-pointer"
-              type="file"
-              name="imageFiles"
-              multiple
-              onChange={handleChange}
-              accept="image/*"
-            />
+            <div className="space-y-2">
+              <Input
+                disabled={loading || isUploading}
+                className="cursor-pointer"
+                type="file"
+                name="imageFiles"
+                multiple
+                onChange={handleChange}
+                accept="image/*"
+              />
+
+              {/* Upload More Button */}
+              {uploadedImages.length > 0 && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() =>
+                    document.querySelector('input[name="imageFiles"]').click()
+                  }
+                  disabled={loading || isUploading}
+                  className="w-full"
+                >
+                  Upload More Images
+                </Button>
+              )}
+
+              {/* Upload Status */}
+              {isUploading && (
+                <div className="flex items-center gap-2 text-blue-600">
+                  <Loader className="animate-spin w-4 h-4" />
+                  <span className="text-sm">Uploading images...</span>
+                </div>
+              )}
+            </div>
+
             {formErrors.imageFiles && (
               <label className="block text-sm text-red-600 mt-1">
                 {formErrors.imageFiles}
@@ -1071,35 +1236,58 @@ const Page = () => {
           </div>
 
           {/* Image Previews */}
-          {imagePreviews.length > 0 && (
+          {/* Image Previews */}
+          {uploadedImages.length > 0 && (
             <div>
               <label className="block text-sm font-medium mb-1">
-                Selected Images (Click to enlarge)
+                Uploaded Images ({uploadedImages.length}) - Click to enlarge
               </label>
               <div className="grid gap-3 justify-center grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-                {imagePreviews.map((preview, index) => (
-                  <div key={index} className="relative">
-                    <Image
-                      src={preview}
-                      alt={`Preview ${index}`}
-                      width={200}
-                      height={200}
-                      className="w-full h-auto object-cover cursor-pointer transition-transform duration-300 hover:scale-105"
-                      onClick={() => setSelectedImage(preview)}
-                    />
-                    {/* Commented out cropped indicator
-                    {croppedImages[index] && (
-                      <span className="absolute top-1 right-1 bg-green-500 text-white text-xs px-1 rounded">
-                        Cropped
-                      </span>
-                    )}
-                    */}
-                  </div>
-                ))}
+                {uploadedImages.map((image, index) => {
+                  const isImageUploading = imageUploadLoading[image.id];
+
+                  return (
+                    <div key={image.id} className="relative group">
+                      <Image
+                        src={image.preview}
+                        alt={`Preview ${index}`}
+                        width={200}
+                        height={200}
+                        className="w-full h-auto object-cover cursor-pointer transition-transform duration-300 hover:scale-105"
+                        onClick={() => setSelectedImage(image.preview)}
+                      />
+
+                      {/* Loading overlay */}
+                      {isImageUploading && (
+                        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+                          <Loader className="animate-spin text-white w-8 h-8" />
+                        </div>
+                      )}
+
+                      {/* Success indicator */}
+                      {!isImageUploading && (
+                        <div className="absolute top-2 right-2 bg-green-500 text-white text-xs px-2 py-1 rounded">
+                          ✓ Uploaded
+                        </div>
+                      )}
+
+                      {/* Delete button */}
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 h-auto"
+                        onClick={() => deleteImage(image.id)}
+                        disabled={loading || isUploading}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
-
           {/* Enlarged Image Modal */}
           {selectedImage && (
             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
@@ -1120,14 +1308,62 @@ const Page = () => {
               </div>
             </div>
           )}
+          {/* Error Summary - Add this before the Submit button */}
+          {Object.values(formErrors).some((error) => error) && (
+            <div className="bg-red-50 border border-red-200 rounded-md p-4">
+              <h3 className="text-red-800 font-medium mb-2">
+                Please fix the following errors:
+              </h3>
+              <ul className="text-red-700 text-sm space-y-1">
+                {Object.entries(formErrors).map(([field, error]) => {
+                  if (!error) return null;
 
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? (
-              <Loader className="animate-spin text-blue-500 cursor-pointer" />
-            ) : (
-              "Submit"
-            )}
-          </Button>
+                  const fieldNames = {
+                    name: "Product Name",
+                    price: "Price",
+                    categories: "Categories",
+                    short_description: "Short Description",
+                    long_description: "Long Description",
+                    product_condition: "Product Condition",
+                    problems: "Problems",
+                    imageFiles: "Images",
+                    tags: "Tags",
+                    discounted_price: "Discounted Price",
+                  };
+
+                  return (
+                    <li key={field} className="flex items-start">
+                      <span className="text-red-500 mr-2">•</span>
+                      <span>
+                        <strong>{fieldNames[field] || field}:</strong> {error}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
+          {isUploading ? (
+            ""
+          ) : (
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={loading || isUploading}
+            >
+              {loading ? (
+                <Loader
+                  className={`animate-spin text-blue-500 ${
+                    loading || isUploading || formErrors.length > 0
+                      ? "cursor-not-allowed"
+                      : "cursor-pointer"
+                  }`}
+                />
+              ) : (
+                "Submit"
+              )}
+            </Button>
+          )}
         </form>
       </div>
     </DashboardWrapper>
