@@ -19,10 +19,10 @@ const safeJsonParse = (str, defaultValue = null) => {
 export async function PUT(request, { params }) {
   try {
     // 1. Authentication and Authorization
-    // const { success, error } = await CheckRouteRole(request, ["admin"]);
-    // if (error || !success) {
-    //   return NextResponse.json({ error }, { status: 401 });
-    // }
+    const { success, error } = await CheckRouteRole(request, ["admin"]);
+    if (error || !success) {
+      return NextResponse.json({ error }, { status: 401 });
+    }
 
     // 2. Validate product ID
     const { id } = params;

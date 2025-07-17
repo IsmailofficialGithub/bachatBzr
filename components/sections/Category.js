@@ -39,8 +39,8 @@ export default function Category() {
       count: 1,
     },
     {
-      title: "Kids Sneakers",
-      subTitle: "Trendy & Comfortable",
+      title: "Versatile Footwear",
+      subTitle: "Casual & Formal Shoes",
       link: "/category/kids Shoes",
       imgSrc: "/assets/img/svg/sneakers.svg",
       count: 1,

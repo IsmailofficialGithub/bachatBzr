@@ -115,6 +115,7 @@ const Page = () => {
         return;
       }
       const accessToken = await getAccessToken();
+      console.log(newCategory)
       const response = await axios.post(
         "/api/categories",
         {
@@ -124,7 +125,6 @@ const Page = () => {
         },
         {
           headers: {
-            "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${accessToken}`,
           },
         },
