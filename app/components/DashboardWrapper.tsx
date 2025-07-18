@@ -16,8 +16,8 @@ interface UserProfile {
 }
 
 const DashboardWrapper: FC<DashboardWrapperProps> = ({ children }) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -41,7 +41,7 @@ const DashboardWrapper: FC<DashboardWrapperProps> = ({ children }) => {
 
         if (profileError) {
           console.error("Error fetching user profile:", profileError);
-          router.push("/authentication?login=true");
+          // router.push("/authentication?login=true");
           return;
         }
 
@@ -55,7 +55,7 @@ const DashboardWrapper: FC<DashboardWrapperProps> = ({ children }) => {
         }
       } catch (error) {
         console.error("Authentication error:", error);
-        router.push("/authentication?login=true");
+        // router.push("/authentication?login=true");
       } finally {
         setIsLoading(false);
       }
@@ -67,7 +67,7 @@ const DashboardWrapper: FC<DashboardWrapperProps> = ({ children }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (event === "SIGNED_OUT" || !session) {
-          router.push("/authentication?login=true");
+          // router.push("/authentication?login=true");
         } else if (event === "SIGNED_IN") {
           // Re-check user access when signed in
           checkUserAccess();

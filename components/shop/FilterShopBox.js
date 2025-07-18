@@ -24,7 +24,7 @@ const FilterShopBox = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [totalPages, setTotalPages] = useState(1);
-  const [limit, setLimit] = useState(25);
+  const [limit, setLimit] = useState(10);
   const [soldProducts, setSoldProducts] = useState([]);
   const [priceFilter, setPriceFilter] = useState({ min: null, max: null });
   const page = useRef(pageParms);

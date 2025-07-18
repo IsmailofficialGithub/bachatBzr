@@ -173,7 +173,7 @@ const Page = () => {
           }
         }
         
-        // Store original data for comparison
+        // Store original data for comparison - EXACT format as backend expects
         setOriginalData({
           name: productData.name || "",
           price: productData.price || 0,
@@ -207,26 +207,75 @@ const Page = () => {
   const handleImageChange = (e) => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
-      setImageFile(files); // Store actual files instead of URLs
+      setImageFile(files);
     }
   };
 
-  // Function to detect changes
+  // Enhanced function to detect changes with precise comparison
   const getChangedFields = () => {
     const changes = {};
     
+    // Helper function for deep comparison
+    const isEqual = (a, b) => {
+      if (a === b) return true;
+      if (a == null || b == null) return a === b;
+      if (Array.isArray(a) && Array.isArray(b)) {
+        return a.length === b.length && a.every((val, i) => isEqual(val, b[i]));
+      }
+      if (typeof a === 'object' && typeof b === 'object') {
+        const keysA = Object.keys(a);
+        const keysB = Object.keys(b);
+        return keysA.length === keysB.length && 
+               keysA.every(key => keysB.includes(key) && isEqual(a[key], b[key]));
+      }
+      return false;
+    };
+    
     // Compare each field with original data
-    if (name !== originalData.name) changes.name = name;
-    if (parseFloat(price) !== originalData.price) changes.price = parseFloat(price);
-    if (shortDescription !== originalData.short_description) changes.short_description = shortDescription;
-    if (longDescription !== originalData.long_description) changes.long_description = longDescription;
-    if (parseInt(condition) !== originalData.product_condition) changes.product_condition = parseInt(condition);
-    if (JSON.stringify(selectedCategories) !== JSON.stringify(originalData.categories)) changes.categories = selectedCategories;
-    if (offerName !== originalData.offer_name) changes.offer_name = offerName;
-    if (parseFloat(discountedPrice || 0) !== (originalData.discounted_price || 0)) changes.discounted_price = discountedPrice ? parseFloat(discountedPrice) : null;
-    if (problems !== originalData.problems) changes.problems = problems;
-    if (JSON.stringify(tags) !== JSON.stringify(originalData.tags)) changes.tags = tags;
-    if (JSON.stringify(specifications) !== JSON.stringify(originalData.additional_information)) changes.additional_information = specifications;
+    if (name !== originalData.name) {
+      changes.name = name;
+    }
+    
+    if (parseFloat(price) !== originalData.price) {
+      changes.price = parseFloat(price);
+    }
+    
+    if (shortDescription !== originalData.short_description) {
+      changes.short_description = shortDescription;
+    }
+    
+    if (longDescription !== originalData.long_description) {
+      changes.long_description = longDescription;
+    }
+    
+    if (parseInt(condition) !== originalData.product_condition) {
+      changes.product_condition = parseInt(condition);
+    }
+    
+    if (!isEqual(selectedCategories, originalData.categories)) {
+      changes.categories = selectedCategories;
+    }
+    
+    if (offerName !== originalData.offer_name) {
+      changes.offer_name = offerName;
+    }
+    
+    const currentDiscountedPrice = discountedPrice ? parseFloat(discountedPrice) : null;
+    if (currentDiscountedPrice !== originalData.discounted_price) {
+      changes.discounted_price = currentDiscountedPrice;
+    }
+    
+    if (problems !== originalData.problems) {
+      changes.problems = problems;
+    }
+    
+    if (!isEqual(tags, originalData.tags)) {
+      changes.tags = tags;
+    }
+    
+    if (!isEqual(specifications, originalData.additional_information)) {
+      changes.additional_information = specifications;
+    }
     
     return changes;
   };
@@ -245,18 +294,20 @@ const Page = () => {
       // Get only changed fields
       const changedFields = getChangedFields();
       
-      // Check if there are any changes or new images/deleted images
-      const hasChanges = Object.keys(changedFields).length > 0 || imageFiles.length > 0 || deletedUrls.length > 0;
+      // Check if there are any changes or image operations
+      const hasTextChanges = Object.keys(changedFields).length > 0;
+      const hasImageChanges = imageFiles.length > 0 || deletedUrls.length > 0;
       
-      if (!hasChanges) {
+      if (!hasTextChanges && !hasImageChanges) {
         toast.info("No changes detected");
         setLoading(false);
         return;
       }
 
+      // Create FormData only with changed fields
       const formDataToSend = new FormData();
       
-      // Add only changed fields
+      // Add only changed text fields
       Object.entries(changedFields).forEach(([key, value]) => {
         if (key === 'categories' || key === 'tags' || key === 'additional_information') {
           formDataToSend.append(key, JSON.stringify(value));
@@ -265,7 +316,7 @@ const Page = () => {
         }
       });
 
-      // Handle image operations
+      // Handle image operations only if there are changes
       if (deletedUrls.length > 0) {
         formDataToSend.append("deleted_images", JSON.stringify(deletedUrls));
       }
@@ -275,6 +326,13 @@ const Page = () => {
           formDataToSend.append("new_images", file);
         });
       }
+
+      // Log what's being sent for debugging
+      console.log("Sending changed fields:", Object.keys(changedFields));
+      console.log("Image operations:", { 
+        newImages: imageFiles.length, 
+        deletedImages: deletedUrls.length 
+      });
 
       const token = await getAccessToken();
       const response = await axios.put(
@@ -290,7 +348,32 @@ const Page = () => {
 
       if (response.data.success) {
         toast.success("Product updated successfully");
-        router.push("/admin/dashboard/products");
+        
+        // Update original data with new values to reset change tracking
+        const updatedOriginalData = { ...originalData };
+        Object.entries(changedFields).forEach(([key, value]) => {
+          updatedOriginalData[key] = value;
+        });
+        
+        // Update images in original data if changed
+        if (hasImageChanges) {
+          const newImageArray = [...imageUrl];
+          if (imageFiles.length > 0 && response.data.product?.images) {
+            updatedOriginalData.images = response.data.product.images;
+            setImageUrl(response.data.product.images);
+          } else {
+            updatedOriginalData.images = newImageArray;
+          }
+        }
+        
+        setOriginalData(updatedOriginalData);
+        
+        // Clear temporary states
+        setImageFile([]);
+        setDeletedUrls([]);
+        
+        // Optional: redirect after successful update
+        // router.push("/admin/dashboard/products");
       } else {
         toast.error(`Failed to update product: ${response.data.message}`);
       }
