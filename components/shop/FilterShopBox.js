@@ -26,50 +26,132 @@ const FilterShopBox = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [limit, setLimit] = useState(10);
   const [soldProducts, setSoldProducts] = useState([]);
+  const [filters, setFilters] = useState({
+  min: null,
+  max: null,
+  sizes: []
+});
+
   const [priceFilter, setPriceFilter] = useState({ min: null, max: null });
+  const [sizeFilter, setSizeFilter] = useState([]);
   const page = useRef(pageParms);
-  const handlePriceFilterChange = async (newFilter) => {
-    setLoading(true);
-    const wasFilterActive =
-      priceFilter.min !== null || priceFilter.max !== null;
-    if (!wasFilterActive) {
-      page.current = 1; // Reset to first page only when applying filter for the first time
+const handleFilterChange = async (newFilters) => {
+  setLoading(true);
+  
+  // Check if any filter was previously active
+  const wasFilterActive = 
+    filters.min !== null || 
+    filters.max !== null || 
+    (filters.sizes && filters.sizes.length > 0);
+  
+  if (!wasFilterActive) {
+    page.current = 1; // Reset to first page only when applying filter for the first time
+  }
+  
+  // Validate that at least one filter is provided
+  const hasMinPrice = newFilters.min !== null && newFilters.min !== 0 && newFilters.min !== '';
+  const hasMaxPrice = newFilters.max !== null && newFilters.max !== 0 && newFilters.max !== '';
+  const hasSizes = newFilters.sizes && Array.isArray(newFilters.sizes) && newFilters.sizes.length > 0;
+  
+  if (!hasMinPrice && !hasMaxPrice && !hasSizes) {
+    setLoading(false);
+    return toast.error("Please provide at least one filter (price or size)");
+  }
+  
+  // Update filter state
+  setFilters(newFilters);
+  
+  try {
+    // Build query parameters
+    const params = new URLSearchParams();
+    params.append("page", page.current.toString());
+    params.append("limit", limit.toString());
+    
+    // Add price filters
+    if (hasMinPrice) {
+      params.append("min", Number(newFilters.min).toString());
     }
-    setPriceFilter(newFilter);
-    try {
-      let query = `/api/product/priceFilter?page=${page.current}&limit=${limit}&`;
-      const max = Number(newFilter.max);
-      const min = Number(newFilter.min);
-      // Only add min/max if they are not null and not zero
-      if ((min === null || min === 0) && (max === null || max === 0)) {
-        return toast.error("Please provide at least one price filter");
-      }
-      if (min !== null && min !== 0) query += `min=${min}&`;
-      if (max !== null && max !== 0) query += `max=${max}&`;
-
-      // Remove trailing '&' or '?' if present
-      query = query.replace(/[&?]$/, "");
-
-      const response = await axios.get(query);
-      if (response.data.success) {
-        setProducts(response.data.data);
-        setTotalPages(response.data.pagination.totalPages);
-        toast.success("Filter applied successfully");
-      }
-    } catch (error) {
-      console.error("Error applying filter:", error);
-      toast.error("Failed to apply filter" + error.message);
-    } finally {
-      setLoading(false);
+    if (hasMaxPrice) {
+      params.append("max", Number(newFilters.max).toString());
     }
-  };
-  const handleDeletePriceFilter = () => {
-    setPriceFilter({ min: null, max: null });
-    page.current = 1;
-    fetchProducts();
-    toast.success("Filter removed successfully");
-  };
+    
+    // Add size filters
+    if (hasSizes) {
+      params.append("sizes", JSON.stringify(newFilters.sizes));
+    }
+    
+    // Use your existing products API endpoint (updated one)
+    const query = `/api/product/priceFilter?${params.toString()}`;
+    
+    const response = await axios.get(query);
+    
+    if (response.data.success) {
+      setProducts(response.data.data);
+      setTotalPages(response.data.pagination.totalPages);
+      
+      // Create success message based on applied filters
+      const appliedFilters = [];
+      if (hasMinPrice || hasMaxPrice) {
+        const priceRange = hasMinPrice && hasMaxPrice 
+          ? `$${newFilters.min}-$${newFilters.max}`
+          : hasMinPrice 
+            ? `$${newFilters.min}+`
+            : `<$${newFilters.max}`;
+        appliedFilters.push(`Price: ${priceRange}`);
+      }
+      if (hasSizes) {
+        appliedFilters.push(`Sizes: ${newFilters.sizes.join(', ')}`);
+      }
+      
+      toast.success(`Filters applied: ${appliedFilters.join(' | ')}`);
+    }
+  } catch (error) {
+    console.error("Error applying filters:", error);
+    toast.error("Failed to apply filters: " + (error.response?.data?.message || error.message));
+  } finally {
+    setLoading(false);
+  }
+};
 
+// Updated clear filter function
+const handleDeletePriceFilter = () => {
+  setPriceFilter({ min: null, max: null });
+  setSizeFilter([]);
+  page.current = 1;
+  fetchProducts();
+  toast.success("All filters removed successfully");
+};
+
+// Combined filter change handler for the new component
+const handleCombinedFilterChange = async (filters) => {
+  // Update both price and size filters
+  setPriceFilter({
+    min: filters.min,
+    max: filters.max
+  });
+  setSizeFilter(filters.sizes || []);
+  
+  // Apply the filters
+  await handlePriceFilterChange({
+    min: filters.min,
+    max: filters.max
+  });
+};
+
+const handleSizeFilterChange = async (sizeFilter) => {
+  await handleFilterChange({
+    min: filters.min, // Keep existing price filters
+    max: filters.max,
+    sizes: sizeFilter.sizes
+  });
+};
+const handlePriceFilterChange = async (priceFilter) => {
+  await handleFilterChange({
+    min: priceFilter.min,
+    max: priceFilter.max,
+    sizes: filters.sizes // Keep existing size filters
+  });
+};
   const handlePageChange = (newPage) => {
     page.current = newPage;
     if (priceFilter.min !== null || priceFilter.max !== null) {
@@ -220,7 +302,7 @@ const FilterShopBox = () => {
                 {" "}
                 <PriceFilterPopover
                   onFilterChange={
-                    searchQuery ? fetchProducts : handlePriceFilterChange
+                    searchQuery ? fetchProducts : handleFilterChange
                   }
                   onClearFilter={handleDeletePriceFilter}
                   initialMin={priceFilter.min || ""}
@@ -229,7 +311,7 @@ const FilterShopBox = () => {
               </div>
 
               <div className="tp-shop-selector">
-                {limit !== 25 ? (
+                {limit !== 10 ? (
                   <button
                     onClick={clearAll}
                     className="btn btn-danger text-nowrap me-2 "

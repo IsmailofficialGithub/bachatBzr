@@ -130,10 +130,10 @@ export default function Slider1() {
                 <div className="tpslider-banner tp-slider-sm-banner mb-30">
                   <Link href="/shop">
                     <div className="tpslider-banner__img">
-                      <img src="/assets/img/slider/banner-slider-01.png" alt="" />
+                      <img src="/assets/img/slider/banner-slider-01.jpeg" alt="" />
                       <div className="tpslider-banner__content">
                         <span className="tpslider-banner__sub-title">Hand made</span>
-                        <h4 className="tpslider-banner__title">
+                        <h4 className="tpslider-banner__title"  style={{color:'#FFFAE6'}}>
                           New Modern Stylist <br /> Crafts
                         </h4>
                       </div>
@@ -148,7 +148,7 @@ export default function Slider1() {
                       <img src="/assets/img/slider/banner-slider-02.png" alt="banner-slider" />
                       <div className="tpslider-banner__content">
                         <span className="tpslider-banner__sub-title">Popular</span>
-                        <h4 className="tpslider-banner__title" style={{color:'orange'}}>
+                        <h4 className="tpslider-banner__title"  style={{color:'#FFFAE6'}}>
                           Energy with our <br /> newest collection
                         </h4>
                       </div>

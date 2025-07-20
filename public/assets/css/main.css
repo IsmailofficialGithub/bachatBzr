@@ -3017,6 +3017,10 @@ a.add-to-cart {
 }
 
 .tpslider-banner__title {
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+  background: rgb(0 0 0 / 13%);
+  color :#FFFAE6;
+  border-radius: 3px;
   font-size: 20px;
   font-weight: 600;
   color: var(--tp-text-body);

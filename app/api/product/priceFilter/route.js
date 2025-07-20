@@ -17,6 +17,27 @@ function parseNumericParam(value, paramName) {
   return parsed;
 }
 
+// Helper function to validate size parameters
+function parseSizeParam(value) {
+  if (!value) return null;
+  
+  // Define valid sizes (you can customize this based on your needs)
+  const validSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15'];
+  const normalizedValue = value.toString().toUpperCase();
+  
+  if (validSizes.includes(normalizedValue)) {
+    return normalizedValue;
+  }
+  
+  // Check if it's a numeric size
+  const numericSize = Number(value);
+  if (!isNaN(numericSize) && numericSize > 0) {
+    return numericSize.toString();
+  }
+  
+  throw new Error(`Invalid size parameter: ${value}. Valid sizes are: ${validSizes.join(', ')}`);
+}
+
 // Helper function to build price filter conditions
 function buildPriceFilter(query, min, max) {
   if (min !== null && max !== null) {
@@ -37,13 +58,51 @@ function buildPriceFilter(query, min, max) {
   return query;
 }
 
+// Helper function to build size filter conditions
+function buildSizeFilter(query, sizes) {
+  if (!sizes || sizes.length === 0) return query;
+  
+  // If only one size, use JSON operator to filter nested field
+  if (sizes.length === 1) {
+    return query.eq("additional_information->>Size", sizes[0]);
+  }
+  
+  // If multiple sizes, use in with JSON operator
+  return query.in("additional_information->>Size", sizes);
+}
+
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
 
-    // Parse and validate parameters
+    // Parse and validate price parameters
     const min = parseNumericParam(searchParams.get("min"), "min");
     const max = parseNumericParam(searchParams.get("max"), "max");
+
+    // Parse and validate size parameters
+    const sizeParam = searchParams.get("sizes");
+    const allSizeParams = searchParams.getAll("sizes"); // Get all 'sizes' parameters
+    let sizes = [];
+    
+    if (allSizeParams.length > 1) {
+      // Handle multiple query parameters: ?sizes=7&sizes=10
+      sizes = allSizeParams.map(size => parseSizeParam(size)).filter(Boolean);
+    } else if (sizeParam) {
+      try {
+        // First, try to parse as JSON array (e.g., ["7","10"])
+        let sizeArray;
+        if (sizeParam.startsWith('[') && sizeParam.endsWith(']')) {
+          sizeArray = JSON.parse(sizeParam);
+        } else {
+          // Handle comma-separated values (e.g., "7,10")
+          sizeArray = sizeParam.split(',').map(s => s.trim());
+        }
+        
+        sizes = sizeArray.map(size => parseSizeParam(size)).filter(Boolean);
+      } catch (parseError) {
+        throw new Error(`Invalid sizes parameter format: ${sizeParam}`);
+      }
+    }
 
     // Additional query parameters for pagination and sorting
     const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
@@ -59,13 +118,14 @@ export async function GET(request) {
       "_id",
       "price",
       "name",
+      "additional_information->>Size", // JSON field for size
       "created_at",
       "updated_at",
     ];
     if (!allowedSortFields.includes(sortBy)) {
       return NextResponse.json(
         {
-          success:false,
+          success: false,
           error: "Invalid sortBy parameter",
           allowedFields: allowedSortFields,
         },
@@ -84,6 +144,9 @@ export async function GET(request) {
     // Apply price filters
     query = buildPriceFilter(query, min, max);
 
+    // Apply size filters
+    query = buildSizeFilter(query, sizes);
+
     // Execute query
     const { data: products, error, count } = await query;
 
@@ -91,7 +154,7 @@ export async function GET(request) {
       console.error("Database query error:", error);
       return NextResponse.json(
         {
-          success:false,
+          success: false,
           error: "Database query failed",
           message:
             process.env.NODE_ENV === "development"
@@ -110,8 +173,8 @@ export async function GET(request) {
     // Return optimized response with metadata
     return NextResponse.json(
       {
-        success:true,
-        message:"SuccessFully getting data",
+        success: true,
+        message: "Successfully getting data",
         data: products || [],
         pagination: {
           currentPage: page,
@@ -126,6 +189,7 @@ export async function GET(request) {
             min: min,
             max: max,
           },
+          sizes: sizes.length > 0 ? sizes : null,
         },
       },
       {
@@ -146,7 +210,7 @@ export async function GET(request) {
     ) {
       return NextResponse.json(
         {
-          success:false,
+          success: false,
           error: "Validation Error",
           message: err.message,
         },
@@ -157,7 +221,7 @@ export async function GET(request) {
     // Generic server error
     return NextResponse.json(
       {
-        success:false,
+        success: false,
         error: "Internal Server Error",
         message:
           process.env.NODE_ENV === "development"

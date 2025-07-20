@@ -5,7 +5,7 @@ export default function Category() {
   const categories = [
     {
       title: "Shoes",
-      subTitle: "Men Sport",
+      subTitle: "Men Sport & Sneakers",
       link: "/category/shoes",
       imgSrc: "/assets/img/svg/shoes.svg",
       count: 2,
@@ -24,12 +24,19 @@ export default function Category() {
       imgSrc: "/assets/img/svg/hoodie.svg",
       count: 3,
     },
+    // {
+    //   title: "Tracksuits",
+    //   subTitle: "Athletic Fit",
+    //   link: "/category/tracksuit",
+    //   imgSrc: "/assets/img/svg/tracksuit.svg",
+    //   count: 10,
+    // },
     {
-      title: "Tracksuits",
-      subTitle: "Athletic Fit",
-      link: "/category/tracksuit",
-      imgSrc: "/assets/img/svg/tracksuit.svg",
-      count: 10,
+      title: "Sneakers",
+      subTitle: "Trendy & Comfortable",
+      link: "/category/sneakers",
+      imgSrc: "/assets/img/svg/sneakers.svg",
+      count: 1,
     },
     {
       title: "Sneakers",
@@ -40,7 +47,7 @@ export default function Category() {
     },
     {
       title: "Versatile Footwear",
-      subTitle: "Casual & Formal Shoes",
+      subTitle: "Formal & Luxury",
       link: "/category/kids Shoes",
       imgSrc: "/assets/img/svg/sneakers.svg",
       count: 1,
