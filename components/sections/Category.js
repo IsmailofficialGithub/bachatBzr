@@ -32,10 +32,10 @@ export default function Category() {
     //   count: 10,
     // },
     {
-      title: "Sneakers",
-      subTitle: "Trendy & Comfortable",
-      link: "/category/sneakers",
-      imgSrc: "/assets/img/svg/sneakers.svg",
+      title: "Shorts",
+      subTitle: "Urban Comfort",
+      link: "/category/shorts",
+      imgSrc: "/assets/img/svg/shorts.svg",
       count: 1,
     },
     {
@@ -46,10 +46,10 @@ export default function Category() {
       count: 1,
     },
     {
-      title: "Versatile Footwear",
-      subTitle: "Formal & Luxury",
-      link: "/category/kids Shoes",
-      imgSrc: "/assets/img/svg/sneakers.svg",
+      title: "Footwear",
+      subTitle: "Formal & Luxury ",
+      link: "/category/formal-shoes",
+      imgSrc: "/assets/img/svg/formalShoes.svg",
       count: 1,
     },
   ];

@@ -271,19 +271,12 @@ const handlePriceFilterChange = async (priceFilter) => {
     setActiveIndex(index);
   };
 
-  // per page handler
-  const perPageHandler = (e) => {
-    setLimit(e.target.value);
-  };
+
 
   useEffect(() => {
     fetchProducts();
   }, [limit]);
-  // clear all filters
-  const clearAll = () => {
-    setLimit(25);
-    toast.success("Filter removed successfully");
-  };
+
 
   return (
     <>
@@ -308,30 +301,6 @@ const handlePriceFilterChange = async (priceFilter) => {
                   initialMin={priceFilter.min || ""}
                   initialMax={priceFilter.max || ""}
                 />
-              </div>
-
-              <div className="tp-shop-selector">
-                {limit !== 10 ? (
-                  <button
-                    onClick={clearAll}
-                    className="btn btn-danger text-nowrap me-2 "
-                    style={{ minHeight: "20px" }}
-                  >
-                    Clear All
-                  </button>
-                ) : undefined}
-
-                <select
-                  onChange={perPageHandler}
-                  className="chosen-single form-select ms-3 "
-                  value={limit}
-                >
-                  wellcome to the filter
-                  <option value=""> ( Default )</option>
-                  <option value="15">15 per page</option>
-                  <option value="25">25 per page</option>
-                  <option value="35">35 per page</option>
-                </select>
               </div>
               <div className="tpproductnav tpnavbar product-filter-nav">
                 <nav>

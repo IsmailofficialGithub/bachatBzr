@@ -373,7 +373,7 @@ const Page = () => {
         setDeletedUrls([]);
         
         // Optional: redirect after successful update
-        // router.push("/admin/dashboard/products");
+        router.push("/admin/dashboard/products");
       } else {
         toast.error(`Failed to update product: ${response.data.message}`);
       }

@@ -3,7 +3,7 @@ import "@/public/assets/css/tailwind-cdn.css"
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ButtonProps, buttonVariants } from "@/components/ui/button"
-
+import theme from "@/data"
 const Pagination = ({ className, ...props }: React.ComponentProps<"nav">) => (
   <nav
     role="navigation"
@@ -34,7 +34,7 @@ const PaginationItem = React.forwardRef<
   React.ComponentProps<"li">
 >(({ className, ...props }, ref) => (
   
-  <li ref={ref} className={cn("", className)} {...props} style={{background:"#f9a253",color:"black",borderRadius:"3px"} }  />
+  <li ref={ref} className={cn("", className)} {...props} style={{background:"#8fa4db",color:"black",borderRadius:"3px"} }  />
 ))
 PaginationItem.displayName = "PaginationItem"
 

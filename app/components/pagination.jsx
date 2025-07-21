@@ -30,11 +30,14 @@ const PaginationComponent = ({
     }
   };
 
-  // Function to generate pagination items
+  // Function to generate pagination items with responsive behavior
   const renderPaginationItems = () => {
     if (!showPageNumbers) return null;
     
     const items = [];
+    
+    // Responsive maxVisiblePages - fewer on mobile
+    const responsiveMaxVisible = window.innerWidth < 640 ? 3 : maxVisiblePages;
     
     // Always show first page
     items.push(
@@ -42,6 +45,7 @@ const PaginationComponent = ({
         <PaginationLink 
           isActive={currentPage === 1} 
           onClick={() => handlePageChange(1)}
+          className="min-w-0 px-2 sm:px-3"
         >
           1
         </PaginationLink>
@@ -49,12 +53,12 @@ const PaginationComponent = ({
     );
     
     // Calculate range of pages to show
-    let startPage = Math.max(2, currentPage - Math.floor(maxVisiblePages / 2));
-    let endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 3);
+    let startPage = Math.max(2, currentPage - Math.floor(responsiveMaxVisible / 2));
+    let endPage = Math.min(totalPages - 1, startPage + responsiveMaxVisible - 3);
     
     // Adjust start if end is too close to totalPages
     if (endPage <= startPage) {
-      startPage = Math.max(2, totalPages - maxVisiblePages + 2);
+      startPage = Math.max(2, totalPages - responsiveMaxVisible + 2);
       endPage = totalPages - 1;
     }
     
@@ -62,7 +66,7 @@ const PaginationComponent = ({
     if (startPage > 2) {
       items.push(
         <PaginationItem key="ellipsis-1">
-          <PaginationEllipsis />
+          <PaginationEllipsis className="px-1 sm:px-2" />
         </PaginationItem>
       );
     }
@@ -74,6 +78,7 @@ const PaginationComponent = ({
           <PaginationLink 
             isActive={currentPage === i}
             onClick={() => handlePageChange(i)}
+            className="min-w-0 px-2 sm:px-3"
           >
             {i}
           </PaginationLink>
@@ -85,8 +90,7 @@ const PaginationComponent = ({
     if (endPage < totalPages - 1) {
       items.push(
         <PaginationItem key="ellipsis-2">
-          <PaginationEllipsis />
-          
+          <PaginationEllipsis className="px-1 sm:px-2" />
         </PaginationItem>
       );
     }
@@ -98,6 +102,7 @@ const PaginationComponent = ({
           <PaginationLink 
             isActive={currentPage === totalPages}
             onClick={() => handlePageChange(totalPages)}
+            className="min-w-0 px-2 sm:px-3"
           >
             {totalPages}
           </PaginationLink>
@@ -114,22 +119,24 @@ const PaginationComponent = ({
   return (
     <div className={className} >
       <Pagination>
-        <PaginationContent className="flex items-center justify-center gap-2 cursor-pointer">
+        <PaginationContent className="flex items-center justify-center gap-1 sm:gap-2 cursor-pointer flex-wrap">
           <PaginationItem>
             <PaginationPrevious 
               onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
-              className={currentPage <= 1 ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
+              className={`${currentPage <= 1 ? "opacity-50 cursor-not-allowed" : "cursor-pointer"} px-2 sm:px-3 text-xs sm:text-sm`}
             />
           </PaginationItem>
           
-          {renderPaginationItems()}
+          <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto max-w-full">
+            {renderPaginationItems()}
+          </div>
           
           <PaginationItem>
             <PaginationNext 
               onClick={() => { currentPage < totalPages && handlePageChange(currentPage + 1);
 
                }}
-              className={currentPage >= totalPages ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
+              className={`${currentPage >= totalPages ? "opacity-50 cursor-not-allowed" : "cursor-pointer"} px-2 sm:px-3 text-xs sm:text-sm`}
             />
           </PaginationItem>
         </PaginationContent>

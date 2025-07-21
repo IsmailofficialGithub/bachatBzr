@@ -13,7 +13,7 @@ import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import SocialShare from "@/components/socialShare/socialShare";
 import { Loader } from "lucide-react";
-import SingleProductSkeleton from '@/components/skeleton/singleProductSkeleton'
+import SingleProductSkeleton from "@/components/skeleton/singleProductSkeleton";
 
 const swiperOptions = {
   modules: [Autoplay, Pagination, Navigation],
@@ -64,12 +64,10 @@ const ShopSingleDynamicV1 = () => {
   const fetchingProduct = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(
-        `/api/product/getSingle/${id}`,
-      );
+      const response = await axios.get(`/api/product/getSingle/${id}`);
       if (response.data.success) {
         setProduct(response.data.product);
-        console.log(response.data)
+        console.log(response.data);
         setRelatedTags(response.data.product.tags);
       } else {
         toast.error("SomeThing went wrong while fetching Product");
@@ -82,10 +80,9 @@ const ShopSingleDynamicV1 = () => {
   };
   const fetchingRelatedProduct = async (tags) => {
     try {
-      const response = await axios.post(
-        `/api/product/relatedProduct`,
-        { tags },
-      );
+      const response = await axios.post(`/api/product/relatedProduct`, {
+        tags,
+      });
       if (response.data.success) {
         setRelatedProduct(response.data.products);
       } else {
@@ -137,102 +134,97 @@ const ShopSingleDynamicV1 = () => {
         <section className="product-area pt-6 pb-6 ">
           <div className="container">
             <div className="row">
-            
-               <div className="col-lg-5 col-md-12" >
+              <div className="col-lg-5 col-md-12">
                 {/* all Images logic */}
-              <div className="tpproduct-details__list-img">
-                  {loading
-                    ? <SingleProductSkeleton type={"image"}/>
-                    : product?.images?.map((image, index) => (
-                        <div
-                          className="tpproduct-details__list-img-item"
-                          key={index}
-                        >
-                          <img
-                            src={image}
-                            alt="Product image is Failed to Load"
-                          />
-                        </div>
-                      ))}
+                <div className="tpproduct-details__list-img">
+                  {loading ? (
+                    <SingleProductSkeleton type={"image"} />
+                  ) : (
+                    product?.images?.map((image, index) => (
+                      <div
+                        className="tpproduct-details__list-img-item"
+                        key={index}
+                      >
+                        <img
+                          src={image}
+                          alt="Product image is Failed to Load"
+                        />
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
               <div className="col-lg-5 col-md-7">
-                {
-                  loading?
-                  <SingleProductSkeleton type={"content"}/>
-                  :
-
+                {loading ? (
+                  <SingleProductSkeleton type={"content"} />
+                ) : (
                   <div className="tpproduct-details__content tpproduct-details__sticky">
-                  <div className="tpproduct-details__tag-area d-flex align-items-center mb-5">
-                    <span className="tpproduct-details__tag">
-                      {
-                        product?.name
-                      }
-                    </span>
-                    <div className="tpproduct-details__rating">
-                      <Link href="#">
-                        <i className="fas fa-star" />
-                      </Link>
-                      <Link href="#">
-                        <i className="fas fa-star" />
-                      </Link>
-                      <Link href="#">
-                        <i className="fas fa-star" />
-                      </Link>
-                      <Link href="#">
-                        <i className="fas fa-star" />
-                      </Link>
+                    <div className="tpproduct-details__tag-area d-flex align-items-center mb-5">
+                      <span className="tpproduct-details__tag">
+                        {product?.name}
+                      </span>
+                      <div className="tpproduct-details__rating">
+                        <Link href="#">
+                          <i className="fas fa-star" />
+                        </Link>
+                        <Link href="#">
+                          <i className="fas fa-star" />
+                        </Link>
+                        <Link href="#">
+                          <i className="fas fa-star" />
+                        </Link>
+                        <Link href="#">
+                          <i className="fas fa-star" />
+                        </Link>
+                      </div>
                     </div>
-                  </div>
-                  <div className="tpproduct-details__title-area d-flex align-items-center flex-wrap mb-5">
-                    <h3 className="tpproduct-details__title">
-                      {product?.name}
-                    </h3>
-                    <span className="tpproduct-details__stock">{product?.sold?"SOLD":"In Stock"}</span>
-                  </div>
-                  <div className="tpproduct-details__price mb-30">
-                    {product?.discounted_price ? (
-                      <del>PKR {product.price}</del>
-                    ) : (
+                    <div className="tpproduct-details__title-area d-flex align-items-center flex-wrap mb-5">
+                      <h3 className="tpproduct-details__title">
+                        {product?.name}
+                      </h3>
+                      <span className="tpproduct-details__stock">
+                        {product?.sold ? "SOLD" : "In Stock"}
+                      </span>
+                    </div>
+                    <div className="tpproduct-details__price mb-30">
+                      {product?.discounted_price ? (
+                        <del>PKR {product.price}</del>
+                      ) : (
+                        ""
+                      )}
+                      <span>
+                        PKR{" "}
+                        {applyDiscount(product.price, product.discounted_price)}
+                      </span>
+                    </div>
+                    <div className="tpproduct-details__pera">
+                      <p>{product.short_description} </p>
+                    </div>
+                    {!product ? (
                       ""
+                    ) : (
+                      <div className="tpproduct-details__count d-flex align-items-center flex-wrap mb-25">
+                        <div className="tpproduct-details__cart ml-20">
+                          <button onClick={addToCart}>
+                            <i className="fal fa-shopping-cart" /> Add To Cart
+                          </button>
+                        </div>
+                        <div
+                          className="tpproduct-details__wishlist ml-3 "
+                          style={{ background: "#ffa24d" }}
+                        >
+                          <button>
+                            <i
+                              className="fal fa-heart"
+                              onClick={addToWishlist}
+                            />
+                          </button>
+                        </div>
+                      </div>
                     )}
-                    <span>
-                      PKR{" "}
-                      {
-                        applyDiscount(product.price, product.discounted_price)
-                      }
-                    </span>
-                  </div>
-                  <div className="tpproduct-details__pera">
-                    <p>
-                      {product.short_description
-                      }{" "}
-                    </p>
-                  </div>
-                  {!product ? (
-                    ""
-                  ) : (
-                    <div className="tpproduct-details__count d-flex align-items-center flex-wrap mb-25">
-                      <div className="tpproduct-details__cart ml-20">
-                        <button onClick={addToCart}>
-                          <i className="fal fa-shopping-cart" /> Add To Cart
-                        </button>
-                      </div>
-                      <div className="tpproduct-details__wishlist ml-3 " style={{background:"#ffa24d"}}>
-                        <button>
-                          <i className="fal fa-heart" onClick={addToWishlist} />
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                  {/* <div className="tpproduct-details__information tpproduct-details__code">
-                    <p>SKU:</p>
-                    <span>BO1D0MX8SJ</span>
-                  </div> */}
-                  <div className="tpproduct-details__information tpproduct-details__categories">
-                    <p>Categories:</p>
-                    {
-                      product?.categories?.map((category, index) => (
+                    <div className="tpproduct-details__information tpproduct-details__categories">
+                      <p>Categories:</p>
+                      {product?.categories?.map((category, index) => (
                         <span key={index}>
                           <Link href={`/categories/${category}`}>
                             {category}
@@ -240,33 +232,28 @@ const ShopSingleDynamicV1 = () => {
                           {index !== product.categories.length - 1 && ","}{" "}
                           {/* Adds comma except for the last item */}
                         </span>
-                      ))
-                    }
+                      ))}
+                    </div>
+                    <div className="tpproduct-details__information tpproduct-details__categories">
+                      <p>Condition:</p>
+                      {<span>{product.product_condition} / 10</span>}
+                    </div>
+                    <div className="tpproduct-details__information tpproduct-details__tags">
+                      <p>Tags:</p>
+                      {product.tags?.length > 0
+                        ? product.tags.map((tag, index) => (
+                            <span key={index}>
+                              <Link href="">{tag}</Link>
+                              {index !== product.tags.length - 1 && ","}{" "}
+                            </span>
+                          ))
+                        : "No tags avaliable"}
+                    </div>
+                    <SocialShare title={`Check out ${product.name}`} />
                   </div>
-                  <div className="tpproduct-details__information tpproduct-details__categories">
-                    <p>Condition:</p>
-                    { <span>{product.product_condition} / 10</span>
-                    }
-                  </div>
-                  <div className="tpproduct-details__information tpproduct-details__tags">
-                    <p>Tags:</p>
-                    { product.tags?.length > 0 ? (
-                      product.tags.map((tag, index) => (
-                        <span key={index}>
-                          <Link href="">{tag}</Link>
-                          {index !== product.tags.length - 1 && ","}{" "}
-                        </span>
-                      ))
-                    ) : (
-                      "No tags avaliable"
-                    )}
-                  </div>
-                  <SocialShare title={`Check out ${product.name}`} />
-                </div>
-                }
+                )}
               </div>
-            
-             
+
               <div className="col-lg-2 col-md-5">
                 <div className="tpproduct-details__condation">
                   <ul>
@@ -330,7 +317,7 @@ const ShopSingleDynamicV1 = () => {
           <div className="container">
             <div className="row">
               <div className="col-lg-12">
-                <div className="tpproduct-details__navtab mb-60">
+                <div className="tpproduct-details__navtab ">
                   <div className="tpproduct-details__nav mb-30">
                     <ul
                       className="nav nav-tabs pro-details-nav-btn"
@@ -423,16 +410,16 @@ const ShopSingleDynamicV1 = () => {
             </div>
           </div>
         </div>
-        <div className="related-product-area pt-80 pb-50 related-product-border">
+        <div className="related-product-area  pb-50 related-product-border">
           <div className="container">
             <div className="row align-items-center">
-              <div className="col-sm-6">
-                <div className="tpsection mb-40">
+              <div className="col-sm-6 mt-10">
+                <div className="tpsection mb-10">
                   <h4 className="tpsection__title">Related Products</h4>
                 </div>
               </div>
               <div className="col-sm-6">
-                <div className="tprelated__arrow d-flex align-items-center justify-content-end mb-40">
+                <div className="tprelated__arrow d-flex align-items-center justify-content-end sm:mb-7 mb-0 ">
                   <div className="tprelated__prv">
                     <i className="far fa-long-arrow-left" />
                   </div>
@@ -453,26 +440,35 @@ const ShopSingleDynamicV1 = () => {
                     <SwiperSlide key={relatedproduct._id}>
                       <div className="tpproduct pb-15 mb-30">
                         <div className="tpproduct__thumb p-relative sm:bg-slate-600">
-                          <Link
-                            href={`/shop/${relatedproduct._id}`}
-                          >
-                            <div >
+                          <Link href={`/shop/${relatedproduct._id}`}>
+                            <div>
                               <img
-                              loading="lazy"
-                                style={{objectFit:"cover",width:"100%",height:"250px" }}
+                                loading="lazy"
+                                style={{
+                                  objectFit: "cover",
+                                  width: "100%",
+                                  height: "250px",
+                                }}
                                 src={relatedproduct.images[0]}
                                 alt="product-thumb"
                               />
                               <img
-                              loading="lazy"
-                                style={{objectFit:"cover",width:"100%",height:"250px" }}
+                                loading="lazy"
+                                style={{
+                                  objectFit: "cover",
+                                  width: "100%",
+                                  height: "250px",
+                                }}
                                 className="product-thumb-secondary"
                                 src={relatedproduct.images[1]}
                                 alt=""
                               />
                             </div>
                           </Link>
-                          <div className="tpproduct__thumb-action" style={{marginTop:"20px"}}>
+                          <div
+                            className="tpproduct__thumb-action"
+                            style={{ marginTop: "20px" }}
+                          >
                             <Link className="quckview" href="#">
                               <i className="fal fa-eye" />
                             </Link>
@@ -499,8 +495,7 @@ const ShopSingleDynamicV1 = () => {
                                 {relatedproduct.discounted_price ? (
                                   <>
                                     <span>
-                                      PKR 
-                                      {' '}
+                                      PKR{" "}
                                       {applyDiscount(
                                         relatedproduct.price,
                                         relatedproduct.discounted_price,

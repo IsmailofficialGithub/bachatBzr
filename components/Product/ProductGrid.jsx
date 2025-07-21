@@ -1,9 +1,35 @@
 import React, { useEffect, useState } from "react";
-import { ShoppingCart, Eye, Heart } from "lucide-react";
+import { ShoppingCart, Eye, Heart, ImageOff, Package } from "lucide-react";
 import { applyDiscount } from "@/lib/discountHandler";
 import Link from "next/link";
 
-// Mock discount handler function since we don't have access to the external lib
+// Custom responsive fallback component
+const ImageFallback = ({ productName, className = "" }) => {
+  return (
+    <div className={`w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex flex-col items-center justify-center ${className}`}>
+      {/* Icon container - responsive sizing */}
+      <div className="flex flex-col items-center space-y-1 sm:space-y-2 text-gray-400">
+        <Package className="w-8 h-8 sm:w-12 sm:h-12 md:w-16 md:h-16" strokeWidth={1.5} />
+        
+        {/* Text - responsive sizing */}
+        <div className="text-center px-2">
+          <p className="text-xs sm:text-sm font-medium text-gray-500 mb-0.5 sm:mb-1">
+            No Image
+          </p>
+          <p className="text-xs text-gray-400 leading-tight line-clamp-2">
+            {productName?.substring(0, 30) + (productName?.length > 30 ? '...' : '')}
+          </p>
+        </div>
+      </div>
+      
+      {/* Decorative elements */}
+      <div className="absolute inset-0 bg-gradient-to-t from-gray-50/20 to-transparent pointer-events-none" />
+      <div className="absolute top-2 right-2 opacity-10">
+        <ImageOff className="w-4 h-4 sm:w-6 sm:h-6" />
+      </div>
+    </div>
+  );
+};
 
 const ProductCard = ({
   images,
@@ -22,18 +48,12 @@ const ProductCard = ({
   const [randomRating] = useState(() => Math.random() * (5 - 2.5) + 2.5);
   const isSold = soldProducts.includes(_id);
 
-  // const isSold = soldProducts.includes(item._id);
-
   const [randomReviewCount] = useState(
     () => Math.floor(Math.random() * (800 - 20 + 1)) + 20,
   );
 
-  // Default placeholder image
-  const defaultPlaceholder =
-    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' viewBox='0 0 300 300'%3E%3Crect width='300' height='300' fill='%23f3f4f6'/%3E%3Cpath d='M150 100c-13.807 0-25 11.193-25 25s11.193 25 25 25 25-11.193 25-25-11.193-25-25-25zm0 40c-8.271 0-15-6.729-15-15s6.729-15 15-15 15 6.729 15 15-6.729 15-15 15z' fill='%236b7280'/%3E%3Cpath d='M200 75H100c-13.807 0-25 11.193-25 25v100c0 13.807 11.193 25 25 25h100c13.807 0 25-11.193 25-25V100c0-13.807-11.193-25-25-25zM85 200V100c0-8.271 6.729-15 15-15h100c8.271 0 15 6.729 15 15v68.787l-21.213-21.213c-5.858-5.858-15.355-5.858-21.213 0L150 170.148l-7.574-7.574c-5.858-5.858-15.355-5.858-21.213 0L85 199.148V200z' fill='%236b7280'/%3E%3C/svg%3E";
-
   // Use first image as default, second image on hover (if available)
-  const defaultImage = images && images[0] ? images[0] : defaultPlaceholder;
+  const defaultImage = images && images[0] ? images[0] : null;
   const hoverImage = images && images[1] ? images[1] : defaultImage;
 
   const hasDiscount = discounted_price ? true : false;
@@ -77,19 +97,23 @@ const ProductCard = ({
   }, [hasDiscount]);
 
   const handleImageError = () => {
-    setImageError(true);
+    setImageError(false);
   };
 
   const getImageToShow = () => {
-    if (imageError) return defaultPlaceholder;
+    if (!defaultImage || imageError) return null;
     if (isHovered && images && images[1] && !imageError) return hoverImage;
     return defaultImage;
   };
 
   const renderStars = (rating) => {
     const stars = [];
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 !== 0;
+    
+    // Convert 1-10 rating to 1-5 star scale
+    const starRating = (rating / 10) * 5;
+    
+    const fullStars = Math.floor(starRating);
+    const hasHalfStar = starRating % 1 !== 0;
 
     for (let i = 0; i < 5; i++) {
       if (i < fullStars) {
@@ -115,77 +139,92 @@ const ProductCard = ({
     return stars;
   };
 
+  const currentImage = getImageToShow();
+
   return (
-    
     <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
       <style jsx>{`
-             .product-wrapper {
-               position: relative;
-               display: inline-block;
-             }
-     
-             .product-image {
-               height: 250px;
-               object-fit: cover;
-               display: block;
-             }
-     
-             .blocked {
-               cursor: not-allowed;
-             }
-     
-             .sold-overlay {
-               position: absolute;
-               top: 0;
-               left: 0;
-               width: 100%;
-               height: 100%;
-               background: rgba(0, 0, 0, 0.6);
-               display: flex;
-               align-items: center;
-               justify-content: center;
-               animation: slideDown 0.5s ease-out forwards;
-               z-index: 10;
-             }
-     
-             .sold-overlay h2 {
-               color: #ff3b3b;
-               font-size: 3rem;
-               font-weight: bold;
-               margin: 0;
-             }
-               
-     
-             @keyframes slideDown {
-               0% {
-                 transform: translateY(-100%);
-                 opacity: 0;
-               }
-               100% {
-                 transform: translateY(0);
-                 opacity: 1;
-               }
-             }
-           `}</style>
-      {/* Image Container */}
+        .product-wrapper {
+          position: relative;
+          display: inline-block;
+        }
 
+        .product-image {
+          height: 250px;
+          object-fit: cover;
+          display: block;
+        }
+
+        .blocked {
+          cursor: not-allowed;
+        }
+
+        .sold-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(0, 0, 0, 0.6);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          animation: slideDown 0.5s ease-out forwards;
+          z-index: 10;
+        }
+
+        .sold-overlay h2 {
+          color: #ff3b3b;
+          font-size: 2rem;
+          font-weight: bold;
+          margin: 0;
+        }
+
+        @media (min-width: 640px) {
+          .sold-overlay h2 {
+            font-size: 3rem;
+          }
+        }
+
+        @keyframes slideDown {
+          0% {
+            transform: translateY(-100%);
+            opacity: 0;
+          }
+          100% {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+      `}</style>
+
+      {/* Image Container */}
       <div
-        className={`relative overflow-hidden bg-gray-100 aspect-square  ${isSold ? "blocked" : ""}`}
+        className={`relative overflow-hidden bg-gray-100 aspect-square ${isSold ? "blocked" : ""}`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
         {isSold && (
-        <div className="sold-overlay">
-          <h2>SOLD</h2>
-        </div>
-      )}
-        <img
-          loading="lazy"
-          src={getImageToShow()}
-          alt={name}
-          className="w-full h-full object-cover transition-all duration-300 group-hover:scale-105"
-          onError={handleImageError}
-        />
+          <div className="sold-overlay">
+            <h2>SOLD</h2>
+          </div>
+        )}
+
+        {/* Show image or fallback component */}
+        {currentImage ? (
+          <img
+            loading="lazy"
+            src={currentImage}
+            alt={name}
+            className="w-full h-full object-cover transition-all duration-300 group-hover:scale-105"
+            onError={handleImageError}
+          />
+        ) : (
+          <ImageFallback 
+            productName={name} 
+            className="relative transition-all duration-300 group-hover:scale-105"
+          />
+        )}
 
         {/* Hover Actions */}
         <div
@@ -262,10 +301,11 @@ const ProductCard = ({
         {/* Rating */}
         <div className="flex items-center space-x-1">
           <div className="flex items-center text-xs sm:text-sm">
-            {renderStars(randomRating)}
+            {renderStars(product_condition)}
           </div>
           <span className="text-xs text-gray-600">({randomReviewCount})</span>
         </div>
+
         {/* Countdown Timer for Discounted Items */}
         {hasDiscount && timeLeft && (
           <div className="text-center bg-red-500 text-white px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full text-xs font-medium">
