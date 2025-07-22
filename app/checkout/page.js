@@ -18,7 +18,7 @@ export default function Checkout() {
   const [cityLoading, setCityLoading] = useState(false);
   const [showCityDropdown, setShowCityDropdown] = useState(false);
   const [citySearchTerm, setCitySearchTerm] = useState("");
-  const [couponMessage,setCouponMessage]=useState("");
+  const [couponMessage, setCouponMessage] = useState("");
 
   // 2. Add this new function for searching cities:
   const searchCities = async (searchTerm) => {
@@ -66,7 +66,7 @@ export default function Checkout() {
     clearTimeout(window.citySearchTimeout);
     window.citySearchTimeout = setTimeout(() => {
       searchCities(value);
-    }, 300);
+    }, 800);
   };
 
   // 4. Add this new function for selecting a city:
@@ -256,31 +256,33 @@ export default function Checkout() {
         toast.error(errors.join("\n"));
         return;
       }
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      // const {
+      //   data: { session },
+      // } = await supabase.auth.getSession();
 
-      if (!session) {
-        toast.error("Please login to continue");
-        return;
-      }
+      // if (!session) {
+      //   toast.error("Please login to continue");
+      //   return;
+      // }
 
-      await createOrder(orderDetails);
-      router.push(`/user/orders`);
+      const data = await createOrder(orderDetails);
+      console.log(data);
+      const orderId = data?.order.id;
+      router.push(session ? "/user/orders" : `/track#${orderId}`);
     } catch (error) {
-      toast.error("Internel server Error");
+      toast.error("Internal server Error");
     } finally {
       setLoading(false);
     }
   };
   // handle Coupon Submit
-  const handleCouponSubmit=async()=>{
-    setCouponMessage("Invalid Coupon Code ...")
+  const handleCouponSubmit = async () => {
+    setCouponMessage("Invalid Coupon Code ...");
 
     setTimeout(() => {
-      setCouponMessage("")
+      setCouponMessage("");
     }, 3000);
-  }
+  };
 
   // handleLoginSubmit
   const handleLoginSubmit = async (e) => {
@@ -369,6 +371,9 @@ export default function Checkout() {
         setSession(data.session);
         if (data?.session?.user.user_metadata.address) {
           setAddress(data.session.user.user_metadata.address);
+          setCitySearchTerm(
+            data.session.user.user_metadata.address?.city?.city_name,
+          );
         }
       } else {
         setLoginToggle(true);
@@ -389,7 +394,7 @@ export default function Checkout() {
       <Layout headerStyle={3} footerStyle={1} breadcrumbTitle="Checkout">
         <div>
           <section
-            className="coupon-area pt-80 pb-30 wow fadeInUp"
+            className="coupon-area pt-10 pb-30 wow fadeInUp"
             data-wow-duration=".8s"
             data-wow-delay=".2s"
           >
@@ -475,17 +480,16 @@ export default function Checkout() {
                       style={{ display: `${isCuponToggle ? "block" : "none"}` }}
                     >
                       <div className="coupon-info">
-                          <p className="checkout-coupon">
-                        <p style={{color:"red"}}>{couponMessage} </p>
-                            <input type="text" placeholder="Coupon Code" />
-                            <button
+                        <p className="checkout-coupon">
+                          <p style={{ color: "red" }}>{couponMessage} </p>
+                          <input type="text" placeholder="Coupon Code" />
+                          <button
                             onClick={handleCouponSubmit}
-                              className="tp-btn tp-color-btn"
-                            >
-                              Apply Coupon
-                            </button>
-                           
-                          </p>
+                            className="tp-btn tp-color-btn"
+                          >
+                            Apply Coupon
+                          </button>
+                        </p>
                       </div>
                     </div>
                     {/* ACCORDION END */}
@@ -601,7 +605,6 @@ export default function Checkout() {
                           </div>
                         </div>
                         {/* city */}
-                       
 
                         <div className="col-md-12">
                           <div
@@ -981,17 +984,15 @@ export default function Checkout() {
                         {cashOnDelivery ? (
                           <div className="order-button-payment ">
                             <button
-                              disabled={session ? false : true}
+                              // disabled={session ? false : true}
                               onClick={handleAddOrder}
                               className="tp-btn tp-color-btn w-100 banner-animation"
                               style={{ cursor: "pointer" }}
                             >
                               {loading ? (
                                 <Loader className="animate-spin" />
-                              ) : session ? (
-                                "Place order"
                               ) : (
-                                "Please login"
+                                "Place order"
                               )}
                             </button>
                           </div>

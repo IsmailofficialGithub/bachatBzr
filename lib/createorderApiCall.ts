@@ -23,7 +23,7 @@ export const createOrder = async (information: OrderInformation): Promise<OrderR
         if (response.data.success) {
             // Dispatch the action to update the Redux state
             store.dispatch(orderCreatedCart(information.product_ids));
-            store.dispatch(orderCreatedWishlist(information.product_ids))
+             store.dispatch(orderCreatedWishlist(information.product_ids))
             toast.success("Order created successfully");
 
 

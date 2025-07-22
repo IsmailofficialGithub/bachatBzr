@@ -1,6 +1,8 @@
+import { sendEmail } from "@/app/utils/sendMail";
 import { applyDiscount } from "@/lib/discountHandler";
 import { supabase } from "@/lib/supabaseSetup";
 import { NextResponse } from "next/server";
+import { OrderCreateHTML } from "@/app/utils/emailData/orderCreated/email";
 
 export async function POST(req) {
   try {
@@ -17,7 +19,7 @@ export async function POST(req) {
 
     // ✅ Validate required fields
     if (
-      !user_id ||
+      // !user_id ||
       !product_ids?.length ||
       !payment_method ||
       !delivery_address ||
@@ -26,7 +28,7 @@ export async function POST(req) {
     ) {
       return NextResponse.json(
         { error: "Missing required fields" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -39,7 +41,7 @@ export async function POST(req) {
     if (productsError || !products) {
       return NextResponse.json(
         { error: "Error fetching products", details: productsError.message },
-        { status: 500 }
+        { status: 500 },
       );
     }
 
@@ -74,13 +76,13 @@ export async function POST(req) {
 
     // ✅ Add Cash on Delivery Fee (PKR 50)
     if (payment_method === "cash_on_delivery") {
-      codFee = 50;
+      codFee = 0;
     } else {
       // ✅ Validate transaction ID for non-COD payments
       if (!transaction_id) {
         return NextResponse.json(
           { error: "Transaction ID is required for non-COD payments" },
-          { status: 400 }
+          { status: 400 },
         );
       }
     }
@@ -89,20 +91,20 @@ export async function POST(req) {
     const totalAmount =
       Math.round((totalPrice + shippingFee + codFee) * 100) / 100;
 
-    const { error } = await supabase
-      .from("products")
-      .update({ sold: true })
-      .in("_id", product_ids);
-    if (error) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Falied to Add Order",
-          error: error.message,
-        },
-        { status: 500 }
-      );
-    }
+    // const { error } = await supabase
+    //   .from("products")
+    //   .update({ sold: true })
+    //   .in("_id", product_ids);
+    // if (error) {
+    //   return NextResponse.json(
+    //     {
+    //       success: false,
+    //       message: "Falied to Add Order",
+    //       error: error.message,
+    //     },
+    //     { status: 500 },
+    //   );
+    // }
 
     // ✅ Insert order into Supabase
     const { data: order, error: orderError } = await supabase
@@ -141,15 +143,31 @@ export async function POST(req) {
         .in("_id", product_ids);
       return NextResponse.json(
         { error: "Error creating order", details: orderError.message },
-        { status: 500 }
+        { status: 500 },
       );
+    }
+    if (order) {
+      const orderId = order.id;
+      const productsDetailForEmail = order.products.map((p) => ({
+        name: p.name,
+        price: p.price,
+        discounted_price: p.discounted_price,
+      }));
+      const totalPriceForEmail = order.total_amount.final_total;
+      const emailHtml = OrderCreateHTML(
+        orderId,
+        productsDetailForEmail,
+        totalPriceForEmail
+      );
+      const emailSubject = "Order Confirmation - Thank You for Your Purchase!";
+      await sendEmail(delivery_address.email, emailSubject, emailHtml);
     }
 
     return NextResponse.json({ success: true, order }, { status: 200 });
   } catch (error) {
     return NextResponse.json(
       { error: "Internal Server Error", details: error.message || error },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
