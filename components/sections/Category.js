@@ -8,7 +8,7 @@ export default function Category() {
       subTitle: "Men Sport & Sneakers",
       link: "/category/shoes",
       imgSrc: "/assets/img/svg/shoes.svg",
-      count: 2,
+      count: 1,
     },
     {
       title: "T-Shirts",
@@ -18,9 +18,9 @@ export default function Category() {
       count: 5,
     },
     {
-      title: "Hoodies",
-      subTitle: "Winter Collection",
-      link: "/category/hoodie",
+      title: "Kids shoes",
+      subTitle: "Sport & formal ",
+      link: "/category/kids",
       imgSrc: "/assets/img/svg/hoodie.svg",
       count: 3,
     },
@@ -36,21 +36,21 @@ export default function Category() {
       subTitle: "Urban Comfort",
       link: "/category/shorts",
       imgSrc: "/assets/img/svg/shorts.svg",
-      count: 1,
+      count: 7,
     },
     {
       title: "Sneakers",
       subTitle: "Trendy & Comfortable",
       link: "/category/sneakers",
       imgSrc: "/assets/img/svg/sneakers.svg",
-      count: 1,
+      count: 2,
     },
     {
       title: "Footwear",
       subTitle: "Formal & Luxury ",
       link: "/category/formal-shoes",
       imgSrc: "/assets/img/svg/formalShoes.svg",
-      count: 1,
+      count: 4,
     },
   ];
 

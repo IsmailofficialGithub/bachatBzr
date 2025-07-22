@@ -92,6 +92,7 @@ const fetchOrderDetail = async (orderIdToFetch) => {
 
     if (data.success && data.data) {
       // Check if packet is already booked
+      console.log(data.data)
       if (data.data.packet_tracking_id && data.data.packet_tracking_id.trim() !== "") {
         setPacketAlreadyBooked(true);
         setTrackingId(data.data.packet_tracking_id);
@@ -280,6 +281,7 @@ const handleRetry = () => {
         toast.error("Failed to submit booking");
         throw new Error(response.data.error || "Failed to submit booking");
       }
+      console.log(response.data)
       setApiResponse(response.data);
     } catch (error) {
       console.error("Submission error:", error);
@@ -575,6 +577,18 @@ if (packetAlreadyBooked) {
             <pre className="text-xs text-blue-700 bg-blue-100 p-2 rounded overflow-auto">
               {JSON.stringify(apiResponse, null, 2)}
             </pre>
+               <div className="mt-4 sm:mt-6 text-center">
+              <button
+                onClick={() => {
+                  const slipUrl = `https://merchantapi.leopardscourier.com/api/booked_packet_slip_api/${apiResponse.track_number}?api_key_secure=NDg3RjdCMjJGNjgzMTJEMkMxQkJDOTNCMUFFQTQ0NUIxNzQ4NzAwODA1&api_key_password_secure=NjU0OTYw`;
+                  window.open(slipUrl, '_blank');
+                }}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium"
+              >
+                <Package className="w-4 h-4" />
+                View Booking Slip
+              </button>
+            </div>
           </div>
         )}
 

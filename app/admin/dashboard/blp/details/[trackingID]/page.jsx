@@ -320,9 +320,22 @@ export default function TrackPacket() {
                         </div>
                       </div>
                     )}
+                    <div className="mt-4 sm:mt-6 text-center">
+  <button
+    onClick={() => {
+      const slipUrl = `https://merchantapi.leopardscourier.com/api/booked_packet_slip_api/${packet.track_number}?api_key_secure=NDg3RjdCMjJGNjgzMTJEMkMxQkJDOTNCMUFFQTQ0NUIxNzQ4NzAwODA1&api_key_password_secure=NjU0OTYw`;
+      window.open(slipUrl, '_blank');
+    }}
+    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm font-medium"
+  >
+    <Package className="w-4 h-4" />
+    View Booking Slip
+  </button>
+</div>
                   </div>
                 </div>
               ))
+              
             ) : (
               <div className="bg-white rounded-xl shadow-lg p-6 sm:p-8 text-center">
                 <div className="p-3 sm:p-4 bg-red-100 rounded-full w-fit mx-auto mb-4">

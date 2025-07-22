@@ -4,7 +4,7 @@ import { NextResponse } from 'next/server';
 
 
 export async function PATCH(request) {
-    const {  success, error } = await CheckRouteRole(req,["admin"]);
+    const {  success, error } = await CheckRouteRole(request,["admin"]);
  if (error || !success) {
     return NextResponse.json({ error }, { status: 401 })
   }

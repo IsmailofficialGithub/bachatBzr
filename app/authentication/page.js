@@ -81,6 +81,33 @@ export default function SignIn() {
     }
   };
 
+
+   const resetpassword = async (e) => {
+    e.preventDefault();
+      const confirm = prompt("Enter 'Reset' to send reset otp to your email");
+      if (confirm !== "Reset") {
+        return alert("Reset cancelled");
+      }
+      try {
+        const { error } = await supabase.auth.resetPasswordForEmail(
+          email,
+          {
+            redirectTo: `${process.env.NEXT_PUBLIC_API_URL}/user/update-password`, // 👈 Must match your frontend route
+          },
+        );
+        if (error) {
+           setMessage({ text: "Failed to send reset password email", status: "error" });
+          toast.error(error.message || "Failed to send reset password email");
+        } else {
+           setMessage({ text: "Reset Link has been sent to your email ...", status: "success" });
+          toast.success(`Reset Link has been sent to your email ...`);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+  
+
   // Handle sign in with email and password
   const handleSignIn = async (e) => {
     e.preventDefault();
@@ -361,23 +388,7 @@ export default function SignIn() {
                           <div className="tpsign__pass">
                             <Link
                               href="#"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                if (email) {
-                                  supabase.auth
-                                    .resetPasswordForEmail(email)
-                                    .then(() =>
-                                      toast.success(
-                                        "Password reset email sent",
-                                      ),
-                                    )
-                                    .catch(() =>
-                                      toast.error("Failed to send reset email"),
-                                    );
-                                } else {
-                                  toast.info("Please enter your email first");
-                                }
-                              }}
+                              onClick={resetpassword}
                             >
                               Forgot Password?
                             </Link>
