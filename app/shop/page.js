@@ -31,7 +31,7 @@ export const metadata = {
   openGraph: {
     title: 'BachatBzr | Affordable Second-Hand & Vintage Shopping',
     description: 'Find unbeatable deals on second-hand and vintage branded products at BachatBzr. Start shopping smart today!',
-    url: 'https://bachatbar.com/shoppage',
+    url: 'https://bachatbar.com/shop',
     siteName: 'BachatBzr',
     images: [
       {

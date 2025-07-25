@@ -3,6 +3,7 @@ import { applyDiscount } from "@/lib/discountHandler";
 import { supabase } from "@/lib/supabaseSetup";
 import { NextResponse } from "next/server";
 import { OrderCreateHTML } from "@/app/utils/emailData/orderCreated/email";
+import { createNotification } from "@/lib/notifications";
 
 export async function POST(req) {
   try {
@@ -16,6 +17,7 @@ export async function POST(req) {
       phone,
       Receiver,
     } = await req.json();
+    console.log('delivery_address',delivery_address)
 
     // ✅ Validate required fields
     if (
@@ -91,20 +93,20 @@ export async function POST(req) {
     const totalAmount =
       Math.round((totalPrice + shippingFee + codFee) * 100) / 100;
 
-    // const { error } = await supabase
-    //   .from("products")
-    //   .update({ sold: true })
-    //   .in("_id", product_ids);
-    // if (error) {
-    //   return NextResponse.json(
-    //     {
-    //       success: false,
-    //       message: "Falied to Add Order",
-    //       error: error.message,
-    //     },
-    //     { status: 500 },
-    //   );
-    // }
+    const { error } = await supabase
+      .from("products")
+      .update({ sold: true })
+      .in("_id", product_ids);
+    if (error) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Falied to Add Order",
+          error: error.message,
+        },
+        { status: 500 },
+      );
+    }
 
     // ✅ Insert order into Supabase
     const { data: order, error: orderError } = await supabase
@@ -146,6 +148,7 @@ export async function POST(req) {
         { status: 500 },
       );
     }
+
     if (order) {
       const orderId = order.id;
       const productsDetailForEmail = order.products.map((p) => ({
@@ -157,9 +160,21 @@ export async function POST(req) {
       const emailHtml = OrderCreateHTML(
         orderId,
         productsDetailForEmail,
-        totalPriceForEmail
+        totalPriceForEmail,
       );
       const emailSubject = "Order Confirmation - Thank You for Your Purchase!";
+      const notificationData = {
+        user_id: 
+         [
+           "41d9c72d-259a-4fb1-b488-c2cd216e19ce",
+           "d4550143-6146-486e-b9a6-0796f90592eb",
+          "d3e0d405-09c4-44fb-933a-3fbc0945580d",
+        ],
+        title: "! New Order !",
+        message: `New Order has been created , Check it out . ORDERID is ${orderId}`,
+        type: "order created",
+      };
+      await createNotification(notificationData );
       await sendEmail(delivery_address.email, emailSubject, emailHtml);
     }
 

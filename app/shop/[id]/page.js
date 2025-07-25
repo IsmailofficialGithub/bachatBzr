@@ -12,7 +12,6 @@ import { toast } from "react-toastify";
 import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import SocialShare from "@/components/socialShare/socialShare";
-import { Loader } from "lucide-react";
 import SingleProductSkeleton from "@/components/skeleton/singleProductSkeleton";
 
 const swiperOptions = {

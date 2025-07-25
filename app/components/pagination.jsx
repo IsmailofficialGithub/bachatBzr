@@ -12,13 +12,15 @@ import {
 } from "@/components/ui/pagination";
 
 const PaginationComponent = ({ 
-  currentPage , 
+  currentPage, 
   totalPages, 
   onPageChange,
   className = "",
   showPageNumbers = true,
   maxVisiblePages = 5
 }) => {
+  // Convert currentPage to number to handle string inputs
+  const currentPageNum = Number(currentPage);
   // Handle page change
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
@@ -30,20 +32,17 @@ const PaginationComponent = ({
     }
   };
 
-  // Function to generate pagination items with responsive behavior
+  // Function to generate pagination items with fixed structure
   const renderPaginationItems = () => {
     if (!showPageNumbers) return null;
     
     const items = [];
     
-    // Responsive maxVisiblePages - fewer on mobile
-    const responsiveMaxVisible = window.innerWidth < 640 ? 3 : maxVisiblePages;
-    
-    // Always show first page
+    // Always show page 1
     items.push(
       <PaginationItem key="page-1">
         <PaginationLink 
-          isActive={currentPage === 1} 
+          isActive={currentPageNum === 1} 
           onClick={() => handlePageChange(1)}
           className="min-w-0 px-2 sm:px-3"
         >
@@ -52,60 +51,54 @@ const PaginationComponent = ({
       </PaginationItem>
     );
     
-    // Calculate range of pages to show
-    let startPage = Math.max(2, currentPage - Math.floor(responsiveMaxVisible / 2));
-    let endPage = Math.min(totalPages - 1, startPage + responsiveMaxVisible - 3);
-    
-    // Adjust start if end is too close to totalPages
-    if (endPage <= startPage) {
-      startPage = Math.max(2, totalPages - responsiveMaxVisible + 2);
-      endPage = totalPages - 1;
-    }
-    
-    // Add ellipsis if needed after first page
-    if (startPage > 2) {
-      items.push(
-        <PaginationItem key="ellipsis-1">
-          <PaginationEllipsis className="px-1 sm:px-2" />
-        </PaginationItem>
-      );
-    }
-    
-    // Add page numbers
-    for (let i = startPage; i <= endPage; i++) {
-      items.push(
-        <PaginationItem key={`page-${i}`}>
-          <PaginationLink 
-            isActive={currentPage === i}
-            onClick={() => handlePageChange(i)}
-            className="min-w-0 px-2 sm:px-3"
-          >
-            {i}
-          </PaginationLink>
-        </PaginationItem>
-      );
-    }
-    
-    // Add ellipsis if needed before last page
-    if (endPage < totalPages - 1) {
-      items.push(
-        <PaginationItem key="ellipsis-2">
-          <PaginationEllipsis className="px-1 sm:px-2" />
-        </PaginationItem>
-      );
-    }
-    
-    // Always show last page if there's more than one page
+    // Always show page 2 if totalPages > 1
     if (totalPages > 1) {
       items.push(
-        <PaginationItem key={`page-${totalPages}`}>
+        <PaginationItem key="page-2">
           <PaginationLink 
-            isActive={currentPage === totalPages}
-            onClick={() => handlePageChange(totalPages)}
+            isActive={currentPageNum === 2} 
+            onClick={() => handlePageChange(2)}
             className="min-w-0 px-2 sm:px-3"
           >
-            {totalPages}
+            2
           </PaginationLink>
+        </PaginationItem>
+      );
+    }
+    
+    // Show current page if it's greater than 2
+    if (currentPageNum > 2) {
+      items.push(
+        <PaginationItem key={`page-${currentPageNum}`}>
+          <PaginationLink 
+            isActive={true}
+            onClick={() => handlePageChange(currentPageNum)}
+            className="min-w-0 px-2 sm:px-3"
+          >
+            {currentPageNum}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+    if(currentPage<3 && totalPages > 2) {
+      items.push(
+        <PaginationItem key={`page-${3}`}>
+          <PaginationLink 
+            onClick={() => handlePageChange(3)}
+            className="min-w-0 px-2 sm:px-3"
+          >
+            {3}
+          </PaginationLink>
+        </PaginationItem>
+      );
+
+    }
+    
+    // Add ellipsis if current page is not the last page and there are more pages
+    if (currentPageNum < totalPages) {
+      items.push(
+        <PaginationItem key="ellipsis">
+          <PaginationEllipsis className="px-1 sm:px-2" />
         </PaginationItem>
       );
     }
@@ -122,8 +115,8 @@ const PaginationComponent = ({
         <PaginationContent className="flex items-center justify-center gap-1 sm:gap-2 cursor-pointer flex-wrap">
           <PaginationItem>
             <PaginationPrevious 
-              onClick={() => currentPage > 1 && handlePageChange(currentPage - 1)}
-              className={`${currentPage <= 1 ? "opacity-50 cursor-not-allowed" : "cursor-pointer"} px-2 sm:px-3 text-xs sm:text-sm`}
+              onClick={() => currentPageNum > 1 && handlePageChange(currentPageNum - 1)}
+              className={`${currentPageNum <= 1 ? "opacity-50 cursor-not-allowed" : "cursor-pointer"} px-2 sm:px-3 text-xs sm:text-sm`}
             />
           </PaginationItem>
           
@@ -133,10 +126,10 @@ const PaginationComponent = ({
           
           <PaginationItem>
             <PaginationNext 
-              onClick={() => { currentPage < totalPages && handlePageChange(currentPage + 1);
-
+              onClick={() => { 
+                currentPageNum < totalPages && handlePageChange(currentPageNum + 1);
                }}
-              className={`${currentPage >= totalPages ? "opacity-50 cursor-not-allowed" : "cursor-pointer"} px-2 sm:px-3 text-xs sm:text-sm`}
+              className={`${currentPageNum >= totalPages ? "opacity-50 cursor-not-allowed" : "cursor-pointer"} px-2 sm:px-3 text-xs sm:text-sm`}
             />
           </PaginationItem>
         </PaginationContent>
