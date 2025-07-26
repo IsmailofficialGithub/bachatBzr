@@ -92,7 +92,6 @@ const fetchOrderDetail = async (orderIdToFetch) => {
 
     if (data.success && data.data) {
       // Check if packet is already booked
-      console.log(data.data)
       if (data.data.packet_tracking_id && data.data.packet_tracking_id.trim() !== "") {
         setPacketAlreadyBooked(true);
         setTrackingId(data.data.packet_tracking_id);
@@ -107,6 +106,7 @@ const fetchOrderDetail = async (orderIdToFetch) => {
       populateFormFromOrder(data.data);
     } else {
       // Order not found
+      console.error("Order not found:", data);
       setOrderNotFound(true);
       setSubmitStatus({ type: "error", message: "Order details not found" });
     }
