@@ -21,7 +21,7 @@ export default function Category() {
       title: "Kids shoes",
       subTitle: "Sport & formal ",
       link: "/category/kids",
-      imgSrc: "/assets/img/svg/hoodie.svg",
+      imgSrc: "/assets/img/svg/kid.svg",
       count: 3,
     },
     // {
