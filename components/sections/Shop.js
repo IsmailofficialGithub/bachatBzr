@@ -71,7 +71,7 @@ export default function Shop() {
                   <i className="fab fa-instagram" />{" "}
                   <a href="https://www.instagram.com/bachatbzr" target="_black">
                     {" "}
-                 Instagram
+                    Instagram
                   </a>{" "}
                 </h4>
               </div>
@@ -81,14 +81,17 @@ export default function Shop() {
             <div className="shopslider-active swiper-container">
               <Swiper {...swiperOptions}>
                 {imagesData.map((image, index) => (
-                 <SwiperSlide className="tpshopitem" key={index}>
-  <Link href={image.redirectUrl} legacyBehavior>
-    <a className="popup-image" target="_blank" rel="noopener noreferrer">
-      <img src={image.Imageurl} alt="shop-thumb" />
-    </a>
-  </Link>
-</SwiperSlide>
-
+                  <SwiperSlide className="tpshopitem" key={index}>
+                    <Link href={image.redirectUrl} legacyBehavior>
+                      <a
+                        className="popup-image"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <img src={image.Imageurl} alt="shop-thumb" />
+                      </a>
+                    </Link>
+                  </SwiperSlide>
                 ))}
               </Swiper>
             </div>
