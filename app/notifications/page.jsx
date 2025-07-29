@@ -233,7 +233,7 @@ const NotificationItem = ({
 const NotificationsCenter = () => {
   const { token, userId, isAuthenticated, loading: authLoading } = useAuth();
   const [notifications, setNotifications] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState("all"); // 'all', 'unread', 'read'

@@ -26,7 +26,7 @@ const Page = () => {
   const params = useParams();
 
   const [selectedImage, setSelectedImage] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [categoriesLoading, setCategoriesLoading] = useState(false);
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);

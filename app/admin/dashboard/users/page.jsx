@@ -47,7 +47,7 @@ const Users = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [totalPages, setTotalPages] = useState(1);
   const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
   const [role, setRole] = useState("all");
 

@@ -193,7 +193,7 @@ const ShopSingleDynamicV1 = () => {
                       )}
                       <span>
                         PKR{" "}
-                        {applyDiscount(product.price, product.discounted_price)}
+                        {product?.discounted_price?applyDiscount(product.price, product.discounted_price):product.price}
                       </span>
                     </div>
                     <div className="tpproduct-details__pera">

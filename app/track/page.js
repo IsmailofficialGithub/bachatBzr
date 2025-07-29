@@ -11,7 +11,7 @@ export default function Track() {
     const [orderId, setOrderId] = useState('');
     const [email, setEmail] = useState('');
     const [orderDetail, setOrderDetail] = useState(null);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [isAutoFilled, setIsAutoFilled] = useState(false);
     const [showResults, setShowResults] = useState(false);
 

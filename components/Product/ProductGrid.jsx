@@ -275,14 +275,19 @@ const ProductCard = ({
         <div className={`absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center transition-opacity duration-300 ${isHovered ? "opacity-60" : "opacity-0"}`}>
           <div className="flex space-x-2">
             <button
-              onClick={() => addToCart(_id)}
+              onClick={() => {
+                addToCart(_id);
+              }}
               className="bg-white p-2 rounded-full hover:bg-gray-50 transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:scale-110"
             >
               <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-700" />
             </button>
-            <button className="bg-white p-2 rounded-full hover:bg-gray-50 transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:scale-110">
-              <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-700" />
-            </button>
+            <button 
+                onClick={() => window.location.href = `/shop/${_id}`}
+                className="bg-white p-2 rounded-full hover:bg-gray-50 transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:scale-110"
+              >
+                <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-700" />
+              </button>
             <button
               onClick={() => addToWishlist(_id)}
               className="bg-white p-2 rounded-full hover:bg-gray-50 transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:scale-110"

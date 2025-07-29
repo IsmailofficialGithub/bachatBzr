@@ -16,7 +16,7 @@ const CheckOutPage = ({ amount, orderDetails }) => {
   const elements = useElements();
   const [error, setError] = useState<string>();
   const [clientSecret, setClientSecret] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

@@ -14,7 +14,6 @@ export const shopSlice = createSlice({
       if (product?.length >= 3) {
         toast.error("You can only add 3 items to the cart.");
       } else {
-        console.log(state.payload)
         const isCartExist = state.cart.some(
           (item) => item._id === payload.product._id,
         );

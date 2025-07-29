@@ -26,7 +26,12 @@ const WishlistItems = () => {
         <tr className="cart-item" key={item._id}>
           <td className="product-thumbnail">
             <Link href={`/shop/${item._id}`}>
-              <img src={`${item.images[0]}`} alt="cart added product" />
+              <img
+   src={item?.images?.[0] || "@/public/assets/img/NoImage.svg"}
+  
+  alt="cart added product"
+/>
+
             </Link>
           </td>
 

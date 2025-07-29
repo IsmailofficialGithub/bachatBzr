@@ -21,7 +21,7 @@ const FilterShopBox = () => {
   const searchQuery = searchParams.get("q") || "";
   const router = useRouter();
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [totalPages, setTotalPages] = useState(1);
   const [limit, setLimit] = useState(10);
