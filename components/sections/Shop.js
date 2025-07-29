@@ -33,28 +33,28 @@ const swiperOptions = {
 };
 const imagesData = [
   {
-    Imageurl: "/assets/img/instagram/instagram-01.jpg",
-    redirectUrl: "https://www.instagram.com/bachatbzr",
+    Imageurl: "/assets/img/instagram/post1.jpeg",
+    redirectUrl: "https://www.instagram.com/p/DMm28w_Nvhi/",
   },
   {
-    Imageurl: "/assets/img/instagram/instagram-02.jpg",
-    redirectUrl: "https://www.instagram.com/bachatbzr",
+    Imageurl: "/assets/img/instagram/post2.jpeg",
+    redirectUrl: "https://www.instagram.com/p/DMmwaG2N9fe/",
   },
   {
-    Imageurl: "/assets/img/instagram/instagram-03.jpg",
-    redirectUrl: "https://www.instagram.com/bachatbzr",
+    Imageurl: "/assets/img/instagram/post3.jpeg",
+    redirectUrl: "https://www.instagram.com/p/DMsK0cUtOaP",
   },
   {
-    Imageurl: "/assets/img/instagram/instagram-04.jpg",
-    redirectUrl: "https://www.instagram.com/bachatbzr",
+    Imageurl: "/assets/img/instagram/post4.jpeg",
+    redirectUrl: "https://www.instagram.com/p/DMmxBhgtpML/",
   },
   {
-    Imageurl: "/assets/img/instagram/instagram-05.jpg",
-    redirectUrl: "https://www.instagram.com/bachatbzr",
+    Imageurl: "/assets/img/instagram/post5.jpeg",
+    redirectUrl: "https://www.instagram.com/p/DMpdcYQNxW0/",
   },
   {
-    Imageurl: "/assets/img/instagram/instagram-06.jpg",
-    redirectUrl: "https://www.instagram.com/bachatbzr",
+    Imageurl: "/assets/img/instagram/post6.jpeg",
+    redirectUrl: "https://www.instagram.com/p/DMpXaL3N90Q/",
   },
 ];
 
@@ -81,11 +81,14 @@ export default function Shop() {
             <div className="shopslider-active swiper-container">
               <Swiper {...swiperOptions}>
                 {imagesData.map((image, index) => (
-                  <SwiperSlide className="tpshopitem" key={index}>
-                    <Link className="popup-image" href={image.redirectUrl}>
-                      <img src={image.Imageurl} alt="shop-thumb" />
-                    </Link>
-                  </SwiperSlide>
+                 <SwiperSlide className="tpshopitem" key={index}>
+  <Link href={image.redirectUrl} legacyBehavior>
+    <a className="popup-image" target="_blank" rel="noopener noreferrer">
+      <img src={image.Imageurl} alt="shop-thumb" />
+    </a>
+  </Link>
+</SwiperSlide>
+
                 ))}
               </Swiper>
             </div>

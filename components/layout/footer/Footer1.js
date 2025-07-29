@@ -19,7 +19,7 @@ export default function Footer1(isMobileMenu) {
                                 <div className="col-lg-3 col-md-4 col-sm-6">
                                     <div className="footer-widget footer-col-1 mb-40">
                                         <div className="footer-logo mb-30">
-                                            <Link href="/"><Image src="/assets/img/logo/logo.png" alt="logo" width={isMobileMenu?150:250 } height={isMobileMenu?100:200}/></Link>
+                                            <Link href="/"><Image src="/assets/img/logo/logo1.png" alt="logo" width={isMobileMenu?150:auto } height={isMobileMenu?100:auto}/></Link>
                                         </div>
                                         <div className="footer-content">
                                             <p>BachatBzr is your go-to marketplace for <br />top-brand, second-hand products in great condition

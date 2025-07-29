@@ -137,7 +137,7 @@ export default function Header3({
                 <div className="logo">
                   <Link href="/">
                     <img
-                      src="/assets/img/logo/logo.png"
+                      src="/assets/img/logo/logo1.png"
                       alt="logo"
                       width={200}
                     />
