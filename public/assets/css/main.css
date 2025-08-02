@@ -9428,15 +9428,16 @@ p.checkout-coupon input[type="text"]:focus {
 .tpcoming__bg {
   background-repeat: no-repeat;
   background-size: contain;
+  height: 100vh
 }
 
 .tpcoming__area {
-  padding-top: 80px;
-  padding-bottom: 280px;
+  padding-bottom: 100px;
 }
 
 .tpcoming__countdown {
   display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
 }
@@ -9459,7 +9460,7 @@ p.checkout-coupon input[type="text"]:focus {
 }
 
 .tpcoming__content {
-  padding-top: 280px;
+  padding-top: 50px;
 }
 
 .tpcoming__content span {

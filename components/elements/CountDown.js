@@ -35,7 +35,7 @@ const Countdown = ({ endDateTime }) => {
   const timeParts = getPartsofTimeDuration(timeRemaining);
 
   return (
-    <div className="countdown">
+    <div className="countdown" style={{display:"flex",flexDirection:"row"}}>
       <span className="cdown days">
         <span className="time-count">{timeParts.days}</span>
         <p>Days</p>
