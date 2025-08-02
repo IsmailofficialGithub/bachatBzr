@@ -1,4 +1,6 @@
 "use client";
+import "@/public/assets/css/tailwind-cdn.css"
+
 import DashboardWrapper from "@/app/components/DashboardWrapper";
 import { applyDiscount } from "@/lib/discountHandler";
 import axios from "axios";

@@ -266,7 +266,6 @@ export default function Checkout() {
       // }
 
       const data = await createOrder(orderDetails);
-      console.log(data);
       const orderId = data?.order.id;
       router.push(session ? "/user/orders" : `/track#${orderId}`);
     } catch (error) {

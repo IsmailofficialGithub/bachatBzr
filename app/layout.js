@@ -10,6 +10,7 @@ import "/public/assets/css/magnific-popup.css";
 import "/public/assets/css/meanmenu.css";
 import "/public/assets/css/spacing.css";
 import "/public/assets/css/main.css";
+import "react-toastify/dist/ReactToastify.css";
 import ClientProviders from "./client-providers";
 
 const jost = Jost({
@@ -31,7 +32,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={`${jost.variable}`}>
         <ClientProviders>
-            {children}
+          {children}
         </ClientProviders>
       </body>
     </html>

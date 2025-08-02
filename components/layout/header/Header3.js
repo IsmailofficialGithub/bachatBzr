@@ -139,7 +139,8 @@ export default function Header3({
                     <img
                       src="/assets/img/logo/logo1.png"
                       alt="logo"
-                      width={200}
+                      width={150}
+                      height={150}
                     />
                   </Link>
                 </div>

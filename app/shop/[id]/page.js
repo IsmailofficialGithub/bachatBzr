@@ -13,45 +13,53 @@ import { Autoplay, Navigation, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import SocialShare from "@/components/socialShare/socialShare";
 import SingleProductSkeleton from "@/components/skeleton/singleProductSkeleton";
+import OptimizedRelatedProducts from "@/components/Product/OptimizedRelatedProducts";
 
 const swiperOptions = {
-  modules: [Autoplay, Pagination, Navigation],
-  slidesPerView: 5,
-  spaceBetween: 25,
-  autoplay: {
-    delay: 3500,
-  },
-  breakpoints: {
-    1400: {
-      slidesPerView: 5,
+    slidesPerView: 4,
+    spaceBetween: 30,
+    // loop and navigation will be handled dynamically
+    breakpoints: {
+      1200: {
+        slidesPerView: 4,
+        spaceBetween: 30,
+      },
+      992: {
+        slidesPerView: 3,
+        spaceBetween: 25,
+      },
+      768: {
+        slidesPerView: 2,
+        spaceBetween: 20,
+      },
+      576: {
+        slidesPerView: 1,
+        spaceBetween: 15,
+      },
+      320: {
+        slidesPerView: 1,
+        spaceBetween: 10,
+      },
     },
-    1200: {
-      slidesPerView: 5,
-    },
-    992: {
-      slidesPerView: 4,
-    },
-    768: {
-      slidesPerView: 2,
-    },
-    576: {
-      slidesPerView: 2,
-    },
-    0: {
-      slidesPerView: 1,
-    },
-  },
-  navigation: {
-    nextEl: ".tprelated__nxt",
-    prevEl: ".tprelated__prv",
-  },
-};
+    // Essential options for proper functionality
+    watchOverflow: true,
+    observer: true,
+    observeParents: true,
+    grabCursor: true,
+    // Enable touch/swipe on mobile
+    touchRatio: 1,
+    touchAngle: 45,
+    simulateTouch: true,
+    allowTouchMove: true,
+  };
+
 
 const ShopSingleDynamicV1 = () => {
   const params = useParams();
   const [product, setProduct] = useState([]);
   const [loading, setLoading] = useState(false);
   const [relatedTags, setRelatedTags] = useState([]);
+   const [loadingRelated, setLoadingRelated] = useState(false);
   const [relatedProducts, setRelatedProduct] = useState([]);
   const id = params.id;
   const [activeIndex, setActiveIndex] = useState(2);
@@ -78,17 +86,21 @@ const ShopSingleDynamicV1 = () => {
     }
   };
   const fetchingRelatedProduct = async (tags) => {
+    setLoadingRelated(true);
     try {
       const response = await axios.post(`/api/product/relatedProduct`, {
         tags,
       });
       if (response.data.success) {
         setRelatedProduct(response.data.products);
+        console.log(relatedProducts)
       } else {
         toast.error(response.data.message);
       }
     } catch (error) {
       toast.error("Falied to fetched related Products");
+    }finally{
+      setLoadingRelated(false);
     }
   };
 
@@ -409,134 +421,35 @@ const ShopSingleDynamicV1 = () => {
             </div>
           </div>
         </div>
-        <div className="related-product-area  pb-50 related-product-border">
+                        {/* Optimized Related Products Section */}
+      {loadingRelated ? (
+        <div className="related-product-area pb-50">
           <div className="container">
-            <div className="row align-items-center">
-              <div className="col-sm-6 mt-10">
-                <div className="tpsection mb-10">
-                  <h4 className="tpsection__title">Related Products</h4>
+            <div className="row">
+              <div className="col-12">
+                <div style={{ 
+                  textAlign: "center", 
+                  padding: "60px 0",
+                  color: "#6c757d"
+                }}>
+                  <div className="spinner-border text-primary" role="status">
+                    <span className="visually-hidden">Loading related products...</span>
+                  </div>
+                  <p style={{ marginTop: "16px" }}>Loading related products...</p>
                 </div>
               </div>
-              <div className="col-sm-6">
-                <div className="tprelated__arrow d-flex align-items-center justify-content-end sm:mb-7 mb-0 ">
-                  <div className="tprelated__prv">
-                    <i className="far fa-long-arrow-left" />
-                  </div>
-                  <div className="tprelated__nxt">
-                    <i className="far fa-long-arrow-right" />
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="swiper-container related-product-active">
-              <Swiper {...swiperOptions}>
-                {!relatedProducts.length > 0 ? (
-                  <h3 style={{ textAlign: "center" }}>
-                    No Related Products Found
-                  </h3>
-                ) : (
-                  relatedProducts.map((relatedproduct, index) => (
-                    <SwiperSlide key={relatedproduct._id}>
-                      <div className="tpproduct pb-15 mb-30">
-                        <div className="tpproduct__thumb p-relative sm:bg-slate-600">
-                          <Link href={`/shop/${relatedproduct._id}`}>
-                            <div>
-                              <img
-                                loading="lazy"
-                                style={{
-                                  objectFit: "cover",
-                                  width: "100%",
-                                  height: "250px",
-                                }}
-                                src={relatedproduct.images[0]}
-                                alt="product-thumb"
-                              />
-                              <img
-                                loading="lazy"
-                                style={{
-                                  objectFit: "cover",
-                                  width: "100%",
-                                  height: "250px",
-                                }}
-                                className="product-thumb-secondary"
-                                src={relatedproduct.images[1]}
-                                alt=""
-                              />
-                            </div>
-                          </Link>
-                          <div
-                            className="tpproduct__thumb-action"
-                            style={{ marginTop: "20px" }}
-                          >
-                            <Link className="quckview" href="#">
-                              <i className="fal fa-eye" />
-                            </Link>
-                            <Link
-                              className="wishlist"
-                              href="#"
-                              onClick={() => {
-                                RelatedaddToWishlist(relatedproduct);
-                              }}
-                            >
-                              <i className="fal fa-heart" />
-                            </Link>
-                          </div>
-                        </div>
-                        <div className="tpproduct__content">
-                          <h3 className="tpproduct__title">
-                            <Link href="/shop-details">
-                              {relatedproduct.name}
-                            </Link>
-                          </h3>
-                          <div className="tpproduct__priceinfo p-relative">
-                            <div className="tpproduct__priceinfo-list">
-                              <span>
-                                {relatedproduct.discounted_price ? (
-                                  <>
-                                    <span>
-                                      PKR{" "}
-                                      {applyDiscount(
-                                        relatedproduct.price,
-                                        relatedproduct.discounted_price,
-                                      )}
-                                    </span>
-
-                                    <span
-                                      style={{
-                                        textDecoration: "line-through",
-                                        color: "red",
-                                        marginLeft: "2px",
-                                      }}
-                                    >
-                                      PKR {relatedproduct.price}
-                                    </span>
-                                  </>
-                                ) : (
-                                  relatedproduct.price
-                                )}
-                              </span>
-                            </div>
-                            <div className="tpproduct__cart">
-                              <Link
-                                href="#"
-                                onClick={() => {
-                                  RelatedaddToCart(relatedproduct);
-                                }}
-                              >
-                                <i className="fal fa-shopping-cart" />
-                                Add To Cart
-                              </Link>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </SwiperSlide>
-                  ))
-                )}
-              </Swiper>
             </div>
           </div>
         </div>
+      ) : (
+        <OptimizedRelatedProducts
+          relatedProducts={relatedProducts}
+          RelatedaddToCart={RelatedaddToCart}
+          RelatedaddToWishlist={RelatedaddToWishlist}
+          applyDiscount={applyDiscount}
+          swiperOptions={swiperOptions}
+        />
+      )}
       </Layout>
     </>
   );
