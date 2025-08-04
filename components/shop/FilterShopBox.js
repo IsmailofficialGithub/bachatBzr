@@ -22,7 +22,6 @@ const FilterShopBox = () => {
   const router = useRouter();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [totalPages, setTotalPages] = useState(1);
   const [limit, setLimit] = useState(10);
   const [soldProducts, setSoldProducts] = useState([]);
@@ -191,10 +190,8 @@ const handlePriceFilterChange = async (priceFilter) => {
         setTotalPages(response.data.pagination.totalPages);
       } else {
         toast.error("Failed to fetch products" + response.data?.message);
-        setError("Failed to fetch products");
       }
     } catch (error) {
-      setError("An error occurred while fetching products");
       toast.error("An error occurred while fetching products");
     } finally {
       setLoading(false);

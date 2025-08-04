@@ -12,6 +12,7 @@ import "/public/assets/css/spacing.css";
 import "/public/assets/css/main.css";
 import "react-toastify/dist/ReactToastify.css";
 import ClientProviders from "./client-providers";
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const jost = Jost({
   weight: ['300', '400', '500', '600', '700'],
@@ -77,6 +78,7 @@ export default function RootLayout({ children }) {
       <body className={`${jost.variable}`}>
         <ClientProviders>
           {children}
+           <SpeedInsights />
         </ClientProviders>
       </body>
     </html>

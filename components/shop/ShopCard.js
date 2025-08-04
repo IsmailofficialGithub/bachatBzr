@@ -137,9 +137,43 @@ const OptimizedShopImage = ({
   );
 };
 
+
 const ShopCard = React.memo(({ item, addToCart, addToWishlist, soldProducts, priority = false }) => {
   const [imageError, setImageError] = useState(false);
-  
+  const [timeLeft, setTimeLeft] = useState(null);
+  const [randomRating] = useState(() => Math.random() * (5 - 2.5) + 2.5);
+  const normalizedInfo = {};
+Object.entries(item.additional_information || {}).forEach(([key, value]) => {
+  normalizedInfo[key.trim()] = typeof value === "string" ? value.trim() : value;
+});
+ useEffect(() => {
+    if (item.discounted_price) {
+      const randomHours = Math.floor(Math.random() * 6) + 1;
+      const randomMinutes = Math.floor(Math.random() * 60);
+      const randomSeconds = Math.floor(Math.random() * 60);
+
+      const endTime = new Date().getTime() + randomHours * 3600000 + randomMinutes * 60000 + randomSeconds * 1000;
+
+      const timer = setInterval(() => {
+        const now = new Date().getTime();
+        const distance = endTime - now;
+
+        if (distance > 0) {
+          const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+          setTimeLeft({ hours, minutes, seconds });
+        } else {
+          setTimeLeft(null);
+          clearInterval(timer);
+        }
+      }, 1000);
+
+      return () => clearInterval(timer);
+    }
+  }, [item.disconnected_price]);
+
+
   const { starCount, rating } = useMemo(() => {
     return {
       starCount: Math.floor(Math.random() * (4 - 3 + 1)) + 3,
@@ -421,19 +455,30 @@ const ShopCard = React.memo(({ item, addToCart, addToWishlist, soldProducts, pri
                   <i className="fal fa-heart" />
                 </a>
               </div>
+              
             </div>
+            
           </div>
         </div>
         
 <div className="tpproduct__content-area">
+                 {item.discounted_price && timeLeft && (
+          <div style={{marginBottom:"1rem"}} className="text-center bg-red-500 text-white px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full text-xs font-medium">
+            {timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s
+          </div>
+        )}
             <h3 className="tpproduct__title mb-5 " >
               <Link href={`/shop/${item._id}`}>{item.name}</Link>
-              {item.discounted_price && <span>{item.discounted_price}% OFF</span>}
+              {item.discounted_price && <span style={{fontWeight: "900"}}>{item.discounted_price}% OFF</span>}
             </h3>
+            
             <div className="tpproduct__priceinfo p-relative">
               <div className="tpproduct__ammount"style={{display: "flex", justifyContent: "space-between"}}>
                 <span>PKR {item.discounted_price?applyDiscount(item.price,item.discounted_price):item.price}.00</span>
                 <span>{item.product_condition}/10</span>
+              </div>
+              <div className="tpproduct__ammount" style={{display: "flex", justifyContent: "space-between"}}>
+               <span> Size: {normalizedInfo?.Size || "N/A"}</span>
               </div>
             </div>
           </div>

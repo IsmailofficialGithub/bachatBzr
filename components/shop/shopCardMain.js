@@ -45,7 +45,10 @@ const ShopCardMain = ({ item, addToCart, addToWishlist }) => {
     }
     setShowHoverImage(false);
   };
-
+  const normalizedInfo = {};
+Object.entries(item.additional_information || {}).forEach(([key, value]) => {
+  normalizedInfo[key.trim()] = typeof value === "string" ? value.trim() : value;
+});
   return (
     <div className="col" ref={cardRef}>
       <div className="tpproduct tpproductitem mb-15 p-relative">
@@ -181,6 +184,9 @@ const ShopCardMain = ({ item, addToCart, addToWishlist }) => {
               <span>{item.product_condition}/10</span>
             </div>
           </div>
+          <div className="tpproduct__ammount" style={{display: "flex", justifyContent: "space-between"}}>
+               Size: {normalizedInfo?.Size || "N/A"}
+              </div>
         </div>
         
         <div className="tpproduct__ratingarea">

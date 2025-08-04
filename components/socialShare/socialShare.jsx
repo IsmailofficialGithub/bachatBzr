@@ -3,7 +3,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
-const SocialShare = ({ title }) => {
+const SocialShare = ({ title ,productId}) => {
   const router = useRouter();
   
   // Get the current absolute URL by combining the base URL with the current path
@@ -43,6 +43,10 @@ toast.error('Instagram does not support direct URL sharing. URL copied to clipbo
       case 'whatsapp':
         shareLink = `https://api.whatsapp.com/send?text=${shareTitle} ${shareUrl}`;
         break;
+        case "copy":
+          const url=`${process.env.NEXT_PUBLIC_API_URL}/shop/${productId}`
+          navigator.clipboard.writeText(url)
+          toast.success("URL copy successfully");
       default:
         return;
     }
@@ -65,6 +69,9 @@ toast.error('Instagram does not support direct URL sharing. URL copied to clipbo
       </Link>
       <Link href="#" onClick={(e) => handleShare(e, 'whatsapp')}>
         <i className="fab fa-whatsapp" />
+      </Link>
+      <Link href="#" onClick={(e) => handleShare(e,'copy')}>
+        <i className="fas fa-copy" />
       </Link>
     </div>
   );

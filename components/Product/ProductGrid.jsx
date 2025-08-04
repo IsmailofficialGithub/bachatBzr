@@ -116,6 +116,7 @@ const ProductCard = ({
   _id,
   discounted_price,
   addToWishlist,
+  additional_information,
   addToCart,
   soldProducts = [],
   priority = false // New prop for above-the-fold images
@@ -199,6 +200,10 @@ const ProductCard = ({
     }
     return optimizedPrimaryImage;
   };
+  const normalizedInfo = {};
+Object.entries(additional_information || {}).forEach(([key, value]) => {
+  normalizedInfo[key.trim()] = typeof value === "string" ? value.trim() : value;
+});
 
   return (
     <div className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
@@ -321,13 +326,20 @@ const ProductCard = ({
             </span>
           )}
         </div>
+        <div className="flex items-center">
+          <span className="text-xs text-gray-600">Condition: </span>
+          <span className="font-medium text-gray-800 text-xs ml-1">
+           Size: {normalizedInfo?.Size || "N/A"}
 
+          </span>
+        </div>
         <div className="flex items-center">
           <span className="text-xs text-gray-600">Condition: </span>
           <span className="font-medium text-gray-800 text-xs ml-1">
             {product_condition}/10
           </span>
         </div>
+
 
         <div className="flex items-center space-x-1">
           <div className="flex items-center text-xs sm:text-sm">

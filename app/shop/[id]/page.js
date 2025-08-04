@@ -250,6 +250,10 @@ const ShopSingleDynamicV1 = () => {
                       {<span>{product.product_condition} / 10</span>}
                     </div>
                     <div className="tpproduct-details__information tpproduct-details__tags">
+                      <p>Problems:</p>
+                     <span>{product.problems}</span>
+                    </div>
+                    <div className="tpproduct-details__information tpproduct-details__tags">
                       <p>Tags:</p>
                       {product.tags?.length > 0
                         ? product.tags.map((tag, index) => (
@@ -260,7 +264,7 @@ const ShopSingleDynamicV1 = () => {
                           ))
                         : "No tags avaliable"}
                     </div>
-                    <SocialShare title={`Check out ${product.name}`} />
+                    <SocialShare title={`Check out ${product.name}`} productId={product._id}/>
                   </div>
                 )}
               </div>

@@ -14,5 +14,34 @@ wishlistItems.js image[0] is not found
 
 import "@/public/assets/css/tailwind-cdn.css"
 
+emails 
+const emails = [
+  "info@inzayn.com",
+  "zaynmalik@inzayn.com",
+  "SelenaGomez@linktr.ee",
+  "KimKardashian@kkwbeauty.com",
+  "JenniferLopez@linktr.ee",
+  "NeymarJr@neymarjr",
+  "lalalalisa_m@lilifilm.com",
+  "katyperry@katyperry.com",
+  "kyliejenner@kyliecosmetics.com",
+  "kendalljenner@kendalljenner.com",
+  "beyonce@beyonce.com",
+  "dualipa@dualipa.com",
+  "billieeilish@billieeilish.com",
+  "badgalriri@fenty.com",
+  "champagnepapi@drakerelated.com",
+  "kingjames@lebronjames.com",
+  "cristiano@cr7.com",
+  "leomessi@messistore.com",
+  "taylorswift@taylornation.com",
+  "justinbieber@bieberfever.com",
+  "shakira@shakira.com",
+  "theweeknd@xo.com",
+  "arjunkapoor@arjunkapoor.in",
+  "shraddhakapoor@shraddhakapoor.in"
+];
+
+
 
 
