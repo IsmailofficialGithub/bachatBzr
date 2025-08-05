@@ -328,11 +328,7 @@ const Page = () => {
       }
 
       // Log what's being sent for debugging
-      console.log("Sending changed fields:", Object.keys(changedFields));
-      console.log("Image operations:", { 
-        newImages: imageFiles.length, 
-        deletedImages: deletedUrls.length 
-      });
+     
 
       const token = await getAccessToken();
       const response = await axios.put(

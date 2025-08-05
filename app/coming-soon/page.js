@@ -38,7 +38,6 @@ const ComingSoonPage = () => {
   const handleSubscribe = (e) => {
     e.preventDefault();
     // Handle email subscription here
-    console.log('Email submitted:', email);
     alert('Thank you for subscribing!');
     setEmail('');
   };

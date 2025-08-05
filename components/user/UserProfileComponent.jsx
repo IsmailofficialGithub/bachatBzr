@@ -29,7 +29,6 @@ const ProfilePage = () => {
   useEffect(() => {
     const fetchSession = async () => {
       const session = await dispatch(fetchAuthSession());
-      console.log(session);
       if (session?.payload.user) {
         const user = session.payload.user;
         const name =

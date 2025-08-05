@@ -52,7 +52,6 @@ const OrderDetail = () => {
                 (payload) => {
                     setOrderDetail(payload.new);
                     toast.info("Some changes have been made to your order");
-                    console.log(payload)
                 }
             )
             .subscribe();

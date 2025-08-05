@@ -86,7 +86,6 @@ export async function PUT(request, { params }) {
         
         if (isChanged) {
           updates[fieldName] = transformedValue;
-          console.log(`Field '${fieldName}' changed from:`, currentValue, 'to:', transformedValue);
         }
       }
     });
@@ -104,7 +103,6 @@ export async function PUT(request, { params }) {
         );
 
         if (validImagesToDelete.length > 0) {
-          console.log('Deleting images:', validImagesToDelete);
           
           // Async delete from Cloudinary (don't await)
           deleteImagesFromCloudinary(validImagesToDelete)
@@ -120,7 +118,6 @@ export async function PUT(request, { params }) {
     // Process new image uploads
     const newImages = formData.getAll("new_images");
     if (newImages.length > 0) {
-      console.log('Uploading new images:', newImages.length);
       
       const uploadResults = await Promise.all(
         Array.from(newImages)
@@ -140,7 +137,6 @@ export async function PUT(request, { params }) {
       if (successfulUploads.length > 0) {
         updatedImages.push(...successfulUploads);
         imagesChanged = true;
-        console.log('Successfully uploaded images:', successfulUploads);
       }
     }
 
@@ -153,7 +149,6 @@ export async function PUT(request, { params }) {
     const hasChanges = Object.keys(updates).length > 1; // More than just updated_at
     
     if (!hasChanges) {
-      console.log('No changes detected, skipping database update');
       return NextResponse.json(
         {
           success: true,
@@ -165,7 +160,6 @@ export async function PUT(request, { params }) {
     }
 
     // 9. Log what's being updated
-    console.log('Updating product with changes:', Object.keys(updates).filter(key => key !== 'updated_at'));
 
     // 10. Update product in database
     const { data: updatedProduct, error: updateError } = await supabase
@@ -201,7 +195,6 @@ export async function PUT(request, { params }) {
     }
 
     // 11. Success response
-    console.log('Product updated successfully with fields:', Object.keys(updates).filter(key => key !== 'updated_at'));
     
     return NextResponse.json(
       {

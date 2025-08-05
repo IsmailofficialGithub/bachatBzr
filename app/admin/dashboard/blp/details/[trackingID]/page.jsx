@@ -37,7 +37,6 @@ export default function TrackPacket() {
   const fetchTrackingData = async (trackNum) => {
     setLoading(true);
     setError("");
-    console.log(trackNum);
 
     try {
       const response = await axios.post("/api/lapord/track-Packet", {

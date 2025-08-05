@@ -30,7 +30,6 @@ export async function GET(request) {
       );
     }
 
-    console.log(sort);
 
     // Fetch paginated data
     const { data: products, error } = await supabase

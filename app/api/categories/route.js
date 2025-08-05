@@ -36,7 +36,6 @@ export async function POST(req) {
   }
   try {
     const body = await req.json();
-    console.log(body)
     const { name, description, parent_id } = body;
 
     if (!name) {

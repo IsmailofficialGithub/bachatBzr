@@ -40,7 +40,6 @@ export const POST = async (req) => {
       { status: 200 }
     );
   } catch (error) {
-    console.log("Error adding user:", error);
     return NextResponse.json(
       {
         success: false,

@@ -281,7 +281,7 @@ const handleRetry = () => {
         toast.error("Failed to submit booking");
         throw new Error(response.data.error || "Failed to submit booking");
       }
-      console.log(response.data)
+      (response.data)
       setApiResponse(response.data);
     } catch (error) {
       console.error("Submission error:", error);

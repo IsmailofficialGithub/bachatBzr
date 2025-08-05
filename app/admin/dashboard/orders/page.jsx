@@ -212,7 +212,6 @@ const Orders = () => {
   const formatAddress = (address) => {
     try {
       const parsed = JSON.parse(address);
-      console.log("address", parsed);
       return `${parsed.address}, ${parsed.city.city_name}, ${parsed.country}`;
     } catch {
       return address;

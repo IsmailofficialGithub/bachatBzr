@@ -5,7 +5,6 @@ import { toast } from "react-toastify"
 export default function Footer1(isMobileMenu) {
     const handleSubscribe=async()=>{
         const input=document.getElementsByClassName("SubscribeInput");
-        console.log(input.value)
         input.value=""
         toast.success("Request send Successfully")
     }

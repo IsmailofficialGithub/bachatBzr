@@ -75,7 +75,6 @@ const BookedPacketsPage = () => {
         );
       }
     } catch (error) {
-      console.log(error);
       setError("Failed to cancel packet. Please try again later.");
       toast.error("Failed to cancel packet. Please try again later.");
     }
@@ -361,10 +360,7 @@ const BookedPacketsPage = () => {
                             onClick={() => {
                               // cancel logic will be added later
                               handlecancel(packet.tracking_number);
-                              console.log(
-                                "cancel packet:",
-                                packet.tracking_number,
-                              );
+                              
                             }}
                             className="flex items-center justify-center px-3 py-2 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700 transition-colors"
                           >

@@ -30,7 +30,6 @@ const useAuth = () => {
         } = await supabase.auth.getSession();
         setToken(session?.access_token || null);
         setUserId(session?.user?.id || null);
-        console.log(userId)
         setLoading(false);
       } catch (error) {
         console.error("Auth error:", error);
@@ -414,8 +413,6 @@ const NotificationsCenter = () => {
   useEffect(() => {
     if (!isAuthenticated || !userId) return;
 
-    console.log('Setting up realtime subscription for user:', userId);
-
     // Create a unique channel name
     const channelName = `notifications-${userId}-${Date.now()}`;
     
@@ -435,11 +432,9 @@ const NotificationsCenter = () => {
           filter: `user_id=eq.${userId}`,
         },
         (payload) => {
-          console.log('Realtime notification update:', payload);
           
           switch (payload.eventType) {
             case 'INSERT':
-              console.log('New notification received:', payload.new);
               setNotifications(prev => {
                 // Check if notification already exists to prevent duplicates
                 const exists = prev.some(n => n.id === payload.new.id);
@@ -453,7 +448,6 @@ const NotificationsCenter = () => {
               break;
               
             case 'UPDATE':
-              console.log('Notification updated:', payload.new);
               setNotifications(prev =>
                 prev.map(notification =>
                   notification.id === payload.new.id
@@ -464,7 +458,6 @@ const NotificationsCenter = () => {
               break;
               
             case 'DELETE':
-              console.log('Notification deleted:', payload.old);
               setNotifications(prev =>
                 prev.filter(notification => notification.id !== payload.old.id)
               );
@@ -475,18 +468,15 @@ const NotificationsCenter = () => {
               break;
               
             default:
-              console.log('Unknown event type:', payload.eventType);
               break;
           }
         }
       )
       .subscribe(async (status, error) => {
-        console.log('Subscription status:', status);
         if (error) {
           console.error('Subscription error:', error);
         }
         if (status === 'SUBSCRIBED') {
-          console.log('Successfully subscribed to notifications realtime updates');
         } else if (status === 'CHANNEL_ERROR') {
           console.error('Channel error - retrying in 5 seconds...');
           setTimeout(() => {
@@ -497,13 +487,11 @@ const NotificationsCenter = () => {
           console.error('Subscription timed out - retrying...');
           subscription.unsubscribe();
         } else if (status === 'CLOSED') {
-          console.log('Subscription closed');
         }
       });
 
     // Cleanup subscription on unmount or dependency change
     return () => {
-      console.log('Cleaning up realtime subscription');
       if (subscription) {
         subscription.unsubscribe();
       }

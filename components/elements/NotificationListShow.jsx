@@ -1,32 +1,4 @@
-// "use client";
-// import useSWR from "swr";
-// import { axiosFetcher } from "@/lib/fetcher";
-// import { useSelector } from "react-redux";
 
-// export default function NotificationListShow() {
-//   const { user } = useSelector((state) => state.auth);
-
-//   const shouldFetch = !!user?.id;
-
-//   const { data } = useSWR(
-//     shouldFetch ? `/api/notification/length?userId=${user.id}` : null,
-//     axiosFetcher,
-//     {
-//       revalidateOnFocus: false,
-//       revalidateOnReconnect: false,
-//       dedupingInterval: 1000 * 60 * 5, // 5 minutes
-//       onSuccess: () => {
-//         console.log("📩 Notification API called");
-//       },
-//     },
-//   );
-
-//   if (!shouldFetch) return null;
-
-//   const unreadNotifications = data?.data?.unread ?? 0;
-
-//   return unreadNotifications===0?"":<span className="tp-product-count">{unreadNotifications}</span>;
-// }
 
 "use client";
 import { useEffect, useState } from "react";
@@ -67,7 +39,6 @@ export default function NotificationListShow() {
           filter: `user_id=eq.${user.id}`, // Filter for current user's notifications
         },
         (payload) => {
-          console.log("🔔 New notification received:", payload);
           toast.success("You have a new notification!");
           // Update the count immediately without waiting for API
           setRealtimeCount((prev) => {
@@ -88,7 +59,6 @@ export default function NotificationListShow() {
           filter: `user_id=eq.${user.id}`,
         },
         (payload) => {
-          console.log("📝 Notification updated:", payload);
           // Revalidate when notifications are marked as read/unread
           mutate();
           setRealtimeCount(null); // Reset to let SWR handle the count
@@ -103,7 +73,6 @@ export default function NotificationListShow() {
           filter: `user_id=eq.${user.id}`,
         },
         (payload) => {
-          console.log("🗑️ Notification deleted:", payload);
           mutate();
           setRealtimeCount(null); // Reset to let SWR handle the count
         },

@@ -10,7 +10,6 @@ const {  success, error } = await CheckRouteRole(req,["admin"]);
   }
   try {
     const body = await req.json();
-    console.log(body)
     // Check required fields
     if (
       !body.weight ||
@@ -102,7 +101,6 @@ const {  success, error } = await CheckRouteRole(req,["admin"]);
       timeout: 30000,
     });
 
-    console.log("Leopards API Response:", response.data);
     return NextResponse.json(response.data);
 
   } catch (error) {

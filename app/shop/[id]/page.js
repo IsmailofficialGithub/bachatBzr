@@ -74,7 +74,6 @@ const ShopSingleDynamicV1 = () => {
       const response = await axios.get(`/api/product/getSingle/${id}`);
       if (response.data.success) {
         setProduct(response.data.product);
-        console.log(response.data);
         setRelatedTags(response.data.product.tags);
       } else {
         toast.error("SomeThing went wrong while fetching Product");
@@ -93,7 +92,6 @@ const ShopSingleDynamicV1 = () => {
       });
       if (response.data.success) {
         setRelatedProduct(response.data.products);
-        console.log(relatedProducts)
       } else {
         toast.error(response.data.message);
       }

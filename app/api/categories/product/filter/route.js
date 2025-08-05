@@ -167,7 +167,6 @@ export async function GET(request) {
       .eq("sold", false)
       .range((page - 1) * limit, page * limit - 1)
       .order(sortBy, { ascending: sortOrder });
-      console.log(query)
 
     // Apply price filters
     query = buildPriceFilter(query, min, max);

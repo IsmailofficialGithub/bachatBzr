@@ -115,7 +115,6 @@ const Page = () => {
         return;
       }
       const accessToken = await getAccessToken();
-      console.log(newCategory)
       const response = await axios.post(
         "/api/categories",
         {

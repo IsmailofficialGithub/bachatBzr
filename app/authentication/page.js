@@ -100,7 +100,6 @@ export default function SignIn() {
             redirectTo: RedirectURL // 👈 Must match your frontend route
           },
         );
-        console.log(RedirectURL);
         if (error) {
            setMessage({ text: "Failed to send reset password email", status: "error" });
           toast.error(error.message || "Failed to send reset password email");
