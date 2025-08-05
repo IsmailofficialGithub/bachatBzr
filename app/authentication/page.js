@@ -519,7 +519,7 @@ export default function SignIn() {
                             onClick={handleInitialSignUp}
                             disabled={isLoading}
                           >
-                            {isLoading ? "Sending..." : "Register Now"}
+                            {isLoading ? "Sending OTP..." : "Register Now"}
                             {!isLoading && (
                               <i className="fal fa-long-arrow-right" />
                             )}
