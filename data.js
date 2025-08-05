@@ -6,7 +6,7 @@ const theme = {
         secondary: "#f3eee7",
         text: "black"
     },
-    websiteLogoUrl:"https://res.cloudinary.com/dzkoeyx3s/image/upload/v1750419010/Bachat_2_tap7mv.png"
+    websiteLogoUrl:"https://res.cloudinary.com/dvcshmojs/image/upload/v1754406151/logo1_yjn8cs.png"
 };
 
 export default theme;

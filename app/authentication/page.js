@@ -88,13 +88,19 @@ export default function SignIn() {
       if (confirm !== "Reset") {
         return alert("Reset cancelled");
       }
+      const RedirectURL= `${process.env.NEXT_PUBLIC_API_URL}/user/update-password`;
+      if (!email) {
+        setMessage({ text: "Please enter your email", status: "error" });
+        toast.error("Please Enter Your Email")
+      }
       try {
         const { error } = await supabase.auth.resetPasswordForEmail(
           email,
           {
-            redirectTo: `${process.env.NEXT_PUBLIC_API_URL}/user/update-password`, // 👈 Must match your frontend route
+            redirectTo: RedirectURL // 👈 Must match your frontend route
           },
         );
+        console.log(RedirectURL);
         if (error) {
            setMessage({ text: "Failed to send reset password email", status: "error" });
           toast.error(error.message || "Failed to send reset password email");
