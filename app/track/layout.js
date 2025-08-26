@@ -1,3 +1,5 @@
+import data from '@/data'
+
 export const metadata = {
   title: 'Track Order - BachatBzr | Your Second-Hand & Vintage Items',
   description: 'Review your cart items from BachatBzr. Shop second-hand, vintage, and branded products at unbeatable prices. Secure checkout and fast delivery available.',
@@ -37,7 +39,7 @@ export const metadata = {
     siteName: 'BachatBzr',
     images: [
       {
-        url: 'https://res.cloudinary.com/dzkoeyx3s/image/upload/v1750419010/Bachat_2_tap7mv.png',
+        url: data.websiteLogoUrl,
         width: 1200,
         height: 630,
         alt: 'BachatBzr Cart - Vintage & Branded Products',

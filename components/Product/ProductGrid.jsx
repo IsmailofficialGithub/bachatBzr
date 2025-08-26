@@ -322,14 +322,14 @@ Object.entries(additional_information || {}).forEach(([key, value]) => {
           </span>
           {hasDiscount && (
             <span className="text-xs sm:text-sm text-gray-500 line-through">
-              PKR {price}
+              {price}
             </span>
           )}
         </div>
         <div className="flex items-center">
-          <span className="text-xs text-gray-600">Condition: </span>
+          <span className="text-xs text-gray-600">Size: </span>
           <span className="font-medium text-gray-800 text-xs ml-1">
-           Size: {normalizedInfo?.Size || "N/A"}
+            {normalizedInfo?.Size || "N/A"}
 
           </span>
         </div>

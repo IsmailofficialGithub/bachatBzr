@@ -1,5 +1,6 @@
 import Layout from "@/components/layout/Layout"
 import FilterShopBox from "@/components/shop/FilterShopBox"
+import data from '@/data'
 export const metadata = {
   title: 'BachatBzr - Shop | Buy Second-Hand & Vintage Branded Products at Low Prices | Shop Now',
   description: 'Shop second-hand, vintage, and branded products at the best prices. Explore affordable fashion, designer clothing, accessories, and more. Sustainable shopping starts here!',
@@ -35,7 +36,7 @@ export const metadata = {
     siteName: 'BachatBzr',
     images: [
       {
-        url: 'https://res.cloudinary.com/dzkoeyx3s/image/upload/v1750419010/Bachat_2_tap7mv.png', // Add an OG image for sharing
+        url: data.websiteLogoUrl, // Add an OG image for sharing
         width: 1200,
         height: 630,
         alt: 'BachatBzr Shop - Vintage & Branded Products',

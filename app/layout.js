@@ -13,7 +13,7 @@ import "/public/assets/css/main.css";
 import "react-toastify/dist/ReactToastify.css";
 import ClientProviders from "./client-providers";
 import { SpeedInsights } from '@vercel/speed-insights/next';
-
+import data from '@/data'
 const jost = Jost({
   weight: ['300', '400', '500', '600', '700'],
   subsets: ['latin'],
@@ -59,7 +59,7 @@ export const metadata = {
     siteName: 'BachatBzr',
     images: [
       {
-        url: 'https://res.cloudinary.com/dzkoeyx3s/image/upload/v1750419010/Bachat_2_tap7mv.png',
+        url: data.websiteLogoUrl,
         width: 1200,
         height: 630,
         alt: 'BachatBzr Cart - Vintage & Branded Products',

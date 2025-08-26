@@ -3,6 +3,7 @@ import { sendEmail } from "@/app/utils/sendMail";
 import { NextResponse } from "next/server";
 import { createNotification } from "@/lib/notifications";
 import { CheckRouteRole } from "@/lib/auth-token";
+import data from '@/data'
 
 export async function PATCH(req) {
   const {  success, error } = await CheckRouteRole(req,["admin"]);
@@ -69,7 +70,7 @@ export async function PATCH(req) {
       <body>
         <div class="container">
           <div class="logo">
-            <img src="https://res.cloudinary.com/dzkoeyx3s/image/upload/v1750419010/Bachat_2_tap7mv.png" alt="Company Logo">
+            <img src=${data.websiteLogoUrl} alt="Company Logo">
           </div>
           <div class="content">
             <p>Dear Valued Customer,</p>

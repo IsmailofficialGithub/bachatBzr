@@ -1,3 +1,5 @@
+import data from '@/data'
+
 export const NewOrdertoAdmin = (orderId, products = [], totalPrice) => {
   const productsHtml = products.map(
     (item) => `<li>${item.name} - PKR ${item.price}</li>`
@@ -59,7 +61,7 @@ export const NewOrdertoAdmin = (orderId, products = [], totalPrice) => {
     <body>
       <div class="container">
         <div class="logo">
-          <img src="https://res.cloudinary.com/dzkoeyx3s/image/upload/v1750419010/Bachat_2_tap7mv.png" alt="BachatBzr Logo">
+          <img src=${data.websiteLogoUrl} alt="BachatBzr Logo">
         </div>
         <h2>🛍️ New Order !</h2>
         <p>SomeOne created a order . Let start work.</p>

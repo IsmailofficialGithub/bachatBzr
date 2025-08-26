@@ -277,8 +277,8 @@ const handlePriceFilterChange = async (priceFilter) => {
 
   return (
     <>
-      <div className="product-filter-content mb-20">
-        <div className="row align-items-center">
+      <div className="product-filter-content sm:mb-20">
+        <div className="row align-items-center mt-2">
           <div className="col-sm-6">
             <div className="product-item-count">
               <span>

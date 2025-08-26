@@ -4,6 +4,7 @@ import DealProduct1 from "@/components/sections/DealProduct1"
 import Product1 from "@/components/sections/Product1"
 import Shop from "@/components/sections/Shop"
 import Slider1 from "@/components/sections/Slider1"
+import data from '@/data'
 export const metadata = {
   title: 'BachatBzr | Buy Second-Hand & Vintage Branded Products at Low Prices | Shop Now',
   description: 'Shop second-hand, vintage, and branded products at the best prices. Explore affordable fashion, designer clothing, accessories, and more. Sustainable shopping starts here!',
@@ -39,7 +40,7 @@ export const metadata = {
     siteName: 'BachatBzr',
     images: [
       {
-        url: 'https://res.cloudinary.com/dzkoeyx3s/image/upload/v1750419010/Bachat_2_tap7mv.png', // Add an OG image for sharing
+        url: data.websiteLogoUrl, // Add an OG image for sharing
         width: 1200,
         height: 630,
         alt: 'BachatBzr Shop - Vintage & Branded Products',
