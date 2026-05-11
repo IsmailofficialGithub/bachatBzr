@@ -247,7 +247,7 @@ export default function Header3({
                           }
                         >
                           <Link href={`/category/${category.name}`}>
-                            <i class="fal fa-gift" /> {category.name}
+                            <i className="fal fa-gift" /> {category.name}
                           </Link>
                         </li>
                       ))}
@@ -389,7 +389,7 @@ export default function Header3({
                     <li>
                       <div className="menu-contact__item">
                         <div className="menu-contact__icon">
-                          <i class="fa fa-envelope" aria-hidden="true" />
+                          <i className="fa fa-envelope" aria-hidden="true" />
                         </div>
                         <div className="menu-contact__info">
                           <Link

@@ -115,7 +115,7 @@ export default function Slider1() {
     <section className="slider-area pb-25">
       <div className="container">
         <div className="row justify-content-xl-end">
-          <div className="col-xl-9 col-xxl-7 col-lg-9">
+          <div className="col-xl-9 col-xxl-9 col-lg-9 col-md-12 col-12 mb-30 mb-lg-0">
             <div className="tp-slider-area p-relative">
               <div ref={sliderRef} className="keen-slider">
                 {/* sliders */}
@@ -186,7 +186,7 @@ export default function Slider1() {
             </div>
           </div>
 
-          <div className="col-xl-3 col-xxl-3 col-lg-3">
+          <div className="col-xl-3 col-xxl-3 col-lg-3 col-md-12 col-12">
             <div className="row">
               <div className="col-lg-12 col-md-6">
                 <div className="tpslider-banner tp-slider-sm-banner mb-30">

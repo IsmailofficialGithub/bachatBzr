@@ -19,11 +19,11 @@ const SingleProductSkeleton = ({ type }) => {
         <div className="flex items-start flex-row gap-4">
          <div className="bg-gray-300 rounded-md h-5 w-20 "></div>
          <div className="flex flex-row  items-center">
-          <div className="text-gray-300 "><i class="fas fa-star"/></div>
-          <div className="text-gray-300 "><i class="fas fa-star"/></div>
-          <div className="text-gray-300 "><i class="fas fa-star"/></div>
-          <div className="text-gray-300 "><i class="fas fa-star"/></div>
-          <div className="text-gray-300 "><i class="fas fa-star"/></div>
+          <div className="text-gray-300 "><i className="fas fa-star"/></div>
+          <div className="text-gray-300 "><i className="fas fa-star"/></div>
+          <div className="text-gray-300 "><i className="fas fa-star"/></div>
+          <div className="text-gray-300 "><i className="fas fa-star"/></div>
+          <div className="text-gray-300 "><i className="fas fa-star"/></div>
          </div>
         </div>
 
